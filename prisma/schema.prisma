@@ -1,0 +1,489 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id               Int                   @id @default(autoincrement())
+  nome             String
+  email            String                @unique
+  senha            String
+  perfil           PerfilUsuario         @default(VENDAS)
+  ativo            Boolean               @default(true)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  historicosPedido HistoricoPedido[]
+  movimentacoes    MovimentacaoEstoque[]
+  vendedor         Vendedor?
+}
+
+model Produto {
+  id                       Int                   @id @default(autoincrement())
+  codigoInterno            String?
+  codigoBarras             String?
+  descricao                String
+  categoria                String?
+  fabricante               String?
+  unidadeVenda             String?
+  unidadeCompra            String?
+  fatorConversao           Float?                @default(1)
+  registroAnvisa           String?
+  temperaturaArmazenamento String?
+  controlaValidade         Boolean               @default(false)
+  controlaLote             Boolean               @default(false)
+  precoCustoBase           Float                 @default(0)
+  precoVendaBase           Float                 @default(0)
+  ativo                    Boolean               @default(true)
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
+  categoriaId              Int?
+  estoqueMinimo            Float                 @default(0)
+  estoqueAtual             EstoqueAtual[]
+  itensCompra              ItemPedidoCompra[]
+  itensVenda               ItemPedidoVenda[]
+  itensSeparacao           ItemSeparacao[]
+  itensTabela              ItemTabelaPreco[]
+  lotes                    Lote[]
+  movimentacoes            MovimentacaoEstoque[]
+  movimentacoesFiscais     MovimentacaoFiscal[]
+  categoriaRef             Categoria?            @relation(fields: [categoriaId], references: [id])
+}
+
+model Categoria {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  ativo     Boolean   @default(true)
+  empresaId Int
+  produtos  Produto[]
+}
+
+model Localizacao {
+  id            Int                   @id @default(autoincrement())
+  nome          String                @unique
+  createdAt     DateTime              @default(now())
+  estoqueAtual  EstoqueAtual[]
+  lotes         Lote[]
+  movimentacoes MovimentacaoEstoque[]
+}
+
+model Lote {
+  id                   Int                   @id @default(autoincrement())
+  produtoId            Int
+  numeroLote           String
+  validade             DateTime?
+  localizacaoId        Int?
+  createdAt            DateTime              @default(now())
+  estoqueAtual         EstoqueAtual[]
+  itensSeparacao       ItemSeparacao[]
+  localizacao          Localizacao?          @relation(fields: [localizacaoId], references: [id])
+  produto              Produto               @relation(fields: [produtoId], references: [id])
+  movimentacoes        MovimentacaoEstoque[]
+  movimentacoesFiscais MovimentacaoFiscal[]
+
+  @@unique([numeroLote, produtoId])
+}
+
+model MovimentacaoEstoque {
+  id                 Int                 @id @default(autoincrement())
+  produtoId          Int
+  loteId             Int?
+  localizacaoId      Int?
+  tipo               TipoMovimentacao
+  quantidade         Float
+  usuario            String              @default("Administrador")
+  observacao         String?
+  createdAt          DateTime            @default(now())
+  destino            String?
+  origem             String?
+  pedidoVendaId      Int?
+  usuarioId          Int?
+  localizacao        Localizacao?        @relation(fields: [localizacaoId], references: [id])
+  lote               Lote?               @relation(fields: [loteId], references: [id])
+  pedidoVenda        PedidoVenda?        @relation(fields: [pedidoVendaId], references: [id])
+  produto            Produto             @relation(fields: [produtoId], references: [id])
+  usuarioRef         Usuario?            @relation(fields: [usuarioId], references: [id])
+  movimentacaoFiscal MovimentacaoFiscal?
+}
+
+model EstoqueAtual {
+  id                   Int           @id @default(autoincrement())
+  produtoId            Int
+  loteId               Int?
+  localizacaoId        Int?
+  quantidadeDisponivel Float         @default(0)
+  quantidadeReservada  Float         @default(0)
+  quantidadeBloqueada  Float         @default(0)
+  updatedAt            DateTime      @updatedAt
+  createdAt            DateTime      @default(now())
+  custoUnitario        Float         @default(0)
+  status               StatusEstoque @default(DISPONIVEL)
+  localizacao          Localizacao?  @relation(fields: [localizacaoId], references: [id])
+  lote                 Lote?         @relation(fields: [loteId], references: [id])
+  produto              Produto       @relation(fields: [produtoId], references: [id])
+}
+
+model Fornecedor {
+  id                Int               @id @default(autoincrement())
+  razaoSocial       String
+  nomeFantasia      String?
+  cnpj              String?           @unique
+  email             String?
+  telefone          String?
+  endereco          String?
+  cidade            String?
+  estado            String?
+  cep               String?
+  ativo             Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  contasPagar       Conta[]
+  documentosFiscais DocumentoFiscal[]
+  pedidosCompra     PedidoCompra[]
+}
+
+model Cliente {
+  id                   Int                  @id @default(autoincrement())
+  razaoSocial          String
+  nomeFantasia         String?
+  cnpjCpf              String?              @unique
+  email                String?
+  telefone             String?
+  endereco             String?
+  cidade               String?
+  estado               String?
+  cep                  String?
+  limiteCredito        Float                @default(0)
+  ativo                Boolean              @default(true)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  contasReceber        Conta[]
+  documentosFiscais    DocumentoFiscal[]
+  movimentacoesFiscais MovimentacaoFiscal[]
+  pedidosVenda         PedidoVenda[]
+  tabelasPreco         TabelaPreco[]
+}
+
+model Vendedor {
+  id           Int           @id @default(autoincrement())
+  nome         String
+  email        String?
+  telefone     String?
+  comissao     Float         @default(0)
+  metaMensal   Float         @default(0)
+  ativo        Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  usuarioId    Int?          @unique
+  pedidosVenda PedidoVenda[]
+  usuario      Usuario?      @relation(fields: [usuarioId], references: [id])
+}
+
+model PedidoCompra {
+  id           Int                @id @default(autoincrement())
+  numero       String             @unique @default(cuid())
+  fornecedorId Int
+  status       StatusPedidoCompra @default(RASCUNHO)
+  observacao   String?
+  valorTotal   Float              @default(0)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  itens        ItemPedidoCompra[]
+  fornecedor   Fornecedor         @relation(fields: [fornecedorId], references: [id])
+}
+
+model ItemPedidoCompra {
+  id             Int          @id @default(autoincrement())
+  pedidoCompraId Int
+  produtoId      Int
+  quantidade     Float
+  precoUnitario  Float        @default(0)
+  subtotal       Float        @default(0)
+  pedidoCompra   PedidoCompra @relation(fields: [pedidoCompraId], references: [id], onDelete: Cascade)
+  produto        Produto      @relation(fields: [produtoId], references: [id])
+}
+
+model PedidoVenda {
+  id                   Int                   @id @default(autoincrement())
+  numero               String                @unique @default(cuid())
+  clienteId            Int
+  vendedorId           Int?
+  desconto             Float                 @default(0)
+  observacao           String?
+  valorTotal           Float                 @default(0)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  empresaFiscalId      Int?
+  tipoPedido           TipoPedido            @default(PEDIDO_NORMAL)
+  status               StatusPedido          @default(PEDIDO_CRIADO)
+  contasReceber        Conta[]
+  documentosFiscais    DocumentoFiscal[]
+  historico            HistoricoPedido[]
+  itens                ItemPedidoVenda[]
+  movimentacoesEstoque MovimentacaoEstoque[]
+  movimentacoesFiscais MovimentacaoFiscal[]
+  cliente              Cliente               @relation(fields: [clienteId], references: [id])
+  empresaFiscal        EmpresaFiscal?        @relation(fields: [empresaFiscalId], references: [id])
+  vendedor             Vendedor?             @relation(fields: [vendedorId], references: [id])
+  separacao            Separacao?
+}
+
+model ItemPedidoVenda {
+  id            Int         @id @default(autoincrement())
+  pedidoVendaId Int
+  produtoId     Int
+  quantidade    Float
+  precoUnitario Float       @default(0)
+  desconto      Float       @default(0)
+  subtotal      Float       @default(0)
+  pedidoVenda   PedidoVenda @relation(fields: [pedidoVendaId], references: [id], onDelete: Cascade)
+  produto       Produto     @relation(fields: [produtoId], references: [id])
+}
+
+model TabelaPreco {
+  id        Int               @id @default(autoincrement())
+  nome      String
+  clienteId Int?
+  ativo     Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  itens     ItemTabelaPreco[]
+  cliente   Cliente?          @relation(fields: [clienteId], references: [id])
+}
+
+model ItemTabelaPreco {
+  id            Int         @id @default(autoincrement())
+  tabelaPrecoId Int
+  produtoId     Int
+  preco         Float
+  descontoMax   Float       @default(0)
+  produto       Produto     @relation(fields: [produtoId], references: [id])
+  tabelaPreco   TabelaPreco @relation(fields: [tabelaPrecoId], references: [id], onDelete: Cascade)
+}
+
+model Separacao {
+  id            Int             @id @default(autoincrement())
+  pedidoVendaId Int             @unique
+  status        StatusSeparacao @default(PENDENTE)
+  responsavel   String?
+  observacao    String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  itens         ItemSeparacao[]
+  romaneio      Romaneio?
+  pedidoVenda   PedidoVenda     @relation(fields: [pedidoVendaId], references: [id])
+}
+
+model ItemSeparacao {
+  id          Int       @id @default(autoincrement())
+  separacaoId Int
+  produtoId   Int
+  loteId      Int?
+  quantidade  Float
+  conferido   Boolean   @default(false)
+  lote        Lote?     @relation(fields: [loteId], references: [id])
+  produto     Produto   @relation(fields: [produtoId], references: [id])
+  separacao   Separacao @relation(fields: [separacaoId], references: [id], onDelete: Cascade)
+}
+
+model Romaneio {
+  id            Int       @id @default(autoincrement())
+  separacaoId   Int       @unique
+  motorista     String?
+  veiculo       String?
+  statusEntrega String    @default("PENDENTE")
+  dataEntrega   DateTime?
+  observacao    String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  separacao     Separacao @relation(fields: [separacaoId], references: [id])
+}
+
+model Conta {
+  id             Int          @id @default(autoincrement())
+  tipo           TipoConta
+  descricao      String
+  valor          Float
+  dataVencimento DateTime
+  dataPagamento  DateTime?
+  status         StatusConta  @default(ABERTA)
+  observacao     String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  clienteId      Int?
+  fornecedorId   Int?
+  pedidoVendaId  Int?
+  cliente        Cliente?     @relation(fields: [clienteId], references: [id])
+  fornecedor     Fornecedor?  @relation(fields: [fornecedorId], references: [id])
+  pedidoVenda    PedidoVenda? @relation(fields: [pedidoVendaId], references: [id])
+}
+
+model EmpresaFiscal {
+  id                   Int                  @id @default(autoincrement())
+  razaoSocial          String
+  nomeFantasia         String?
+  cnpj                 String               @unique
+  inscricaoEstadual    String?
+  regimeTributario     RegimeTributario?
+  ativo                Boolean              @default(true)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  documentosFiscais    DocumentoFiscal[]
+  movimentacoesFiscais MovimentacaoFiscal[]
+  pedidosVenda         PedidoVenda[]
+}
+
+model DocumentoFiscal {
+  id                   Int                   @id @default(autoincrement())
+  tipo                 TipoDocumentoFiscal
+  numero               String
+  chaveAcesso          String?
+  empresaFiscalId      Int
+  fornecedorId         Int?
+  clienteId            Int?
+  pedidoVendaId        Int?
+  status               StatusDocumentoFiscal @default(PENDENTE)
+  dataEmissao          DateTime?
+  createdAt            DateTime              @default(now())
+  cliente              Cliente?              @relation(fields: [clienteId], references: [id])
+  empresaFiscal        EmpresaFiscal         @relation(fields: [empresaFiscalId], references: [id])
+  fornecedor           Fornecedor?           @relation(fields: [fornecedorId], references: [id])
+  pedidoVenda          PedidoVenda?          @relation(fields: [pedidoVendaId], references: [id])
+  movimentacoesFiscais MovimentacaoFiscal[]
+}
+
+model MovimentacaoFiscal {
+  id                    Int                      @id @default(autoincrement())
+  movimentacaoEstoqueId Int                      @unique
+  pedidoVendaId         Int?
+  clienteId             Int?
+  empresaFiscalId       Int
+  documentoFiscalId     Int
+  produtoId             Int
+  loteId                Int?
+  quantidade            Float
+  valorTotal            Float                    @default(0)
+  status                StatusMovimentacaoFiscal @default(PENDENTE)
+  dataEmissao           DateTime?
+  createdAt             DateTime                 @default(now())
+  cliente               Cliente?                 @relation(fields: [clienteId], references: [id])
+  documentoFiscal       DocumentoFiscal          @relation(fields: [documentoFiscalId], references: [id])
+  empresaFiscal         EmpresaFiscal            @relation(fields: [empresaFiscalId], references: [id])
+  lote                  Lote?                    @relation(fields: [loteId], references: [id])
+  movimentacaoEstoque   MovimentacaoEstoque      @relation(fields: [movimentacaoEstoqueId], references: [id])
+  pedidoVenda           PedidoVenda?             @relation(fields: [pedidoVendaId], references: [id])
+  produto               Produto                  @relation(fields: [produtoId], references: [id])
+}
+
+model HistoricoPedido {
+  id             Int           @id @default(autoincrement())
+  pedidoVendaId  Int
+  statusAnterior StatusPedido?
+  statusNovo     StatusPedido
+  usuarioId      Int?
+  observacao     String?
+  createdAt      DateTime      @default(now())
+  pedidoVenda    PedidoVenda   @relation(fields: [pedidoVendaId], references: [id])
+  usuario        Usuario?      @relation(fields: [usuarioId], references: [id])
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAIDA
+  AJUSTE
+  RESERVA
+  BLOQUEIO
+  PERDA
+  TRANSFERENCIA
+  CANCELAMENTO_RESERVA
+  DEVOLUCAO
+}
+
+enum StatusEstoque {
+  DISPONIVEL
+  RESERVADO
+  BLOQUEADO
+  VENCIDO
+  QUARENTENA
+}
+
+enum TipoDocumentoFiscal {
+  NFE_ENTRADA
+  NFE_SAIDA
+  AJUSTE
+}
+
+enum StatusDocumentoFiscal {
+  PENDENTE
+  EMITIDA
+  CANCELADA
+}
+
+enum StatusMovimentacaoFiscal {
+  PENDENTE
+  EMITIDA
+  CANCELADA
+}
+
+enum RegimeTributario {
+  SIMPLES_NACIONAL
+  LUCRO_PRESUMIDO
+  LUCRO_REAL
+}
+
+enum StatusPedidoCompra {
+  RASCUNHO
+  ENVIADO
+  PARCIAL
+  RECEBIDO
+  CANCELADO
+}
+
+enum TipoPedido {
+  PEDIDO_NORMAL
+  PEDIDO_INTERNO
+}
+
+enum StatusPedido {
+  PEDIDO_CRIADO
+  RESERVADO
+  AGUARDANDO_APROVACAO_FINANCEIRA
+  APROVADO_FINANCEIRO
+  REPROVADO_FINANCEIRO
+  EM_SEPARACAO
+  SEPARADO
+  FATURADO
+  EM_TRANSITO
+  ENTREGUE
+  FINALIZADO
+  CANCELADO
+}
+
+enum StatusSeparacao {
+  PENDENTE
+  EM_ANDAMENTO
+  CONFERIDO
+  ENVIADO
+}
+
+enum TipoConta {
+  RECEBER
+  PAGAR
+}
+
+enum StatusConta {
+  ABERTA
+  PAGA
+  VENCIDA
+  CANCELADA
+}
+
+enum PerfilUsuario {
+  ADMINISTRADOR
+  VENDAS
+  ESTOQUE
+  FINANCEIRO
+}
