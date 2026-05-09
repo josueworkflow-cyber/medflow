@@ -13,6 +13,7 @@ export async function GET(
       where: { id: Number(id) },
       include: {
         cliente: true,
+        empresaFiscal: true,
         itens: {
           include: { produto: true },
         },
@@ -21,6 +22,13 @@ export async function GET(
 
     if (!venda) {
       return NextResponse.json({ error: "Venda não encontrada." }, { status: 404 });
+    }
+
+    if (venda.tipoPedido !== "PEDIDO_NORMAL") {
+      return NextResponse.json({ error: "Pedido interno nao emite NF." }, { status: 400 });
+    }
+    if (!venda.empresaFiscalId) {
+      return NextResponse.json({ error: "Empresa emissora nao definida." }, { status: 400 });
     }
 
     // Preparar dados para o gerador

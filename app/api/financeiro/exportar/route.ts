@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
     const vendas = await prisma.pedidoVenda.findMany({
       where: {
         createdAt: { gte: dInicio, lte: dFim },
-        status: { in: ["FATURADO", "ENTREGUE"] }
+        tipoPedido: "PEDIDO_NORMAL",
+        status: { in: ["FATURADO", "AUTORIZADO_PARA_SEPARACAO", "EM_SEPARACAO", "SEPARADO", "DESPACHADO", "FINALIZADO"] }
       },
       include: { cliente: true }
     });

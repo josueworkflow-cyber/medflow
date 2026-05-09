@@ -31,6 +31,10 @@ type DashboardData = {
   faturamentoMes: number;
   qtdVendasMes: number;
   pedidosAbertos: number;
+  aguardandoEstoque: number;
+  aguardandoFinanceiro: number;
+  aguardandoCliente: number;
+  autorizadosSeparacao: number;
   margemMedia: number;
   topProdutos: { descricao: string; qtdVendida: number; valorTotal: number }[];
   vendasPorCliente: { razaoSocial: string; totalVendas: number; qtdPedidos: number }[];
@@ -68,10 +72,12 @@ export default function Dashboard() {
     );
   }
 
-  const d = data || {
+  const d: DashboardData = {
     skusAtivos: 0, itensEstoque: 0, valorEstoque: 0, proximosVencer: 0,
     vencidos: 0, faturamentoMes: 0, qtdVendasMes: 0, pedidosAbertos: 0,
+    aguardandoEstoque: 0, aguardandoFinanceiro: 0, aguardandoCliente: 0, autorizadosSeparacao: 0,
     margemMedia: 0, topProdutos: [], vendasPorCliente: [],
+    ...(data ?? {}),
   };
 
   return (
@@ -90,7 +96,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              R$ {d.faturamentoMes.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              R$ {(d.faturamentoMes ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               <span className="text-emerald-500 font-medium">+{d.qtdVendasMes}</span> vendas realizadas
@@ -105,7 +111,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{d.pedidosAbertos}</div>
-            <p className="text-xs text-muted-foreground mt-1">Aguardando separação/faturamento</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Estoque {d.aguardandoEstoque} / Financeiro {d.aguardandoFinanceiro}
+            </p>
           </CardContent>
         </Card>
 
@@ -141,7 +149,7 @@ export default function Dashboard() {
             </div>
             <div>
               <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Valor em Estoque</p>
-              <p className="text-lg font-bold">R$ {d.valorEstoque.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
+               <p className="text-lg font-bold">R$ {(d.valorEstoque ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
             </div>
           </CardContent>
         </Card>
@@ -153,7 +161,7 @@ export default function Dashboard() {
             </div>
             <div>
               <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Total de Itens</p>
-              <p className="text-lg font-bold">{d.itensEstoque.toLocaleString("pt-BR")}</p>
+               <p className="text-lg font-bold">{(d.itensEstoque ?? 0).toLocaleString("pt-BR")}</p>
             </div>
           </CardContent>
         </Card>
@@ -210,7 +218,7 @@ export default function Dashboard() {
                       <TableCell className="font-medium text-slate-700">{p.descricao}</TableCell>
                       <TableCell className="text-right">{p.qtdVendida}</TableCell>
                       <TableCell className="text-right font-bold">
-                        R$ {p.valorTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        R$ {(p.valorTotal ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -245,7 +253,7 @@ export default function Dashboard() {
                       <TableCell className="font-medium text-slate-700">{c.razaoSocial}</TableCell>
                       <TableCell className="text-right">{c.qtdPedidos}</TableCell>
                       <TableCell className="text-right font-bold">
-                        R$ {c.totalVendas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        R$ {(c.totalVendas ?? 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </TableCell>
                     </TableRow>
                   ))}

@@ -25,6 +25,9 @@ export async function POST(req: NextRequest) {
       custoUnitario,
       usuarioId,
       observacao,
+      fornecedorId,
+      enderecoEstoque,
+      status,
     } = body;
 
     if (!produtoId || !quantidade) {
@@ -43,6 +46,9 @@ export async function POST(req: NextRequest) {
       custoUnitario: custoUnitario ? Number(custoUnitario) : undefined,
       usuarioId: usuarioId ? Number(usuarioId) : undefined,
       observacao,
+      fornecedorId,
+      enderecoEstoque,
+      status,
     });
 
     return NextResponse.json({ success: true, data: mov });

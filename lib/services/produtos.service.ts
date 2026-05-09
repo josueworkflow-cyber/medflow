@@ -20,9 +20,7 @@ export async function getProdutos(filtros?: ProdutoFiltros): Promise<ProdutoList
     where.categoria = filtros.categoria;
   }
   
-  if (filtros?.ativo !== undefined) {
-    where.ativo = filtros.ativo;
-  }
+  where.ativo = filtros?.ativo ?? true;
 
   return await prisma.produto.findMany({
     where,
@@ -53,8 +51,9 @@ export async function atualizarProduto(
   });
 }
 
-export async function deletarProduto(id: number): Promise<void> {
-  await prisma.produto.delete({
+export async function inativarProduto(id: number): Promise<void> {
+  await prisma.produto.update({
     where: { id },
+    data: { ativo: false },
   });
 }

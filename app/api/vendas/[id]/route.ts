@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { PedidoService } from "@/lib/services/pedido.service";
+import { requireAuthActor } from "@/lib/authz";
 
 export async function GET(
   req: NextRequest,
@@ -12,16 +14,21 @@ export async function GET(
       include: {
         cliente: true,
         vendedor: true,
-        empresaFiscal: { select: { razaoSocial: true, cnpj: true } },
+        empresaFiscal: { select: { razaoSocial: true, cnpj: true, nomeFantasia: true, inscricaoEstadual: true, regimeTributario: true } },
+        documentosFiscais: true,
         itens: { include: { produto: true } },
-        separacao: { include: { itens: true, romaneio: true } },
+        separacao: { include: { itens: true } },
         historico: {
           include: { usuario: { select: { nome: true } } },
-          orderBy: { createdAt: "desc" }
-        }
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
-    if (!pedido) return NextResponse.json({ error: "Pedido não encontrado." }, { status: 404 });
+
+    if (!pedido) {
+      return NextResponse.json({ error: "Pedido nao encontrado." }, { status: 404 });
+    }
+
     return NextResponse.json(pedido);
   } catch (error) {
     console.error("GET /api/vendas/[id]", error);
@@ -35,20 +42,21 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
+    const actor = await requireAuthActor();
     const body = await req.json();
-    
-    // Status não pode ser alterado diretamente aqui, apenas via rota de transição
-    const pedido = await prisma.pedidoVenda.update({
-      where: { id: Number(id) },
-      data: {
-        observacao: body.observacao ?? undefined,
-        desconto: body.desconto != null ? Number(body.desconto) : undefined,
-      },
-    });
+
+    const pedido = await PedidoService.atualizarDadosPedido(Number(id), {
+      observacao: body.observacao,
+      formaPagamento: body.formaPagamento,
+      prazoPagamento: body.prazoPagamento,
+      desconto: body.desconto !== undefined ? Number(body.desconto) : undefined,
+    }, actor);
+
     return NextResponse.json(pedido);
-  } catch (error) {
+  } catch (error: any) {
     console.error("PUT /api/vendas/[id]", error);
-    return NextResponse.json({ error: "Erro ao atualizar pedido." }, { status: 500 });
+    const message = error.message || "Erro ao atualizar pedido.";
+    const status = message.includes("permissao") || message.includes("Autenticacao") ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }
-

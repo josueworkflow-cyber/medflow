@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { getProdutoById, atualizarProduto, deletarProduto } from "@/lib/services/produtos.service";
+import { getProdutoById, atualizarProduto, inativarProduto } from "@/lib/services/produtos.service";
 
 export async function GET(
   req: NextRequest,
@@ -86,7 +86,7 @@ export async function DELETE(
 
     const { id } = await params;
     
-    await deletarProduto(Number(id));
+    await inativarProduto(Number(id));
 
     return NextResponse.json({ ok: true });
   } catch (error) {

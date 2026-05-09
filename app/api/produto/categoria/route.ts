@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { getCategorias, criarCategoria } from "@/lib/services/categorias.service";
+import { getCategorias, criarCategoria, getAllCategoriasFlat } from "@/lib/services/categorias.service";
 
 export async function GET() {
   try {
-    const categorias = await getCategorias();
-    return NextResponse.json(categorias);
+    const hierarchical = await getCategorias();
+    const flat = await getAllCategoriasFlat();
+    return NextResponse.json({ hierarchical, flat });
   } catch (error) {
     console.error("GET /api/produto/categoria", error);
     return NextResponse.json(
@@ -25,12 +26,13 @@ export async function POST(req: Request) {
       );
     }
 
-    const categoria = await criarCategoria(body.nome);
+    const categoria = await criarCategoria(body.nome, body.parentId);
     return NextResponse.json(categoria, { status: 201 });
   } catch (error) {
     console.error("POST /api/produto/categoria", error);
+    const message = error instanceof Error ? error.message : "Erro ao criar categoria.";
     return NextResponse.json(
-      { error: "Erro ao criar categoria." },
+      { error: message },
       { status: 500 }
     );
   }

@@ -7,6 +7,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ClasseRisco {
+  I
+  II
+  III
+  IV
+}
+
+enum Apresentacao {
+  AMPOLA
+  FRASCO
+  CAIXA
+  SACHE
+  BOLSA
+  SERINGA
+  TUBO
+  BLISTER
+  BOMBONA
+  LATA
+  GALERIA
+  UNIDADE
+  OUTRA
+}
+
+enum StatusLote {
+  DISPONIVEL
+  QUARENTENA
+  BLOQUEADO
+  VENCIDO
+}
+
 model Usuario {
   id               Int                   @id @default(autoincrement())
   nome             String
@@ -42,6 +72,19 @@ model Produto {
   updatedAt                DateTime              @updatedAt
   categoriaId              Int?
   estoqueMinimo            Float                 @default(0)
+  
+  cnpjFabricante           String?
+  classeRisco              ClasseRisco?
+  codigoFabricante         String?
+  apresentacao             Apresentacao?
+  concentracaoValor        Float?
+  concentracaoUnidade      String?
+  principioAtivo           String?
+  marca                    String?
+  conteudoEmbalagem        Int?
+  localizacaoEstoque       String?
+  pontoReposicao           Float?
+  
   estoqueAtual             EstoqueAtual[]
   itensCompra              ItemPedidoCompra[]
   itensVenda               ItemPedidoVenda[]
@@ -54,11 +97,14 @@ model Produto {
 }
 
 model Categoria {
-  id        Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   nome      String
-  ativo     Boolean   @default(true)
+  ativo     Boolean    @default(true)
   empresaId Int
+  parentId  Int?
   produtos  Produto[]
+  parent    Categoria? @relation("CategoriaHierarchy", fields: [parentId], references: [id])
+  children  Categoria[] @relation("CategoriaHierarchy")
 }
 
 model Localizacao {
@@ -77,9 +123,14 @@ model Lote {
   validade             DateTime?
   localizacaoId        Int?
   createdAt            DateTime              @default(now())
+  fornecedorId         Int?
+  enderecoEstoque      String?
+  status               StatusLote            @default(DISPONIVEL)
+  precoCusto           Float?
   estoqueAtual         EstoqueAtual[]
   itensSeparacao       ItemSeparacao[]
-  localizacao          Localizacao?          @relation(fields: [localizacaoId], references: [id])
+  fornecedor           Fornecedor?           @relation(fields: [fornecedorId], references: [id])
+  localizacaoRef       Localizacao?          @relation(fields: [localizacaoId], references: [id])
   produto              Produto               @relation(fields: [produtoId], references: [id])
   movimentacoes        MovimentacaoEstoque[]
   movimentacoesFiscais MovimentacaoFiscal[]
@@ -101,11 +152,13 @@ model MovimentacaoEstoque {
   origem             String?
   pedidoVendaId      Int?
   usuarioId          Int?
+  empresaFiscalId    Int?
   localizacao        Localizacao?        @relation(fields: [localizacaoId], references: [id])
   lote               Lote?               @relation(fields: [loteId], references: [id])
   pedidoVenda        PedidoVenda?        @relation(fields: [pedidoVendaId], references: [id])
   produto            Produto             @relation(fields: [produtoId], references: [id])
   usuarioRef         Usuario?            @relation(fields: [usuarioId], references: [id])
+  empresaFiscal      EmpresaFiscal?      @relation(fields: [empresaFiscalId], references: [id])
   movimentacaoFiscal MovimentacaoFiscal?
 }
 
@@ -143,6 +196,7 @@ model Fornecedor {
   contasPagar       Conta[]
   documentosFiscais DocumentoFiscal[]
   pedidosCompra     PedidoCompra[]
+  lotes              Lote[]
 }
 
 model Cliente {
@@ -219,6 +273,8 @@ model PedidoVenda {
   empresaFiscalId      Int?
   tipoPedido           TipoPedido            @default(PEDIDO_NORMAL)
   status               StatusPedido          @default(PEDIDO_CRIADO)
+  formaPagamento       FormaPagamento?
+  prazoPagamento       String?
   contasReceber        Conta[]
   documentosFiscais    DocumentoFiscal[]
   historico            HistoricoPedido[]
@@ -273,7 +329,6 @@ model Separacao {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   itens         ItemSeparacao[]
-  romaneio      Romaneio?
   pedidoVenda   PedidoVenda     @relation(fields: [pedidoVendaId], references: [id])
 }
 
@@ -289,50 +344,55 @@ model ItemSeparacao {
   separacao   Separacao @relation(fields: [separacaoId], references: [id], onDelete: Cascade)
 }
 
-model Romaneio {
-  id            Int       @id @default(autoincrement())
-  separacaoId   Int       @unique
-  motorista     String?
-  veiculo       String?
-  statusEntrega String    @default("PENDENTE")
-  dataEntrega   DateTime?
-  observacao    String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  separacao     Separacao @relation(fields: [separacaoId], references: [id])
+model Conta {
+  id               Int                  @id @default(autoincrement())
+  tipo             TipoConta
+  descricao        String
+  valor            Float
+  valorPago        Float                @default(0)
+  dataVencimento   DateTime
+  dataPagamento    DateTime?
+  status           StatusConta          @default(ABERTA)
+  observacao       String?
+  formaPagamento   FormaPagamento?
+  categoria        String?
+  parcelaNumero    Int?
+  parcelaTotal     Int?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  clienteId        Int?
+  fornecedorId     Int?
+  pedidoVendaId    Int?
+  cliente          Cliente?             @relation(fields: [clienteId], references: [id])
+  fornecedor       Fornecedor?          @relation(fields: [fornecedorId], references: [id])
+  pedidoVenda      PedidoVenda?         @relation(fields: [pedidoVendaId], references: [id])
+  historicoPagamentos HistoricoPagamento[]
 }
 
-model Conta {
-  id             Int          @id @default(autoincrement())
-  tipo           TipoConta
-  descricao      String
+model HistoricoPagamento {
+  id             Int             @id @default(autoincrement())
+  contaId        Int
   valor          Float
-  dataVencimento DateTime
-  dataPagamento  DateTime?
-  status         StatusConta  @default(ABERTA)
+  data           DateTime        @default(now())
+  formaPagamento FormaPagamento?
   observacao     String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  clienteId      Int?
-  fornecedorId   Int?
-  pedidoVendaId  Int?
-  cliente        Cliente?     @relation(fields: [clienteId], references: [id])
-  fornecedor     Fornecedor?  @relation(fields: [fornecedorId], references: [id])
-  pedidoVenda    PedidoVenda? @relation(fields: [pedidoVendaId], references: [id])
+  createdAt      DateTime        @default(now())
+  conta          Conta           @relation(fields: [contaId], references: [id], onDelete: Cascade)
 }
 
 model EmpresaFiscal {
-  id                   Int                  @id @default(autoincrement())
+  id                   Int                   @id @default(autoincrement())
   razaoSocial          String
   nomeFantasia         String?
-  cnpj                 String               @unique
+  cnpj                 String                @unique
   inscricaoEstadual    String?
   regimeTributario     RegimeTributario?
-  ativo                Boolean              @default(true)
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+  ativo                Boolean               @default(true)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
   documentosFiscais    DocumentoFiscal[]
   movimentacoesFiscais MovimentacaoFiscal[]
+  movimentacoesEstoque MovimentacaoEstoque[]
   pedidosVenda         PedidoVenda[]
 }
 
@@ -384,6 +444,8 @@ model HistoricoPedido {
   statusAnterior StatusPedido?
   statusNovo     StatusPedido
   usuarioId      Int?
+  setor          PerfilUsuario?
+  tipoAcao       String?
   observacao     String?
   createdAt      DateTime      @default(now())
   pedidoVenda    PedidoVenda   @relation(fields: [pedidoVendaId], references: [id])
@@ -442,6 +504,17 @@ enum StatusPedidoCompra {
   CANCELADO
 }
 
+enum FormaPagamento {
+  PIX
+  BOLETO
+  CARTAO_CREDITO
+  CARTAO_DEBITO
+  DINHEIRO
+  TRANSFERENCIA
+  A_PRAZO
+  CHEQUE
+}
+
 enum TipoPedido {
   PEDIDO_NORMAL
   PEDIDO_INTERNO
@@ -449,24 +522,36 @@ enum TipoPedido {
 
 enum StatusPedido {
   PEDIDO_CRIADO
-  RESERVADO
+  AGUARDANDO_ESTOQUE
+  ESTOQUE_CONFIRMADO
+  ESTOQUE_PARCIAL
+  ESTOQUE_INDISPONIVEL
+  AGUARDANDO_FORNECEDOR
   AGUARDANDO_APROVACAO_FINANCEIRA
   APROVADO_FINANCEIRO
   REPROVADO_FINANCEIRO
+  PAGAMENTO_PENDENTE
+  CONDICAO_COMERCIAL_PENDENTE
+  AGUARDANDO_CONFIRMACAO_CLIENTE
+  CLIENTE_CONFIRMOU
+  PEDIDO_EM_REVISAO
+  AGUARDANDO_FATURAMENTO
+  PEDIDO_INTERNO_AUTORIZADO
+  AUTORIZADO_PARA_SEPARACAO
   EM_SEPARACAO
   SEPARADO
   FATURADO
-  EM_TRANSITO
-  ENTREGUE
+  DESPACHADO
   FINALIZADO
   CANCELADO
+  CANCELADO_PELO_CLIENTE
 }
 
 enum StatusSeparacao {
   PENDENTE
   EM_ANDAMENTO
   CONFERIDO
-  ENVIADO
+  DESPACHADO
 }
 
 enum TipoConta {

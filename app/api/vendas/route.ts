@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PedidoService } from "@/lib/services/pedido.service";
+import { requireAuthActor } from "@/lib/authz";
 
 export async function GET() {
   try {
@@ -22,6 +23,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    const actor = await requireAuthActor();
     const body = await req.json();
 
     const pedido = await PedidoService.criarPedido({
@@ -31,13 +33,15 @@ export async function POST(req: NextRequest) {
       empresaFiscalId: body.empresaFiscalId ? Number(body.empresaFiscalId) : undefined,
       desconto: Number(body.desconto || 0),
       observacao: body.observacao || undefined,
+      formaPagamento: body.formaPagamento || undefined,
+      prazoPagamento: body.prazoPagamento || undefined,
       itens: body.itens.map((i: any) => ({
         produtoId: Number(i.produtoId),
         quantidade: Number(i.quantidade),
         precoUnitario: Number(i.precoUnitario),
         desconto: Number(i.desconto || 0),
       })),
-    });
+    }, actor);
 
     return NextResponse.json(pedido, { status: 201 });
   } catch (error: any) {
@@ -45,4 +49,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message || "Erro ao criar pedido de venda." }, { status: 500 });
   }
 }
-

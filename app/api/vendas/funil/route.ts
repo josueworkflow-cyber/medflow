@@ -6,6 +6,12 @@ export async function GET() {
     const pedidos = await prisma.pedidoVenda.findMany({
       include: {
         cliente: { select: { razaoSocial: true } },
+        vendedor: { select: { nome: true } },
+        historico: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          include: { usuario: { select: { nome: true } } },
+        },
       },
       orderBy: { updatedAt: "desc" },
     });
@@ -13,7 +19,10 @@ export async function GET() {
     // Agrupar por status
     const funil = pedidos.reduce((acc: any, pedido) => {
       if (!acc[pedido.status]) acc[pedido.status] = [];
-      acc[pedido.status].push(pedido);
+      acc[pedido.status].push({
+        ...pedido,
+        ultimaAtualizacao: pedido.historico[0] || null,
+      });
       return acc;
     }, {});
 

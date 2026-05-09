@@ -32,6 +32,7 @@ export class EstoqueService {
    */
   static async getEstoqueResumo() {
     const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
     const em30dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
 
     const [saldos, vencendoCount, faturadoMes] = await Promise.all([
@@ -41,11 +42,17 @@ export class EstoqueService {
           quantidadeReservada: true,
         },
       }),
-      prisma.lote.count({
+      prisma.estoqueAtual.aggregate({
         where: {
-          validade: { gte: hoje, lte: em30dias },
-          estoqueAtual: { some: { quantidadeDisponivel: { gt: 0 } } }
-        }
+          quantidadeDisponivel: { gt: 0 },
+          lote: {
+            validade: {
+              gte: hoje,
+              lte: em30dias
+            }
+          }
+        },
+        _count: true,
       }),
       prisma.movimentacaoFiscal.aggregate({
         where: {
@@ -57,8 +64,6 @@ export class EstoqueService {
       })
     ]);
 
-    // Itens sem alocação fiscal (exemplo de regra: movimentações de saída sem registro fiscal correspondente)
-    // Para simplificar, vamos buscar saídas sem movimentação fiscal vinculada
     const semAlocacaoFiscal = await prisma.movimentacaoEstoque.count({
       where: {
         tipo: 'SAIDA',
@@ -69,7 +74,7 @@ export class EstoqueService {
     return {
       fisicoTotal: saldos._sum.quantidadeDisponivel || 0,
       reservados: saldos._sum.quantidadeReservada || 0,
-      vencendo: vencendoCount,
+      vencendo: vencendoCount._count || 0,
       semAlocacaoFiscal,
       faturadoNoMes: faturadoMes._sum.valorTotal || 0
     };
@@ -87,9 +92,20 @@ export class EstoqueService {
     custoUnitario?: number;
     usuarioId?: number;
     observacao?: string;
+    fornecedorId?: number;
+    enderecoEstoque?: string;
+    status?: 'DISPONIVEL' | 'QUARENTENA' | 'BLOQUEADO' | 'VENCIDO';
   }) {
     return prisma.$transaction(async (tx) => {
       let loteId = null;
+      const produto = await tx.produto.findUnique({ where: { id: data.produtoId } });
+      if (!produto) throw new Error("Produto nao encontrado");
+      if (produto.controlaLote && !data.numeroLote) {
+        throw new Error("Lote e obrigatorio para este produto");
+      }
+      if (produto.controlaValidade && !data.validade) {
+        throw new Error("Validade e obrigatoria para este produto");
+      }
       
       if (data.numeroLote) {
         const lote = await tx.lote.upsert({
@@ -101,13 +117,21 @@ export class EstoqueService {
           },
           update: {
             validade: data.validade,
-            localizacaoId: data.localizacaoId
+            localizacaoId: data.localizacaoId,
+            fornecedorId: data.fornecedorId,
+            enderecoEstoque: data.enderecoEstoque,
+            status: data.status || 'DISPONIVEL',
+            precoCusto: data.custoUnitario
           },
           create: {
             numeroLote: data.numeroLote,
             validade: data.validade,
             produtoId: data.produtoId,
-            localizacaoId: data.localizacaoId
+            localizacaoId: data.localizacaoId,
+            fornecedorId: data.fornecedorId,
+            enderecoEstoque: data.enderecoEstoque,
+            status: data.status || 'DISPONIVEL',
+            precoCusto: data.custoUnitario
           }
         });
         loteId = lote.id;
@@ -289,8 +313,8 @@ export class EstoqueService {
           throw new Error(`Estoque insuficiente para o produto ID ${item.produtoId}`);
         }
 
-        let qtdADezetivarRes = Math.min(estoque.quantidadeReservada, item.quantidade);
-        let qtdADezetivarDisp = item.quantidade - qtdADezetivarRes;
+        const qtdADezetivarRes = Math.min(estoque.quantidadeReservada, item.quantidade);
+        const qtdADezetivarDisp = item.quantidade - qtdADezetivarRes;
 
         await tx.estoqueAtual.update({
           where: { id: estoque.id },
@@ -309,6 +333,7 @@ export class EstoqueService {
             quantidade: item.quantidade,
             pedidoVendaId: data.pedidoVendaId,
             usuarioId: data.usuarioId,
+            empresaFiscalId: data.empresaFiscalId,
             destino: `Cliente ID ${data.clienteId}`,
             observacao: `Saída por faturamento pedido ${data.pedidoVendaId}`
           }

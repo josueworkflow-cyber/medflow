@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { TipoMovimentacao } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,9 +13,9 @@ export async function POST(req: NextRequest) {
       observacao,
     } = body;
 
-    if (!produtoId || !quantidade || !codigoLote) {
+    if (!produtoId || !quantidade) {
       return NextResponse.json(
-        { error: "Produto, lote e quantidade são obrigatórios" },
+        { error: "Produto e quantidade sao obrigatorios." },
         { status: 400 }
       );
     }
@@ -24,79 +23,89 @@ export async function POST(req: NextRequest) {
     const qtd = Number(quantidade);
     if (qtd <= 0) {
       return NextResponse.json(
-        { error: "Quantidade deve ser maior que zero" },
+        { error: "Quantidade deve ser maior que zero." },
         { status: 400 }
       );
     }
 
-    // 1. Garantir que o lote existe (upsert)
-    const lote = await prisma.lote.upsert({
-      where: {
-        numeroLote_produtoId: {
-          numeroLote: codigoLote.trim(),
-          produtoId: Number(produtoId),
-        },
-      },
-      update: {
-        validade: validade ? new Date(validade) : undefined,
-      },
-      create: {
-        numeroLote: codigoLote.trim(),
-        validade: validade ? new Date(validade) : null,
-        produtoId: Number(produtoId),
-      },
-    });
-
-    // 2. Criar a movimentação de ENTRADA
-    await prisma.movimentacaoEstoque.create({
-      data: {
-        produtoId: Number(produtoId),
-        loteId: lote.id,
-        tipo: "ENTRADA",
-        quantidade: qtd,
-        observacao: observacao || "Entrada manual via formulário",
-        usuario: "Administrador",
-      },
-    });
-
-    // 3. Atualizar o EstoqueAtual
-    const estoqueExistente = await prisma.estoqueAtual.findFirst({
-      where: {
-        produtoId: Number(produtoId),
-        loteId: lote.id,
-      },
-    });
-
-    if (estoqueExistente) {
-      await prisma.estoqueAtual.update({
-        where: { id: estoqueExistente.id },
-        data: {
-          quantidadeDisponivel: { increment: qtd },
-        },
-      });
-    } else {
-      await prisma.estoqueAtual.create({
-        data: {
-          produtoId: Number(produtoId),
-          loteId: lote.id,
-          quantidadeDisponivel: qtd,
-        },
-      });
+    const produto = await prisma.produto.findUnique({ where: { id: Number(produtoId) } });
+    if (!produto) {
+      return NextResponse.json({ error: "Produto nao encontrado." }, { status: 404 });
+    }
+    if (produto.controlaLote && !codigoLote?.trim()) {
+      return NextResponse.json({ error: "Lote e obrigatorio para este produto." }, { status: 400 });
+    }
+    if (produto.controlaValidade && !validade) {
+      return NextResponse.json({ error: "Validade e obrigatoria para este produto." }, { status: 400 });
     }
 
-    // 4. Se houver custo unitário, atualizar no cadastro do produto (opcional/regra de negócio)
-    if (custoUnitario) {
-      await prisma.produto.update({
-        where: { id: Number(produtoId) },
-        data: { precoCustoBase: Number(custoUnitario) },
+    const lote = codigoLote?.trim()
+      ? await prisma.lote.upsert({
+          where: {
+            numeroLote_produtoId: {
+              numeroLote: codigoLote.trim(),
+              produtoId: Number(produtoId),
+            },
+          },
+          update: {
+            validade: validade ? new Date(validade) : undefined,
+          },
+          create: {
+            numeroLote: codigoLote.trim(),
+            validade: validade ? new Date(validade) : null,
+            produtoId: Number(produtoId),
+          },
+        })
+      : null;
+
+    await prisma.$transaction(async (tx) => {
+      await tx.movimentacaoEstoque.create({
+        data: {
+          produtoId: Number(produtoId),
+          loteId: lote?.id,
+          tipo: "ENTRADA",
+          quantidade: qtd,
+          observacao: observacao || "Entrada operacional",
+          usuario: "Administrador",
+        },
       });
-    }
+
+      const estoqueExistente = await tx.estoqueAtual.findFirst({
+        where: {
+          produtoId: Number(produtoId),
+          loteId: lote?.id ?? null,
+        },
+      });
+
+      if (estoqueExistente) {
+        await tx.estoqueAtual.update({
+          where: { id: estoqueExistente.id },
+          data: { quantidadeDisponivel: { increment: qtd } },
+        });
+      } else {
+        await tx.estoqueAtual.create({
+          data: {
+            produtoId: Number(produtoId),
+            loteId: lote?.id,
+            quantidadeDisponivel: qtd,
+            custoUnitario: custoUnitario ? Number(custoUnitario) : 0,
+          },
+        });
+      }
+
+      if (custoUnitario) {
+        await tx.produto.update({
+          where: { id: Number(produtoId) },
+          data: { precoCustoBase: Number(custoUnitario) },
+        });
+      }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Erro na entrada de estoque:", error);
     return NextResponse.json(
-      { error: "Falha ao processar entrada de estoque" },
+      { error: "Falha ao processar entrada de estoque." },
       { status: 500 }
     );
   }
