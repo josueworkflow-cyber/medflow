@@ -1,8 +1,8 @@
 # Documento de Requisitos de Produto (PRD) - MedFlow ERP
 
-**Versão:** 1.2  
+**Versão:** 1.3  
 **Status:** Base oficial de contexto para IA e desenvolvimento  
-**Última atualização:** Reorganização completa do módulo Financeiro (4 páginas), novo módulo de Pedidos do Estoque, entidade HistoricoPagamento, regras de baixa financeira e fluxo de caixa.
+**Última atualização:** Sincronização completa com o código atual. Adicionados: Contabilidade (5ª página do Financeiro), módulos Compras, Vendedores, Categorias, Relatórios e Configurações. Novas entidades (TabelaPreco, Localizacao, PedidoCompra). Alinhamento de nomenclatura de perfis e status com o código. Documentação do futuro App Mobile Android para VENDAS e ESTOQUE.
 
 ---
 
@@ -66,6 +66,7 @@ O sistema deve permitir que cada setor saiba exatamente:
 ---
 
 ## 2. Arquitetura de Segurança e Acesso
+
 ## 2. Arquitetura de Segurança, Acesso e Permissões
 
 O MedFlow ERP deve possuir controle de acesso por perfil de usuário, garantindo que cada setor visualize as informações necessárias, mas só consiga alterar pedidos, dados e status quando estiver dentro da sua responsabilidade operacional.
@@ -78,7 +79,7 @@ O pedido pode ser visualizado por todos os setores autorizados, porém somente o
 
 O sistema deve possuir os seguintes perfis principais:
 
-#### Administrador
+#### ADMINISTRADOR
 
 Perfil com acesso total ao sistema.
 
@@ -92,10 +93,12 @@ Permissões:
 - Consultar histórico completo dos pedidos
 - Ajustar configurações do sistema
 - Visualizar financeiro, estoque, vendas e fiscal
+- Acessar relatórios gerenciais
+- Acessar página de configurações
 
 ---
 
-#### Vendedor
+#### VENDAS
 
 Perfil responsável pela criação e acompanhamento comercial do pedido.
 
@@ -114,6 +117,10 @@ Permissões:
 - Marcar cliente confirmou
 - Marcar cliente recusou
 - Enviar pedido para revisão
+- Gerenciar clientes (CRUD)
+- Gerenciar vendedores (CRUD)
+- Visualizar catálogo de produtos e categorias
+- Visualizar dashboard e funil de vendas
 
 Restrições:
 
@@ -123,12 +130,14 @@ Restrições:
 - Não pode separar produto
 - Não pode dar baixa no estoque
 - Não pode alterar pedido fora da etapa comercial
+- Não pode acessar módulo financeiro, estoque, compras ou fornecedores
+- Não pode acessar usuários, relatórios ou configurações
 
 ---
 
-#### Estoque
+#### ESTOQUE
 
-Perfil responsável por disponibilidade, reserva, separação e despacho.
+Perfil responsável por disponibilidade, reserva, separação, despacho, compras e entrada de estoque.
 
 Permissões:
 
@@ -143,6 +152,12 @@ Permissões:
 - Marcar pedido como despachado
 - Registrar movimentações de estoque
 - Visualizar lote, validade e saldo disponível
+- Gerenciar fornecedores (CRUD)
+- Criar pedidos de compra
+- Importar NF-e de entrada (XML)
+- Registrar entrada de estoque com lote e validade
+- Visualizar giro de estoque e alertas
+- Visualizar catálogo de produtos e categorias
 
 Restrições:
 
@@ -152,6 +167,8 @@ Restrições:
 - Não pode emitir NF
 - Não pode alterar forma de pagamento
 - Não pode alterar pedido quando ele não estiver na etapa do estoque
+- Não pode acessar módulo financeiro, vendas ou clientes
+- Não pode acessar usuários, relatórios ou configurações
 
 Regra importante:
 
@@ -159,7 +176,7 @@ Quando o pedido for marcado como despachado, o sistema deve finalizar automatica
 
 ---
 
-#### Financeiro
+#### FINANCEIRO
 
 Perfil responsável por pré-aprovação, faturamento, autorização de pedido interno e geração de contas a receber.
 
@@ -176,6 +193,9 @@ Permissões:
 - Escolher empresa emissora: DAC ou Pulse
 - Gerar conta a receber
 - Liberar pedido para separação
+- Gerenciar fornecedores (consulta compartilhada com ESTOQUE)
+- Visualizar dashboard e funil de vendas
+- Acessar painéis financeiros (dashboard, pedidos, contas, fluxo de caixa, contabilidade)
 
 Restrições:
 
@@ -184,6 +204,8 @@ Restrições:
 - Não pode alterar disponibilidade de estoque
 - Não pode confirmar venda no lugar do vendedor
 - Não pode alterar pedido quando ele não estiver na etapa financeira
+- Não pode acessar módulo de estoque, compras, vendas ou clientes
+- Não pode acessar usuários, relatórios ou configurações
 
 ---
 
@@ -247,12 +269,12 @@ Cada usuário deve acessar o sistema com:
 
 Após o login, o sistema deve identificar o perfil do usuário e liberar apenas as telas e ações compatíveis com sua função.
 
-Perfis esperados:
+Perfis esperados (enum `PerfilUsuario` no código):
 
-- Administrador
-- Vendedor
-- Estoque
-- Financeiro
+- ADMINISTRADOR
+- VENDAS
+- ESTOQUE
+- FINANCEIRO
 
 ---
 
@@ -266,10 +288,10 @@ Usuários autenticados só podem acessar módulos permitidos ao seu perfil.
 
 Exemplos:
 
-- Vendedor acessa Vendas e acompanhamento de pedidos.
-- Estoque acessa Estoque, separação e movimentações.
-- Financeiro acessa pré-aprovação, faturamento e contas a receber.
-- Administrador acessa todos os módulos.
+- VENDAS acessa Vendas, Clientes, Vendedores e acompanhamento de pedidos.
+- ESTOQUE acessa Estoque, Compras, Fornecedores, separação e movimentações.
+- FINANCEIRO acessa pré-aprovação, faturamento, contas a receber, fluxo de caixa e contabilidade.
+- ADMINISTRADOR acessa todos os módulos.
 
 ---
 
@@ -319,7 +341,7 @@ Regra sobre forma de pagamento:
 
 Após a criação do pedido, o sistema deve verificar automaticamente a disponibilidade dos produtos no estoque, inclusive sinalizar que foi o proprio sistema que confirmou se o produto estava disponivel no estoque
 
-Possíveis resultados: 
+Possíveis resultados:
 
 - **Disponível** --- sinalizar
 - **Parcialmente disponível** ---- Sinalizar e encaminhar para o Estoque resolver (caso não tenha um kpi sobre isso verificar p incluir)
@@ -509,7 +531,6 @@ Status inicial nessa etapa:
 
 - **Autorizado para separação**
 
-
 Depois:
 
 - **Separado**
@@ -560,32 +581,32 @@ Regra crítica:
 
 ## 4. Status Oficiais do Pedido
 
-Os principais status do pedido são:
+Os principais status do pedido (enum `StatusPedido` no código) são:
 
-1. **Pedido criado**
-2. **Aguardando verificação do estoque**
-3. **Estoque confirmado**
-4. **Parcialmente disponível**
-5. **Produto indisponível**
-6. **Aguardando fornecedor**
-7. **Aguardando pré-aprovação financeira**
-8. **Pré-aprovado pelo financeiro**
-9. **Reprovado pelo financeiro**
-10. **Pagamento pendente**
-11. **Condição comercial pendente**
-12. **Aguardando confirmação do cliente**
-13. **Cliente confirmou**
-14. **Pedido em revisão**
-15. **Pedido cancelado pelo cliente**
-16. **Aguardando faturamento**
-17. **Faturado**
-18. **Pedido interno autorizado**
-19. **Autorizado para separação**
-20. **Em separação**
-21. **Separado**
-22. **Despachado**
-23. **Finalizado**
-24. **Cancelado**
+1. **PEDIDO_CRIADO** — Pedido criado
+2. **AGUARDANDO_ESTOQUE** — Aguardando verificação do estoque
+3. **ESTOQUE_CONFIRMADO** — Estoque confirmado
+4. **ESTOQUE_PARCIAL** — Parcialmente disponível
+5. **ESTOQUE_INDISPONIVEL** — Produto indisponível
+6. **AGUARDANDO_FORNECEDOR** — Aguardando fornecedor
+7. **AGUARDANDO_APROVACAO_FINANCEIRA** — Aguardando pré-aprovação financeira
+8. **APROVADO_FINANCEIRO** — Pré-aprovado pelo financeiro
+9. **REPROVADO_FINANCEIRO** — Reprovado pelo financeiro
+10. **PAGAMENTO_PENDENTE** — Pagamento pendente
+11. **CONDICAO_COMERCIAL_PENDENTE** — Condição comercial pendente
+12. **AGUARDANDO_CONFIRMACAO_CLIENTE** — Aguardando confirmação do cliente
+13. **CLIENTE_CONFIRMOU** — Cliente confirmou
+14. **PEDIDO_EM_REVISAO** — Pedido em revisão
+15. **CANCELADO_PELO_CLIENTE** — Pedido cancelado pelo cliente
+16. **AGUARDANDO_FATURAMENTO** — Aguardando faturamento
+17. **FATURADO** — Faturado
+18. **PEDIDO_INTERNO_AUTORIZADO** — Pedido interno autorizado
+19. **AUTORIZADO_PARA_SEPARACAO** — Autorizado para separação
+20. **EM_SEPARACAO** — Em separação
+21. **SEPARADO** — Separado
+22. **DESPACHADO** — Despachado
+23. **FINALIZADO** — Finalizado
+24. **CANCELADO** — Cancelado
 
 Status que não devem existir no sistema:
 
@@ -677,16 +698,18 @@ Lógica de funcionamento:
 
 O pipeline deve refletir o fluxo oficial do pedido.
 
-Colunas recomendadas:
+Colunas oficiais do funil (implementado em `funil/page.tsx`):
 
-- Criado
-- Estoque
-- Pré-aprovação financeira
-- Confirmação com cliente
-- Faturamento / autorização
-- Separação
-- Aguardando coleta
-- Finalizado
+| Coluna | Status incluídos |
+| :--- | :--- |
+| CRIADO | PEDIDO_CRIADO |
+| ESTOQUE | AGUARDANDO_ESTOQUE, ESTOQUE_PARCIAL, ESTOQUE_INDISPONIVEL, AGUARDANDO_FORNECEDOR, ESTOQUE_CONFIRMADO |
+| FINANCEIRO | AGUARDANDO_APROVACAO_FINANCEIRA, PAGAMENTO_PENDENTE, CONDICAO_COMERCIAL_PENDENTE, REPROVADO_FINANCEIRO |
+| CLIENTE | APROVADO_FINANCEIRO, AGUARDANDO_CONFIRMACAO_CLIENTE, PEDIDO_EM_REVISAO |
+| FATURAMENTO | CLIENTE_CONFIRMOU, AGUARDANDO_FATURAMENTO, FATURADO, PEDIDO_INTERNO_AUTORIZADO |
+| SEPARACAO | AUTORIZADO_PARA_SEPARACAO, EM_SEPARACAO |
+| DESPACHO | SEPARADO, DESPACHADO |
+| FINALIZADO | FINALIZADO, CANCELADO, CANCELADO_PELO_CLIENTE |
 
 Não usar colunas de entrega, trânsito ou entregue.
 
@@ -757,7 +780,7 @@ Regra:
 
 ### 6.7 Módulo Financeiro (Reorganizado v1.2)
 
-O módulo financeiro é organizado em **4 páginas principais**, com abas internas e modais para ações complexas. Não concentrar tudo em uma tela única e não criar páginas desnecessárias.
+O módulo financeiro é organizado em **5 páginas principais**, com abas internas e modais para ações complexas. Não concentrar tudo em uma tela única e não criar páginas desnecessárias.
 
 Os perfis com acesso ao módulo financeiro são: **FINANCEIRO** e **ADMINISTRADOR**.
 
@@ -860,6 +883,7 @@ Página única para controlar Contas a Receber, Contas a Pagar e Clientes Devedo
 **Aba 1 — Contas a Receber:**
 
 Tabela com colunas:
+
 - Cliente
 - Descrição (com categoria opcional)
 - Pedido vinculado (se houver, exibe `#numero`)
@@ -887,6 +911,7 @@ Tabela com colunas:
 Mesma estrutura da aba Contas a Receber, porém com fornecedor/categoria no lugar de cliente.
 
 **Ações disponíveis:**
+
 - Registrar pagamento (total ou parcial)
 - Editar vencimento
 - Histórico de pagamentos
@@ -895,6 +920,7 @@ Mesma estrutura da aba Contas a Receber, porém com fornecedor/categoria no luga
 **Aba 3 — Clientes / Devedores:**
 
 Visão por cliente com pendências. Tabela com colunas:
+
 - Cliente (razão social + CNPJ/CPF)
 - Total em aberto (R$)
 - Total vencido (R$, vermelho se > 0)
@@ -930,6 +956,7 @@ Abre modal ao clicar no botão "Nova conta". Campos:
 **Regra de parcelamento:**
 
 Se `parcelas > 1`, o sistema gera automaticamente N contas com:
+
 - Valor da parcela = valorTotal / parcelas (última parcela ajusta arredondamento)
 - Vencimento escalonado: dataBase + (intervalo * i) para cada parcela i
 - `parcelaNumero` e `parcelaTotal` preenchidos em cada conta
@@ -1029,6 +1056,29 @@ Cada linha mostra: A Receber (valor e quantidade), A Pagar (valor e quantidade),
 
 ---
 
+#### 6.7.5 Financeiro / Contabilidade (`/sistema/financeiro/contabilidade`)
+
+Página de exportação contábil para geração de arquivos SPED e relatórios fiscais.
+
+**Fluxo de uso:**
+
+1. Usuário seleciona período (data início e data fim)
+2. Clica em "Exportar" para gerar arquivo CSV/TXT
+3. O sistema chama `GET /api/financeiro/exportar?inicio=&fim=`
+4. O arquivo é baixado automaticamente pelo navegador
+
+**API:** `GET /api/financeiro/exportar?inicio=&fim=` — retorna blob (CSV) para download.
+
+**Campos exportados:**
+
+- Data, tipo (RECEBER/PAGAR), descrição, cliente/fornecedor, valor, forma de pagamento, status, vencimento
+
+**Regras:**
+
+- Acesso exclusivo para FINANCEIRO e ADMINISTRADOR
+- Período obrigatório para evitar exportações massivas
+- Arquivo gerado no formato CSV para compatibilidade com sistemas contábeis
+
 ### 6.8 Pedidos do Estoque (`/sistema/estoque/pedidos`)
 
 Página focada nos pedidos que exigem ação do estoque: verificação de disponibilidade, separação e despacho.
@@ -1085,6 +1135,194 @@ Os perfis com acesso são: **ESTOQUE** e **ADMINISTRADOR**.
 - Despachar finaliza automaticamente: DESPACHADO → FINALIZADO na mesma transação
 - O ERP não controla entrega ou logística após o despacho
 - SWR com refresh automático a cada 30 segundos
+
+---
+
+#### 6.8.1 Movimentações de Estoque (`/sistema/estoque/movimentacoes`)
+
+Página para visualização completa do histórico de movimentações de estoque.
+
+**KPIs exibidos:**
+
+- Entradas do mês
+- Saídas do mês
+- Reservas do mês
+- Ajustes realizados
+- Movimentações do dia
+
+**Filtros rápidos:** Hoje, 7 dias, 30 dias, Entradas, Saídas, Reservas, Ajustes
+**Filtros avançados:** Produto, Pedido, Usuário, Lote, Origem (painel colapsável)
+**Range de datas:** Data início e data fim manuais
+
+**Tabela de movimentações** (até 200 registros):
+
+- Produto (código + nome)
+- Tipo (ENTRADA, SAIDA, AJUSTE, RESERVA, CANCELAMENTO_RESERVA, DEVOLUCAO, PERDA)
+- Quantidade (colorido +/-)
+- Lote e validade
+- Pedido vinculado
+- Origem
+- Empresa Fiscal
+- Usuário
+- Data/Hora
+
+**Modal de detalhe** (ícone de olho): exibe dados completos da movimentação incluindo documento fiscal, localização e observação.
+
+**API:** `GET /api/estoque/movimentacoes?filtro=&inicio=&fim=` — retorna `{ movimentacoes, kpis }`.
+
+---
+
+#### 6.8.2 Entrada de Estoque (`/sistema/estoque/entrada`)
+
+Página para registro de entrada de produtos no estoque com controle de lote e validade.
+
+**Formulário de entrada:**
+
+| Campo | Tipo | Obrigatório |
+| :--- | :--- | :--- |
+| Produto | Select do catálogo | Sim |
+| Código do Lote | Texto | Sim |
+| Data de Validade | Data | Não |
+| Quantidade | Número | Sim |
+| Custo Unitário | Número (R$) | Não |
+| Observação | Texto | Não |
+
+**Comportamento:**
+
+- Ao submeter, chama `POST /api/estoque/lote/entrada`
+- Cria ou atualiza `Lote` com `StatusLote.DISPONIVEL`
+- Incrementa `EstoqueAtual.quantidadeDisponivel`
+- Gera `MovimentacaoEstoque` tipo `ENTRADA`
+- Se o produto tem `controlaLote = true`, o lote é obrigatório
+- Se o produto tem `controlaValidade = true`, a validade é obrigatória
+- Formulário limpa após submissão com sucesso
+
+**API:** `POST /api/estoque/lote/entrada`
+
+---
+
+#### 6.8.3 Giro de Estoque (`/sistema/estoque/giro`)
+
+Página analítica de giro de estoque.
+
+Exibe indicadores de rotatividade por produto e período, auxiliando na gestão de compras e identificação de produtos parados.
+
+**API:** `GET /api/estoque/giro?periodo=`
+
+---
+
+#### 6.8.4 Alertas de Estoque (`/sistema/estoque/alertas`)
+
+Página de alertas e notificações de estoque.
+
+Exibe:
+
+- Produtos abaixo do estoque mínimo
+- Produtos próximos ao vencimento
+- Produtos sem movimentação recente
+- Lotes em quarentena ou bloqueados
+
+**API:** `GET /api/estoque/alertas`
+
+---
+
+### 6.9 Compras (`/sistema/compras` e `/sistema/compras/importar`)
+
+Módulo de gestão de compras, acessível por ESTOQUE e ADMINISTRADOR.
+
+#### 6.9.1 Pedidos de Compra (`/sistema/compras`)
+
+**Criar pedido de compra:**
+
+- Selecionar fornecedor
+- Adicionar itens (produto, quantidade, preço unitário)
+- Status inicial: `RASCUNHO`
+- Status possíveis: `RASCUNHO`, `ENVIADO`, `PARCIAL`, `RECEBIDO`, `CANCELADO`
+
+**Visualização:** Tabela com número, fornecedor, status, valor total e data.
+
+**API:** `GET /api/compras`, `POST /api/compras`, `GET /api/compras/[id]`
+
+#### 6.9.2 Importar NF-e de Entrada (`/sistema/compras/importar`)
+
+Permite fazer upload de arquivo XML de NF-e de entrada para:
+
+- Criar pedido de compra automaticamente
+- Extrair produtos, quantidades e valores do XML
+- Associar fornecedor pelo CNPJ
+
+**Parser:** `lib/nfe-parser.ts` — extrai chave, número, emitente, produtos (com lote/validade se disponível no XML).
+
+**API:** `POST /api/compras/importar`
+
+---
+
+### 6.10 Vendedores (`/sistema/vendedores`)
+
+Módulo de cadastro e gestão de vendedores, acessível por VENDAS e ADMINISTRADOR.
+
+**CRUD de vendedores:**
+
+| Campo | Tipo |
+| :--- | :--- |
+| Nome | Texto (obrigatório) |
+| Email | Texto |
+| Telefone | Texto |
+| Comissão | Número (%) |
+| Meta Mensal | Número (R$) |
+
+**Vinculação:** Um `Vendedor` pode ser vinculado a um `Usuario` do perfil `VENDAS` (campo `usuarioId`, unique).
+
+**APIs:** `GET /api/vendedores`, `POST /api/vendedores`, `GET|PUT|DELETE /api/vendedores/[id]`
+
+---
+
+### 6.11 Categorias (`/sistema/categorias`)
+
+Gerenciamento de categorias de produtos com hierarquia de até 5 níveis.
+
+**Estrutura hierárquica:**
+
+- Categoria pai (`parentId` opcional, auto-referência via `CategoriaHierarchy`)
+- Limite de 5 níveis de profundidade
+- Validação de referência circular ao alterar categoria
+
+**CRUD de categorias:**
+
+- Criar categoria (vinculada a `empresaId = 1` fixo)
+- Listar categorias em árvore recursiva
+- Atualizar categoria (valida profundidade máxima e ausência de ciclo)
+- Excluir categoria (soft delete, apenas se sem produtos vinculados)
+
+**APIs:** `GET /api/produto/categoria`, `POST /api/produto/categoria`, `GET|PUT|DELETE /api/produto/categoria/[id]`
+
+**Serviço:** `lib/services/categorias.service.ts`
+
+---
+
+### 6.12 Relatórios (`/sistema/relatorios`)
+
+Módulo de relatórios gerenciais, acessível por ADMINISTRADOR.
+
+#### 6.12.1 Margem (`/sistema/relatorios/margem`)
+
+Relatório de margem por produto/período.
+
+**API:** `GET /api/relatorios/margem`
+
+#### 6.12.2 Validade (`/sistema/relatorios/validade`)
+
+Relatório de controle de validade dos lotes.
+
+**API:** `GET /api/estoque/relatorio` (reutilizada)
+
+---
+
+### 6.13 Configurações (`/sistema/configuracoes`)
+
+Página de configurações do sistema, acessível apenas por ADMINISTRADOR.
+
+Centraliza parâmetros gerais do ERP (detalhes a serem definidos conforme necessidade).
 
 ---
 
@@ -1202,7 +1440,7 @@ Separado
 ↓
 Despachado
 ↓
-Finalizado automaticamente
+Finalizado
 ```
 
 ---
@@ -1212,58 +1450,181 @@ Finalizado automaticamente
 Rotas sob `app/api/financeiro/`:
 
 #### `GET /api/financeiro`
+
 Lista contas. Query params: `tipo` (RECEBER/PAGAR), `status` (ABERTA,PAGA,VENCIDA separados por vírgula), `clienteId`.
 
 Inclui: `cliente`, `fornecedor`, `pedidoVenda`, `historicoPagamentos`.
 
 #### `POST /api/financeiro`
+
 Cria conta(s). Body: `tipo`, `descricao`, `valor`, `dataVencimento`, `observacao`, `formaPagamento`, `categoria`, `clienteId`, `fornecedorId`, `parcelas`, `intervalo`.
 
 Se `parcelas > 1`, usa `createMany` para gerar N contas com valores rateados e vencimentos escalonados.
 
 #### `GET /api/financeiro/[id]`
+
 Detalhe de uma conta com `historicoPagamentos`, `cliente`, `fornecedor`, `pedidoVenda`.
 
 #### `PUT /api/financeiro/[id]`
+
 Atualiza conta. Suporta duas ações:
 
 - **Edição normal:** `status`, `dataVencimento`, `dataPagamento`, `observacao`, `descricao`, `formaPagamento`, `categoria`
 - **Baixa financeira:** `acao: "baixa"`, `valor`, `data`, `formaPagamento`, `observacao`. Atualiza `valorPago`, recalcula status (PAGA se saldo zerado, ABERTA/VENCIDA caso contrário), cria `HistoricoPagamento`. Operação atômica via `$transaction`.
 
 #### `DELETE /api/financeiro/[id]`
+
 Soft-delete: muda status para `CANCELADA`. Não remove o registro.
 
 #### `GET /api/financeiro/resumo`
+
 Resumo para o Dashboard Financeiro. Retorna: `aReceber`, `qtdReceber`, `aPagar`, `qtdPagar`, `recebidoMes`, `pagoMes`, `saldoRealizado`, `saldoPrevisto`, `contasVencidas`, `vencendoHoje`, `preAprovacao`, `faturamento`, `internosAutorizar`, `clientesPendencia`.
 
 Todas as agregações usam `_sum` e `_count` do Prisma.
 
 #### `GET /api/financeiro/pedidos?filtro=`
+
 Lista pedidos financeiros filtrados por grupo de status. Query param `filtro`:
 `pre_aprovacao`, `pre_aprovados`, `cliente_confirmou`, `faturamento`, `pendente_interno`, `faturados`, `liberados`, `revisao`, `todos`.
 
 Retorna `{ pedidos, historicoClientes, empresas }`. `historicoClientes` contém para cada cliente envolvido: total de compras, contas abertas, valor aberto, inadimplências e valor inadimplente.
 
 #### `GET /api/financeiro/fluxo-caixa?periodo=`
+
 Dados do fluxo de caixa. Query params: `periodo` (hoje, 7, 15, 30, mes) OU `dataInicio` + `dataFim`.
 
 Retorna:
+
 - `realizado`: entradas recebidas, saídas pagas, resultado
 - `previsto`: a receber em aberto, a pagar em aberto, saldo projetado
 - `vencimento`: array de 6 faixas (Vencido, Vence hoje, Próx. 7d, Próx. 15d, Próx. 30d, Acima de 30d) cada uma com aReceber, qtdReceber, aPagar, qtdPagar, saldo
 
 #### `GET /api/financeiro/clientes-devedores`
+
 Lista clientes com pendências financeiras. Retorna array ordenado por total em aberto decrescente, com: `razaoSocial`, `cnpjCpf`, `limiteCredito`, `totalAberto`, `totalVencido`, `totalAVencer`, `venceEm7Dias`, `ultimoPagamento`, `parcelasAbertas`, `parcelasVencidas`, `pedidosVinculados`.
 
 Filtra apenas clientes que possuem pelo menos uma conta RECEBER com status ABERTA ou VENCIDA.
 
-### 7.6 APIs do Estoque — Pedidos
+#### `GET /api/financeiro/exportar?inicio=&fim=`
+
+Exporta dados financeiros em CSV para contabilidade/SPED. Retorna blob com colunas: data, tipo (RECEBER/PAGAR), descrição, cliente/fornecedor, valor, forma de pagamento, status, vencimento.
+
+### 7.6 APIs do Estoque
+
+Rotas sob `app/api/estoque/`:
 
 #### `GET /api/estoque/pedidos?filtro=`
+
 Lista pedidos na alçada do estoque. Query param `filtro`:
 `verificacao`, `separacao`, `despacho`, `finalizados`, `todos`.
 
 Inclui: `cliente`, `vendedor`, `empresaFiscal`, `itens` (com `produto`), `separacao`, `historico` (últimas 5 transições com `usuario`).
+
+#### `GET /api/estoque/movimentacoes?filtro=&inicio=&fim=&produto=&pedido=&usuario=&lote=&origem=`
+
+Lista movimentações de estoque com filtros combináveis. Retorna `{ movimentacoes, kpis }` com agregações de entradas, saídas, reservas, ajustes e total do dia.
+
+#### `GET /api/estoque/resumo`
+
+Resumo agregado do estoque para cards de dashboard: SKUs ativos, total de itens, itens críticos, itens esgotados.
+
+#### `GET /api/estoque/produtos-resumo`
+
+Resumo por produto com: código, descrição, categoria, quantidade atual (disponível e reservada), estoque mínimo, nível (barra de progresso), status.
+
+#### `GET /api/estoque/relatorio`
+
+Relatório de estoque com dados de validade por lote.
+
+#### `GET /api/estoque/historico/[produtoId]`
+
+Histórico de movimentações de um produto específico.
+
+#### `POST /api/estoque/saida`
+
+Registra saída manual de estoque (não vinculada a pedido).
+
+#### `POST /api/estoque/reserva`
+
+Cria reserva de estoque para um pedido.
+
+#### `POST /api/estoque/reserva/cancelar`
+
+Cancela reserva de estoque, liberando o saldo.
+
+#### `GET /api/estoque/alertas`
+
+Lista alertas: produtos abaixo do mínimo, lotes próximos ao vencimento, lotes em quarentena/bloqueados.
+
+#### `GET /api/estoque/giro?periodo=`
+
+Dados de giro/rotatividade de estoque por produto e período.
+
+#### `POST /api/estoque/lote/entrada`
+
+Registra entrada de estoque com lote, validade, quantidade e custo. Cria ou atualiza `Lote`, incrementa `EstoqueAtual`, gera `MovimentacaoEstoque` tipo ENTRADA.
+
+#### `GET /api/estoque/lote`
+
+Lista lotes cadastrados.
+
+### 7.7 APIs Fiscais
+
+Rotas sob `app/api/fiscal/`:
+
+#### `GET /api/fiscal/empresas`
+
+Lista empresas fiscais (DAC, Pulse).
+
+#### `GET /api/fiscal/relatorio`
+
+Relatório fiscal agregado.
+
+#### `GET /api/fiscal/movimentacoes`
+
+Lista movimentações fiscais vinculadas a documentos fiscais.
+
+### 7.8 APIs de Compras
+
+Rotas sob `app/api/compras/`:
+
+#### `GET /api/compras`
+
+Lista pedidos de compra.
+
+#### `POST /api/compras`
+
+Cria pedido de compra com itens.
+
+#### `POST /api/compras/importar`
+
+Importa NF-e de entrada via upload de XML. Usa `lib/nfe-parser.ts` para extrair dados.
+
+### 7.9 APIs de Vendedores
+
+Rotas sob `app/api/vendedores/`:
+
+#### `GET /api/vendedores`
+
+Lista vendedores.
+
+#### `POST /api/vendedores`
+
+Cria vendedor.
+
+#### `GET|PUT|DELETE /api/vendedores/[id]`
+
+Operações por ID.
+
+### 7.10 Outras APIs
+
+#### `GET /api/vendas/[id]/nfe`
+
+Gera NF-e de saída para o pedido. Usa `lib/nfe-generator.ts`.
+
+#### `GET /api/relatorios/margem`
+
+Relatório de margem por produto/período.
 
 ---
 
@@ -1306,14 +1667,21 @@ Finalizado
 | **MovimentacaoFiscal** | Vínculo fiscal | Conecta saída física a documento fiscal quando houver NF. |
 | **PedidoVenda** | Comercial | Entidade central do fluxo. Controla tipo do pedido e status atual. |
 | **HistoricoPedido** | Auditoria do pedido | Registra cada transição de status, usuário, setor, data e observação. |
-| **Conta** | Financeiro | Contas a receber/pagar vinculadas a pedidos. Campos: `valorPago` (total já baixado), `formaPagamento`, `categoria`, `parcelaNumero`, `parcelaTotal`. Status: ABERTA, PAGA, VENCIDA, CANCELADA. |
+| **Conta** | Financeiro | Contas a receber/pagar vinculadas a pedidos. Campos: `valorPago`, `formaPagamento`, `categoria`, `parcelaNumero`, `parcelaTotal`. Status: ABERTA, PAGA, VENCIDA, CANCELADA. |
 | **HistoricoPagamento** | Auditoria financeira | Registra cada baixa/pagamento com valor, data, forma de pagamento e observação. Vinculado a `Conta` com cascade delete. |
 | **Separacao** | Separação operacional | Controla picking, conferência, embalagem e despacho interno. |
+| **DocumentoFiscal** | Documento fiscal | NF-e de entrada ou saída. Armazena chave de acesso, número e status. |
+| **Categoria** | Categoria de produtos | Hierarquia de até 5 níveis via `parentId`. Vinculada a `empresaId`. |
+| **Localizacao** | Localização física | Controle de endereçamento de estoque (prateleira, galpão, etc). |
+| **TabelaPreco** | Preço por cliente | Tabela de preços vinculada opcionalmente a um cliente. |
+| **ItemTabelaPreco** | Preço por produto | Preço e desconto máximo por produto dentro de uma tabela. |
+| **PedidoCompra** | Compra | Pedido de compra com fornecedor. Status: RASCUNHO, ENVIADO, PARCIAL, RECEBIDO, CANCELADO. |
+| **ItemPedidoCompra** | Item de compra | Produto, quantidade e preço unitário do pedido de compra. |
+| **Vendedor** | Vendedor | Cadastro de vendedor com meta e comissão. Pode ser vinculado a `Usuario`. |
 
 ---
 
-**## 9. Fluxo Resumido Oficial**
-
+## 9. Fluxo Resumido Oficial
 
 Este é o resumo obrigatório do fluxo principal do pedido dentro do MedFlow ERP.
 
@@ -1458,7 +1826,7 @@ As seguintes regras não devem ser alteradas sem solicitação explícita:
 12. O pedido só pode ser alterado pelo setor responsável pela etapa atual.
 13. Toda baixa financeira deve gerar registro em `HistoricoPagamento` com valor, data, forma de pagamento e observação.
 14. Baixas financeiras devem ser atômicas: atualização da `Conta` e criação do `HistoricoPagamento` na mesma transação.
-15. O módulo financeiro possui exatamente 4 páginas: Dashboard, Pedidos Financeiros, Contas e Fluxo de Caixa.
+15. O módulo financeiro possui exatamente 5 páginas: Dashboard, Pedidos Financeiros, Contas, Fluxo de Caixa e Contabilidade.
 16. O módulo de estoque de pedidos possui filtros internos por grupo de status, seguindo o mesmo padrão visual de Pedidos Financeiros.
 
 ---
@@ -1474,7 +1842,7 @@ Sempre que a IA for solicitada a criar, alterar ou melhorar qualquer parte do Me
 5. Essa alteração respeita o setor responsável pela etapa?
 6. Essa alteração evita qualquer controle de entrega ou logística?
 7. Essa alteração mantém o pedido finalizando após despacho?
-8. Essa alteração mantém o módulo financeiro em no máximo 4 páginas (Dashboard, Pedidos Financeiros, Contas, Fluxo de Caixa)?
+8. Essa alteração mantém o módulo financeiro em no máximo 5 páginas (Dashboard, Pedidos Financeiros, Contas, Fluxo de Caixa, Contabilidade)?
 9. Toda baixa financeira gera registro de auditoria em `HistoricoPagamento`?
 10. As APIs financeiras usam transações atômicas para baixas e criação de parcelas?
 
@@ -1516,3 +1884,82 @@ Separado
 Despachado
 ↓
 Finalizado
+
+---
+
+## 11. Roadmap: App Mobile Android (VENDAS e ESTOQUE)
+
+### 11.1 Visão Geral
+
+Está planejado um **aplicativo nativo Android (APK)** para os perfis **VENDAS** e **ESTOQUE**, a ser desenvolvido após a estabilização completa do MVP web.
+
+O app consumirá as **mesmas APIs REST** já existentes no backend, sem necessidade de novo backend. A autenticação usará o mesmo sistema NextAuth com tokens JWT.
+
+**Premissas:**
+- O APK só será gerado quando o sistema web estiver 100% funcional e estável
+- Durante o desenvolvimento do MVP web, as funcionalidades devem ser pensadas considerando o futuro uso mobile
+- APIs devem permanecer stateless e autenticáveis via Bearer token
+
+### 11.2 Funcionalidades por Perfil
+
+#### VENDAS (App Mobile)
+
+| Funcionalidade | API Existente |
+| :--- | :--- |
+| Criar pedido rápido | `POST /api/vendas` |
+| Selecionar cliente | `GET /api/clientes` |
+| Buscar produtos (catálogo) | `GET /api/produto` |
+| Visualizar status dos pedidos | `GET /api/vendas?status=` |
+| Confirmar com cliente | `POST /api/vendas/[id]/transicao` |
+| Enviar para revisão | `POST /api/vendas/[id]/transicao` |
+| Funil de vendas simplificado | `GET /api/vendas/funil` |
+| Notificações push | A implementar (Firebase Cloud Messaging) |
+
+#### ESTOQUE (App Mobile)
+
+| Funcionalidade | API Existente |
+| :--- | :--- |
+| Verificar disponibilidade | `GET /api/estoque/pedidos?filtro=verificacao` |
+| Confirmar estoque / Enviar para financeiro | `POST /api/vendas/[id]/transicao` |
+| Marcar aguardando fornecedor | `POST /api/vendas/[id]/transicao` |
+| Iniciar / Finalizar separação | `POST /api/vendas/[id]/transicao` |
+| Marcar despachado | `POST /api/vendas/[id]/transicao` |
+| **Scanner de código de barras** | `GET /api/estoque/lote` |
+| Entrada de estoque rápida | `POST /api/estoque/lote/entrada` |
+| Consultar posição de estoque | `GET /api/estoque/produtos-resumo` |
+| Notificações push | A implementar (Firebase Cloud Messaging) |
+
+### 11.3 Recomendações Técnicas (verificar se são realmente as melhores opções para o projeto)
+
+| Aspecto | Recomendação |
+| :--- | :--- |
+| **Linguagem** | Kotlin (nativo Android) |
+| **Autenticação** | Bearer token JWT via NextAuth |
+| **Rede** | Retrofit + OkHttp |
+| **Offline** | Room DB para cache; fila de ações com sincronização |
+| **Push** | Firebase Cloud Messaging (FCM) |
+| **Scanner** | CameraX + ML Kit Barcode Scanning |
+| **Arquitetura** | MVVM com Repository pattern |
+| **Build** | Gradle, APK assinado para distribuição interna |
+
+### 11.4 Cuidados para o Desenvolvimento Atual
+
+Enquanto o MVP web está em desenvolvimento:
+
+1. **APIs retornam JSON puro** — sem dependência de cookies/sessão
+2. **Rotas de transição são autocontidas** — `POST /api/vendas/[id]/transicao` com body `{ acao }`
+3. **Endpoints suportam filtros via query params** — evitam over-fetching no mobile
+4. **Respostas incluem dados relacionados** com `include` do Prisma — evitam N+1 requests
+5. **Tratamento de erro padronizado** — `{ error: string }` com HTTP status apropriado
+6. **Não criar lógica de UI no backend** — mobile terá sua própria UI
+
+### 11.5 Fluxo de Notificações Push (Planejado)
+
+| Evento no ERP | Notificação para |
+| :--- | :--- |
+| Pedido vai para `AGUARDANDO_ESTOQUE` | ESTOQUE |
+| Pedido vai para `AGUARDANDO_APROVACAO_FINANCEIRA` | FINANCEIRO |
+| Pedido vai para `AGUARDANDO_CONFIRMACAO_CLIENTE` | VENDAS |
+| Pedido vai para `AUTORIZADO_PARA_SEPARACAO` | ESTOQUE |
+
+As notificações push serão implementadas após a estabilização do MVP, junto com o desenvolvimento do APK.
