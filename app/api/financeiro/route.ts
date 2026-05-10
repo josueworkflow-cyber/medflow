@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 function gerarParcelas(
   valorTotal: number,
@@ -24,7 +25,10 @@ function gerarParcelas(
 }
 
 export async function GET(req: NextRequest) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
+    assertPerfil(actor, ["FINANCEIRO"]);
     const tipo = req.nextUrl.searchParams.get("tipo");
     const status = req.nextUrl.searchParams.get("status");
     const clienteId = req.nextUrl.searchParams.get("clienteId");
@@ -48,14 +52,18 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(contas);
-  } catch (error) {
-    console.error("GET /api/financeiro", error);
+  } catch (e: any) {
+    if (e.message?.includes("permissao")) return NextResponse.json({ error: e.message }, { status: 403 });
+    console.error("GET /api/financeiro", e);
     return NextResponse.json({ error: "Erro ao buscar contas." }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
+    assertPerfil(actor, ["FINANCEIRO"]);
     const body = await req.json();
 
     if (!body.descricao?.trim() || !body.valor || !body.dataVencimento || !body.tipo) {
@@ -105,8 +113,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(conta, { status: 201 });
-  } catch (error) {
-    console.error("POST /api/financeiro", error);
+  } catch (e: any) {
+    if (e.message?.includes("permissao")) return NextResponse.json({ error: e.message }, { status: 403 });
+    console.error("POST /api/financeiro", e);
     return NextResponse.json({ error: "Erro ao criar conta." }, { status: 500 });
   }
 }

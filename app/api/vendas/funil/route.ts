@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthActor } from "@/lib/authz";
 
 export async function GET() {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
     const pedidos = await prisma.pedidoVenda.findMany({
       include: {
@@ -16,7 +19,6 @@ export async function GET() {
       orderBy: { updatedAt: "desc" },
     });
 
-    // Agrupar por status
     const funil = pedidos.reduce((acc: any, pedido) => {
       if (!acc[pedido.status]) acc[pedido.status] = [];
       acc[pedido.status].push({

@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthActor } from "@/lib/authz";
 
 export async function GET() {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
     const hoje = new Date();
     const em30dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);

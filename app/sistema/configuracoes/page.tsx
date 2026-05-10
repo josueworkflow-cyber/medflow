@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Settings, Shield, Building, Bell, User } from "lucide-react";
+import { Settings, Shield, Building, Bell, Clock } from "lucide-react";
 
 export default function ConfiguracoesPage() {
   return (
@@ -19,7 +19,9 @@ export default function ConfiguracoesPage() {
           </CardHeader>
           <CardContent>
             <CardDescription className="mb-4">CNPJ, endereço, logotipo e informações fiscais da distribuidora.</CardDescription>
-            <button className="text-sm font-semibold text-primary hover:underline">Editar informações</button>
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-600">
+              <Clock className="h-3.5 w-3.5" /> Em breve
+            </span>
           </CardContent>
         </Card>
 
@@ -30,7 +32,9 @@ export default function ConfiguracoesPage() {
           </CardHeader>
           <CardContent>
             <CardDescription className="mb-4">Políticas de senha, autenticação em duas etapas e logs de acesso.</CardDescription>
-            <button className="text-sm font-semibold text-primary hover:underline">Configurar segurança</button>
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-600">
+              <Clock className="h-3.5 w-3.5" /> Em breve
+            </span>
           </CardContent>
         </Card>
 
@@ -41,7 +45,9 @@ export default function ConfiguracoesPage() {
           </CardHeader>
           <CardContent>
             <CardDescription className="mb-4">Alertas de estoque baixo, vencimentos e novos pedidos por e-mail.</CardDescription>
-            <button className="text-sm font-semibold text-primary hover:underline">Gerenciar alertas</button>
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-amber-600">
+              <Clock className="h-3.5 w-3.5" /> Em breve
+            </span>
           </CardContent>
         </Card>
       </div>
@@ -54,23 +60,23 @@ export default function ConfiguracoesPage() {
           <CardDescription>Estes ajustes afetam o cálculo de impostos e regras de negócio globais.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 opacity-60">
             <div>
               <p className="text-sm font-medium">Backup Automático</p>
               <p className="text-xs text-slate-500">Realizar backup da base de dados diariamente às 03:00</p>
             </div>
-            <div className="h-6 w-11 bg-slate-200 rounded-full relative cursor-pointer opacity-50">
-              <div className="absolute left-1 top-1 h-4 w-4 bg-white rounded-full"></div>
-            </div>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600">
+              <Clock className="h-3 w-3" /> Em breve
+            </span>
           </div>
-          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200 opacity-60">
             <div>
               <p className="text-sm font-medium">Modo Homologação NF-e</p>
               <p className="text-xs text-slate-500">Emitir notas sem valor fiscal para fins de teste</p>
             </div>
-            <div className="h-6 w-11 bg-emerald-500 rounded-full relative cursor-pointer">
-              <div className="absolute right-1 top-1 h-4 w-4 bg-white rounded-full shadow-sm"></div>
-            </div>
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600">
+              <Clock className="h-3 w-3" /> Em breve
+            </span>
           </div>
         </CardContent>
       </Card>

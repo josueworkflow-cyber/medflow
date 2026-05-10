@@ -13,7 +13,7 @@ export default function ValidadePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/estoque/alertas").then((r) => r.json()).then(setData).finally(() => setLoading(false));
+    fetch("/api/relatorios/validade").then((r) => r.json()).then(setData).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <main className="p-6"><h1 className="text-3xl font-semibold">Controle de Validade</h1><p className="text-slate-500 mt-4">Carregando...</p></main>;

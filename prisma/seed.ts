@@ -1,10 +1,11 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+
 const prisma = new PrismaClient()
 
 async function main() {
   console.log('Seeding Empresa Fiscal...')
   
-  // Dados do nfe-generator.ts
   const empresa = await prisma.empresaFiscal.upsert({
     where: { cnpj: '00000000000191' },
     update: {},
@@ -13,12 +14,30 @@ async function main() {
       nomeFantasia: 'MedFlow',
       cnpj: '00000000000191',
       inscricaoEstadual: '1234567890',
-      regimeTributario: 'LUCRO_REAL', // Padrão para teste
+      regimeTributario: 'LUCRO_REAL',
       ativo: true,
     },
   })
 
   console.log({ empresa })
+
+  console.log('Seeding Usuario Admin...')
+  
+  const senhaHash = await bcrypt.hash('admin123', 10)
+
+  const admin = await prisma.usuario.upsert({
+    where: { email: 'admin@medflow.com' },
+    update: {},
+    create: {
+      nome: 'Administrador',
+      email: 'admin@medflow.com',
+      senha: senhaHash,
+      perfil: 'ADMINISTRADOR',
+      ativo: true,
+    },
+  })
+
+  console.log({ admin })
   console.log('Seed finished.')
 }
 

@@ -59,7 +59,6 @@ const cadastrosItems: NavItem[] = [
       { title: "Clientes", url: "/sistema/clientes" },
       { title: "Vendedores", url: "/sistema/vendedores" },
       { title: "Fornecedores", url: "/sistema/fornecedores" },
-      { title: "Usuarios", url: "/sistema/usuarios" },
     ],
   },
 ];
@@ -72,6 +71,7 @@ const comercialItems: NavItem[] = [
     children: [
       { title: "Vendas", url: "/sistema/vendas" },
       { title: "Compras", url: "/sistema/compras" },
+      { title: "Importar NF-e", url: "/sistema/compras/importar" },
     ],
   },
 ];
@@ -86,6 +86,8 @@ const estoqueItems: NavItem[] = [
       { title: "Pedidos Estoque", url: "/sistema/estoque/pedidos" },
       { title: "Movimentacoes", url: "/sistema/estoque/movimentacoes" },
       { title: "Entrada", url: "/sistema/estoque/entrada" },
+      { title: "Alertas", url: "/sistema/estoque/alertas" },
+      { title: "Giro", url: "/sistema/estoque/giro" },
     ],
   },
 ];
@@ -100,12 +102,17 @@ const financeiroItems: NavItem[] = [
       { title: "Pedidos Financeiros", url: "/sistema/financeiro/pedidos" },
       { title: "Contas", url: "/sistema/financeiro/contas" },
       { title: "Fluxo de Caixa", url: "/sistema/financeiro/fluxo-caixa" },
+      { title: "Contabilidade", url: "/sistema/financeiro/contabilidade" },
     ],
   },
 ];
 
 const adminItems: NavItem[] = [
-  { title: "Relatorios", url: "/sistema/relatorios", icon: BarChart3 },
+  { title: "Usuarios", url: "/sistema/usuarios", icon: UserCircle },
+  { title: "Relatorios", url: "/sistema/relatorios", icon: BarChart3, children: [
+    { title: "Margem", url: "/sistema/relatorios/margem" },
+    { title: "Validade", url: "/sistema/relatorios/validade" },
+  ]},
   { title: "Configuracoes", url: "/sistema/configuracoes", icon: Settings },
 ];
 
@@ -153,15 +160,35 @@ export function AppSidebar() {
 
   const podeVer = (url: string) => {
     if (perfil === "ADMINISTRADOR") return true;
-    if (url === "#" || url === "/sistema" || url === "/sistema/pedidos/funil") return true;
+    if (url === "#" || url === "/sistema" || url.startsWith("/sistema/pedidos")) return true;
+
     if (url.startsWith("/sistema/financeiro")) return perfil === "FINANCEIRO";
+
     if (url.startsWith("/sistema/estoque") || url.startsWith("/sistema/compras")) return perfil === "ESTOQUE";
+
     if (url.startsWith("/sistema/fornecedores")) return perfil === "ESTOQUE" || perfil === "FINANCEIRO";
-    if (url.startsWith("/sistema/vendas") || url.startsWith("/sistema/clientes") || url.startsWith("/sistema/vendedores")) {
+
+    if (
+      url.startsWith("/sistema/vendas") ||
+      url.startsWith("/sistema/clientes") ||
+      url.startsWith("/sistema/vendedores")
+    ) {
       return perfil === "VENDAS";
     }
-    if (url.startsWith("/sistema/usuarios") || url.startsWith("/sistema/configuracoes")) return false;
-    return true;
+
+    if (url.startsWith("/sistema/produtos") || url.startsWith("/sistema/categorias")) {
+      return perfil === "VENDAS" || perfil === "ESTOQUE";
+    }
+
+    if (
+      url.startsWith("/sistema/usuarios") ||
+      url.startsWith("/sistema/relatorios") ||
+      url.startsWith("/sistema/configuracoes")
+    ) {
+      return false;
+    }
+
+    return false;
   };
 
   const filtrarItem = (item: NavItem): NavItem | null => {

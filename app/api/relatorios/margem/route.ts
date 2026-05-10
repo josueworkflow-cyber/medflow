@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET() {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  try {
+    assertPerfil(actor, ["ADMINISTRADOR"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
   try {
     const produtos = await prisma.produto.findMany({
       where: { ativo: true, precoCustoBase: { gt: 0 }, precoVendaBase: { gt: 0 } },
@@ -16,7 +24,7 @@ export async function GET() {
     });
 
     const margens = produtos.map((p) => {
-      const margem = ((p.precoVendaBase - p.precoCustoBase) / p.precoCustoBase) * 100;
+      const margem = ((p.precoVendaBase - p.precoCustoBase) / p.precoVendaBase) * 100;
       const markup = ((p.precoVendaBase - p.precoCustoBase) / p.precoCustoBase) * 100;
       return {
         ...p,

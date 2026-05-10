@@ -65,10 +65,10 @@ export default function ContabilidadePage() {
 
               <div className="space-y-2">
                 <label className="mb-1 block text-xs font-medium text-slate-500 uppercase">Formato do Arquivo</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700">SPED Fiscal (Simplificado)</button>
-                  <button className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">CSV Contábil (Excel)</button>
-                </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button disabled className="rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-medium text-slate-400 cursor-not-allowed relative">SPED Fiscal (Em breve)<span className="absolute top-1 right-2 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-semibold">EM BREVE</span></button>
+            <button className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-700">CSV Contábil (Excel)</button>
+          </div>
               </div>
 
               <button

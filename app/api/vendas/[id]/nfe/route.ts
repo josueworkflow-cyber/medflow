@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateNFeXML } from "@/lib/nfe-generator";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  try {
+    assertPerfil(actor, ["FINANCEIRO"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
   try {
     const { id } = await params;
 
@@ -21,7 +29,7 @@ export async function GET(
     });
 
     if (!venda) {
-      return NextResponse.json({ error: "Venda não encontrada." }, { status: 404 });
+      return NextResponse.json({ error: "Venda nao encontrada." }, { status: 404 });
     }
 
     if (venda.tipoPedido !== "PEDIDO_NORMAL") {
@@ -31,7 +39,6 @@ export async function GET(
       return NextResponse.json({ error: "Empresa emissora nao definida." }, { status: 400 });
     }
 
-    // Preparar dados para o gerador
     const xmlData = {
       vendaId: venda.id,
       numero: venda.id.toString().padStart(6, '0'),
@@ -39,9 +46,9 @@ export async function GET(
       cliente: {
         razaoSocial: venda.cliente.razaoSocial,
         cnpjCpf: venda.cliente.cnpjCpf || "",
-        logradouro: venda.cliente.endereco?.split(',')[0] || "Não informado",
+        logradouro: venda.cliente.endereco?.split(',')[0] || "Nao informado",
         numero: venda.cliente.endereco?.split(',')[1]?.trim() || "SN",
-        bairro: "Bairro", // Campo padrão se não tivermos
+        bairro: "Bairro",
         cidade: venda.cliente.cidade || "Cidade",
         uf: venda.cliente.estado || "SP",
         cep: venda.cliente.cep || "00000000",
@@ -50,8 +57,8 @@ export async function GET(
       itens: venda.itens.map((item) => ({
         codigo: item.produto.codigoInterno || item.produtoId.toString(),
         descricao: item.produto.descricao,
-        ncm: "30049099", // NCM genérico para medicamentos
-        cfop: "5102", // Venda de mercadoria
+        ncm: "30049099",
+        cfop: "5102",
         unidade: item.produto.unidadeVenda || "UN",
         quantidade: item.quantidade,
         valorUnitario: item.precoUnitario,
@@ -62,7 +69,6 @@ export async function GET(
 
     const xml = generateNFeXML(xmlData);
 
-    // Retorna o XML como arquivo para download
     return new NextResponse(xml, {
       headers: {
         "Content-Type": "application/xml",

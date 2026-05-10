@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET() {
   try {
+    const actor = await getAuthActor();
+    if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+    try { assertPerfil(actor, ["FINANCEIRO"]); } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 403 }); }
+
     const hoje = new Date();
     const hojeDate = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
     const em7 = new Date(hojeDate); em7.setDate(em7.getDate() + 7);

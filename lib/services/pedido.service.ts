@@ -226,6 +226,7 @@ export class PedidoService {
       StatusPedido.AGUARDANDO_ESTOQUE,
       StatusPedido.ESTOQUE_PARCIAL,
       StatusPedido.ESTOQUE_INDISPONIVEL,
+      StatusPedido.ESTOQUE_CONFIRMADO,
       StatusPedido.AGUARDANDO_FORNECEDOR,
       StatusPedido.AUTORIZADO_PARA_SEPARACAO,
       StatusPedido.EM_SEPARACAO,
@@ -236,9 +237,13 @@ export class PedidoService {
       StatusPedido.PAGAMENTO_PENDENTE,
       StatusPedido.CONDICAO_COMERCIAL_PENDENTE,
       StatusPedido.AGUARDANDO_FATURAMENTO,
+      StatusPedido.CLIENTE_CONFIRMOU,
+      StatusPedido.FATURADO,
+      StatusPedido.PEDIDO_INTERNO_AUTORIZADO,
     ];
     const vendas: StatusPedido[] = [
       StatusPedido.AGUARDANDO_CONFIRMACAO_CLIENTE,
+      StatusPedido.APROVADO_FINANCEIRO,
       StatusPedido.REPROVADO_FINANCEIRO,
       StatusPedido.PEDIDO_EM_REVISAO,
     ];

@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { EstoqueService } from "@/lib/services/estoque.service";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET() {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  try {
+    assertPerfil(actor, ["ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
   try {
     const resumo = await EstoqueService.getEstoqueResumo();
     return NextResponse.json(resumo);

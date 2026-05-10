@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { StatusConta } from "@prisma/client";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const actor = await getAuthActor();
+    if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+    try { assertPerfil(actor, ["FINANCEIRO"]); } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 403 }); }
     const { id } = await params;
     const conta = await prisma.conta.findUnique({
       where: { id: Number(id) },
@@ -30,6 +34,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const actor = await getAuthActor();
+    if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+    try { assertPerfil(actor, ["FINANCEIRO"]); } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 403 }); }
     const { id } = await params;
     const body = await req.json();
     const conta = await prisma.conta.findUnique({ where: { id: Number(id) } });
@@ -138,6 +145,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const actor = await getAuthActor();
+    if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+    try { assertPerfil(actor, ["FINANCEIRO"]); } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 403 }); }
     const { id } = await params;
     await prisma.conta.update({
       where: { id: Number(id) },

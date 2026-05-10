@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
+import { EstoqueService } from "@/lib/services/estoque.service";
 
 export async function POST(req: NextRequest) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  try {
+    assertPerfil(actor, ["ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
   try {
     const body = await req.json();
     const {
@@ -28,85 +36,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const produto = await prisma.produto.findUnique({ where: { id: Number(produtoId) } });
-    if (!produto) {
-      return NextResponse.json({ error: "Produto nao encontrado." }, { status: 404 });
-    }
-    if (produto.controlaLote && !codigoLote?.trim()) {
-      return NextResponse.json({ error: "Lote e obrigatorio para este produto." }, { status: 400 });
-    }
-    if (produto.controlaValidade && !validade) {
-      return NextResponse.json({ error: "Validade e obrigatoria para este produto." }, { status: 400 });
-    }
-
-    const lote = codigoLote?.trim()
-      ? await prisma.lote.upsert({
-          where: {
-            numeroLote_produtoId: {
-              numeroLote: codigoLote.trim(),
-              produtoId: Number(produtoId),
-            },
-          },
-          update: {
-            validade: validade ? new Date(validade) : undefined,
-          },
-          create: {
-            numeroLote: codigoLote.trim(),
-            validade: validade ? new Date(validade) : null,
-            produtoId: Number(produtoId),
-          },
-        })
-      : null;
-
-    await prisma.$transaction(async (tx) => {
-      await tx.movimentacaoEstoque.create({
-        data: {
-          produtoId: Number(produtoId),
-          loteId: lote?.id,
-          tipo: "ENTRADA",
-          quantidade: qtd,
-          observacao: observacao || "Entrada operacional",
-          usuario: "Administrador",
-        },
-      });
-
-      const estoqueExistente = await tx.estoqueAtual.findFirst({
-        where: {
-          produtoId: Number(produtoId),
-          loteId: lote?.id ?? null,
-        },
-      });
-
-      if (estoqueExistente) {
-        await tx.estoqueAtual.update({
-          where: { id: estoqueExistente.id },
-          data: { quantidadeDisponivel: { increment: qtd } },
-        });
-      } else {
-        await tx.estoqueAtual.create({
-          data: {
-            produtoId: Number(produtoId),
-            loteId: lote?.id,
-            quantidadeDisponivel: qtd,
-            custoUnitario: custoUnitario ? Number(custoUnitario) : 0,
-          },
-        });
-      }
-
-      if (custoUnitario) {
-        await tx.produto.update({
-          where: { id: Number(produtoId) },
-          data: { precoCustoBase: Number(custoUnitario) },
-        });
-      }
+    await EstoqueService.registrarEntrada({
+      produtoId: Number(produtoId),
+      quantidade: qtd,
+      numeroLote: codigoLote?.trim() || undefined,
+      validade: validade ? new Date(validade) : undefined,
+      custoUnitario: custoUnitario ? Number(custoUnitario) : undefined,
+      observacao: observacao || undefined,
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro na entrada de estoque:", error);
+    const status = error.message?.includes("obrigat") ? 400 : 500;
     return NextResponse.json(
-      { error: "Falha ao processar entrada de estoque." },
-      { status: 500 }
+      { error: error.message || "Falha ao processar entrada de estoque." },
+      { status }
     );
   }
 }

@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { getProdutoById, atualizarProduto, inativarProduto } from "@/lib/services/produtos.service";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
-    }
-
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
+  try {
     const { id } = await params;
     const produto = await getProdutoById(Number(id));
 
     if (!produto) {
       return NextResponse.json(
-        { error: "Produto não encontrado." },
+        { error: "Produto nao encontrado." },
         { status: 404 }
       );
     }
@@ -36,12 +38,14 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
-    }
-
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
+  try {
     const { id } = await params;
     const body = await req.json();
 
@@ -78,14 +82,16 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
-    }
-
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
+  try {
     const { id } = await params;
-    
+
     await inativarProduto(Number(id));
 
     return NextResponse.json({ ok: true });

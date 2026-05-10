@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { getCategorias, criarCategoria, getAllCategoriasFlat } from "@/lib/services/categorias.service";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET() {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  try {
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
   try {
     const hierarchical = await getCategorias();
     const flat = await getAllCategoriasFlat();
@@ -16,12 +24,19 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  try {
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
   try {
     const body = await req.json();
 
     if (!body.nome || !String(body.nome).trim()) {
       return NextResponse.json(
-        { error: "Nome da categoria é obrigatório." },
+        { error: "Nome da categoria e obrigatorio." },
         { status: 400 }
       );
     }

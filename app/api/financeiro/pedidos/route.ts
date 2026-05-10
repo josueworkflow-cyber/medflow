@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET(req: NextRequest) {
   try {
+    const actor = await getAuthActor();
+    if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+    try { assertPerfil(actor, ["FINANCEIRO"]); } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 403 }); }
+
     const filtro = req.nextUrl.searchParams.get("filtro") || "todos";
 
     const statusPorFiltro: Record<string, string[]> = {

@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PedidoService } from "@/lib/services/pedido.service";
-import { requireAuthActor } from "@/lib/authz";
+import { getAuthActor } from "@/lib/authz";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
     const { id } = await params;
     const { acao, dados } = await req.json();
-    const actor = await requireAuthActor();
     const pedidoId = Number(id);
     let result;
 

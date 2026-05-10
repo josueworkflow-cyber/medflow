@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { getProdutos, criarProduto } from "@/lib/services/produtos.service";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function GET() {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
-    }
-
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
+  try {
     const produtos = await getProdutos();
     return NextResponse.json(produtos);
   } catch (error) {
@@ -21,16 +23,18 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
-    }
-
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
+  try {
     const body = await req.json();
-    
+
     if (!body.descricao) {
-      return NextResponse.json({ error: "Descrição é obrigatória." }, { status: 400 });
+      return NextResponse.json({ error: "Descricao e obrigatoria." }, { status: 400 });
     }
 
     const produto = await criarProduto({

@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { atualizarCategoria, deletarCategoria } from "@/lib/services/categorias.service";
+import { getAuthActor, assertPerfil } from "@/lib/authz";
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  try {
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
   try {
     const { id } = await params;
     const body = await req.json();
@@ -30,6 +38,13 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const actor = await getAuthActor();
+  if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  try {
+    assertPerfil(actor, ["VENDAS", "ESTOQUE"]);
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 403 });
+  }
   try {
     const { searchParams } = new URL(req.url);
     const idParam = searchParams.get("id");
@@ -38,7 +53,7 @@ export async function DELETE(
 
     if (!categoryId) {
       return NextResponse.json(
-        { error: "ID da categoria é obrigatório." },
+        { error: "ID da categoria e obrigatorio." },
         { status: 400 }
       );
     }

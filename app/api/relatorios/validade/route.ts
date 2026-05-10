@@ -6,7 +6,7 @@ export async function GET() {
   const actor = await getAuthActor();
   if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
-    assertPerfil(actor, ["ESTOQUE"]);
+    assertPerfil(actor, ["ADMINISTRADOR"]);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 403 });
   }
@@ -14,7 +14,6 @@ export async function GET() {
     const hoje = new Date();
     const em30dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-    // Alertas de vencimento
     const lotesVencendo = await prisma.lote.findMany({
       where: {
         validade: { gte: hoje, lte: em30dias },
@@ -37,34 +36,6 @@ export async function GET() {
       },
     });
 
-    // Alertas estoque mínimo
-    const produtosComEstoque = await prisma.produto.findMany({
-      where: { ativo: true, estoqueMinimo: { gt: 0 } },
-      include: {
-        estoqueAtual: {
-          select: { quantidadeDisponivel: true },
-        },
-      },
-    });
-
-    const abaixoMinimo = produtosComEstoque
-      .map((p) => {
-        const estoqueDisponivel = p.estoqueAtual.reduce(
-          (sum, e) => sum + e.quantidadeDisponivel,
-          0
-        );
-        return {
-          id: p.id,
-          descricao: p.descricao,
-          codigoInterno: p.codigoInterno,
-          estoqueMinimo: p.estoqueMinimo,
-          estoqueAtual: estoqueDisponivel,
-          diferenca: estoqueDisponivel - p.estoqueMinimo,
-        };
-      })
-      .filter((p) => p.estoqueAtual < p.estoqueMinimo);
-
-    // Valor em risco (produtos vencidos)
     const valorEmRisco = lotesVencidos.reduce((sum, lote) => {
       const qtd = lote.estoqueAtual.reduce((s, e) => s + e.quantidadeDisponivel, 0);
       return sum + qtd * (lote.produto?.precoCustoBase || 0);
@@ -87,16 +58,11 @@ export async function GET() {
         codigo: l.produto?.codigoInterno,
         quantidade: l.estoqueAtual.reduce((s, e) => s + e.quantidadeDisponivel, 0),
       })),
-      abaixoMinimo,
       valorEmRisco,
-      totais: {
-        vencendo: lotesVencendo.length,
-        vencidos: lotesVencidos.length,
-        abaixoMinimo: abaixoMinimo.length,
-      },
+      totais: { vencendo: lotesVencendo.length, vencidos: lotesVencidos.length },
     });
   } catch (error) {
-    console.error("GET /api/estoque/alertas", error);
-    return NextResponse.json({ error: "Erro ao gerar alertas." }, { status: 500 });
+    console.error("GET /api/relatorios/validade", error);
+    return NextResponse.json({ error: "Erro ao gerar relatorio de validade." }, { status: 500 });
   }
 }
