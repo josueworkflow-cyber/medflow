@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { RegimeTributario, StatusDocumentoFiscal, TipoDocumentoFiscal } from "@prisma/client";
+import { empresaFiscalSelect } from "@/lib/fiscal-select";
 
 export class FiscalService {
   /**
@@ -21,7 +22,7 @@ export class FiscalService {
         }
       },
       include: {
-        empresaFiscal: true,
+        empresaFiscal: { select: empresaFiscalSelect },
         cliente: true,
         documentoFiscal: true,
         produto: { select: { descricao: true } },
@@ -36,7 +37,8 @@ export class FiscalService {
    */
   static async getEmpresasFiscais() {
     return prisma.empresaFiscal.findMany({
-      where: { ativo: true }
+      where: { ativo: true },
+      select: empresaFiscalSelect
     });
   }
 

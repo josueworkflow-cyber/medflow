@@ -853,7 +853,7 @@ export class PedidoService {
             empresaFiscalId: empresaFiscalId!,
             clienteId: ped.clienteId,
             pedidoVendaId: id,
-            status: StatusDocumentoFiscal.EMITIDA,
+            status: StatusDocumentoFiscal.AUTORIZADA,
             dataEmissao: new Date(),
           },
         });
@@ -973,7 +973,7 @@ export class PedidoService {
 
         const documentoFiscal = pedido.tipoPedido === "PEDIDO_NORMAL"
           ? await tx.documentoFiscal.findFirst({
-              where: { pedidoVendaId: id, status: "EMITIDA" },
+              where: { pedidoVendaId: id, status: "AUTORIZADA" },
               orderBy: { createdAt: "desc" },
             })
           : null;
@@ -1031,7 +1031,7 @@ export class PedidoService {
                 loteId: reserva.loteId,
                 quantidade: reserva.quantidade,
                 valorTotal,
-                status: "EMITIDA",
+                status: "AUTORIZADA",
                 dataEmissao: new Date(),
               },
             });

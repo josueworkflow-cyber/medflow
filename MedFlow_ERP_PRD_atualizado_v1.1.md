@@ -1,8 +1,8 @@
 # Documento de Requisitos de Produto (PRD) - MedFlow ERP
 
-**Versão:** 1.3  
+**Versão:** 1.4  
 **Status:** Base oficial de contexto para IA e desenvolvimento  
-**Última atualização:** Sincronização completa com o código atual. Adicionados: Contabilidade (5ª página do Financeiro), módulos Compras, Vendedores, Categorias, Relatórios e Configurações. Novas entidades (TabelaPreco, Localizacao, PedidoCompra). Alinhamento de nomenclatura de perfis e status com o código. Documentação do futuro App Mobile Android para VENDAS e ESTOQUE.
+**Última atualização:** Sincronização completa com o código atual. Adicionados padrões de validação rigorosos com Zod para rotas críticas de cadastro de produtos e pedidos, paginação no catálogo de produtos e vendas, otimização de árvore de categorias em memória e restauração de índices de banco de dados para evitar drift.
 
 ---
 
@@ -1625,6 +1625,25 @@ Gera NF-e de saída para o pedido. Usa `lib/nfe-generator.ts`.
 #### `GET /api/relatorios/margem`
 
 Relatório de margem por produto/período.
+
+---
+
+### 7.11 Padrões de Segurança, Validação e Performance
+
+#### Validação de Inputs com Zod
+Para garantir a integridade dos dados inseridos no sistema e evitar erros silenciosos ou drift de tipos, os endpoints de criação de registros críticos utilizam esquemas de validação robustos com a biblioteca `zod`:
+- **`POST /api/produto`**: Valida a descrição mínima obrigatória, códigos, preços, flags de controle de lote/validade, e todos os metadados do produto enviadas pelo client (CNPJ do fabricante, classe de risco, apresentação, princípio ativo, etc.). Utiliza coerção (`z.coerce`) de valores numéricos e booleanos e validações por enums nativos (`ClasseRisco` e `Apresentacao`).
+- **`POST /api/vendas`**: Valida ID do cliente, ID do vendedor, tipo de pedido (através de `z.nativeEnum(TipoPedido)`), desconto não negativo, e um array de itens contendo ID do produto válido, quantidade maior que zero, preço não negativo e array não vazio.
+
+#### Paginação de Listagens (Prevenção de Gargalos)
+Para evitar que a renderização do frontend e as consultas ao banco de dados degradem conforme o volume de dados cresce, as seguintes APIs foram paginadas:
+- **`GET /api/produto`** e **`GET /api/vendas`**: Aceitam parâmetros de consulta `page` e retornam um formato unificado contendo `{ items, total, page, pageSize }`. O backend executa a busca física com `take` e `skip` em paralelo com a contagem total de registros através de `Promise.all` para máxima eficiência.
+
+#### Otimização de Busca e Montagem de Árvore de Categorias
+Para o carregamento de estruturas de árvore (ex: categorias hierárquicas), a estratégia de JOINs aninhados (include recursivo no Prisma) foi substituída por uma busca plana contendo todas as categorias ativas seguida de reconstrução em árvore (`buildTree`) em memória do servidor, reduzindo o tempo de consulta no banco de dados para complexidade linear $O(N)$.
+
+#### Melhoria nas Transições de Página
+As animações artificiais de transição de páginas no ERP foram simplificadas e otimizadas no layout raiz (`app/sistema/layout.tsx`), removendo atrasos desnecessários do `framer-motion` para garantir resposta visual imediata durante a navegação.
 
 ---
 

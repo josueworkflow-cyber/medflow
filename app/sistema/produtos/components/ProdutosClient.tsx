@@ -123,17 +123,32 @@ const CLASSE_RISCO = [
   { value: "IV", label: "IV - Máximo Risco" },
 ];
 
+const PAGE_SIZE = 50;
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 interface ProdutosClientProps {
-  initialData: ProdutoListItem[];
+  initialData: {
+    items: ProdutoListItem[];
+    total: number;
+    page: number;
+    pageSize: number;
+  };
   categorias: CategoriaWithChildren[];
 }
 
 export function ProdutosClient({ initialData, categorias }: ProdutosClientProps) {
-  const { data: produtos, mutate } = useSWR<ProdutoListItem[]>("/api/produto", fetcher, {
-    fallbackData: initialData,
-  });
+  const [page, setPage] = useState(0);
+  const [search, setSearch] = useState("");
+
+  const { data, mutate } = useSWR<{ items: ProdutoListItem[]; total: number; page: number; pageSize: number }>(
+    `/api/produto?page=${page}&pageSize=${PAGE_SIZE}&search=${encodeURIComponent(search)}`,
+    fetcher,
+    {
+      fallbackData: initialData,
+      keepPreviousData: true,
+    }
+  );
 
   const [form, setForm] = useState<FormData>(initialForm);
   const [saving, setSaving] = useState(false);
@@ -227,8 +242,8 @@ export function ProdutosClient({ initialData, categorias }: ProdutosClientProps)
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const resultado = await res.json();
+      if (!res.ok) throw new Error(resultado.error);
 
       toast.success("Produto cadastrado com sucesso!");
       setForm(initialForm);
@@ -258,7 +273,8 @@ export function ProdutosClient({ initialData, categorias }: ProdutosClientProps)
     }
   }
 
-  const produtosList = Array.isArray(produtos) ? produtos : [];
+  const produtosList = data?.items || [];
+  const total = data?.total || 0;
 
   function formatConcentracao(p: any): string {
     if (p.concentracaoValor && p.concentracaoUnidade) {
@@ -528,7 +544,18 @@ export function ProdutosClient({ initialData, categorias }: ProdutosClientProps)
         <CardHeader className="bg-slate-50/50 border-b flex flex-row items-center justify-between py-3">
           <div>
             <CardTitle className="text-base">Produtos Cadastrados</CardTitle>
-            <CardDescription className="text-xs">{produtosList.length} itens no sistema</CardDescription>
+            <CardDescription className="text-xs">{total} itens no sistema</CardDescription>
+          </div>
+          <div className="w-64">
+            <Input
+              placeholder="Buscar por descrição..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(0);
+              }}
+              className="h-8 text-xs bg-white"
+            />
           </div>
         </CardHeader>
         <CardContent className="pt-4">
@@ -579,6 +606,32 @@ export function ProdutosClient({ initialData, categorias }: ProdutosClientProps)
                 ))}
               </TableBody>
             </Table>
+          </div>
+          <div className="flex items-center justify-between pt-4 border-t mt-4">
+            <div className="text-xs text-slate-500">
+              Página <span className="font-semibold text-slate-700">{page + 1}</span> de{" "}
+              <span className="font-semibold text-slate-700">{Math.ceil(total / PAGE_SIZE) || 1}</span>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="h-8 text-xs"
+              >
+                Anterior
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => (p + 1 < Math.ceil(total / PAGE_SIZE) ? p + 1 : p))}
+                disabled={page + 1 >= Math.ceil(total / PAGE_SIZE)}
+                className="h-8 text-xs"
+              >
+                Próximo
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

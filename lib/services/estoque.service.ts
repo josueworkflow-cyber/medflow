@@ -351,7 +351,7 @@ export class EstoqueService {
             loteId: item.loteId,
             quantidade: item.quantidade,
             valorTotal: item.valorTotal,
-            status: 'EMITIDA',
+            status: 'AUTORIZADA',
             dataEmissao: new Date()
           }
         });

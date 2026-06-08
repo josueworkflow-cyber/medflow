@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateNFeXML } from "@/lib/nfe-generator";
 import { getAuthActor, assertPerfil } from "@/lib/authz";
+import { empresaFiscalSelect } from "@/lib/fiscal-select";
 
 export async function GET(
   req: NextRequest,
@@ -21,7 +22,7 @@ export async function GET(
       where: { id: Number(id) },
       include: {
         cliente: true,
-        empresaFiscal: true,
+        empresaFiscal: { select: empresaFiscalSelect },
         itens: {
           include: { produto: true },
         },

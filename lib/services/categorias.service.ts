@@ -16,38 +16,24 @@ export async function getCategorias(): Promise<CategoriaWithChildren[]> {
     where: {
       empresaId: EMPRESA_ID_FIXA,
       ativo: true,
-      parentId: null,
     },
-    include: {
-      children: {
-        where: { ativo: true },
-        include: {
-          children: {
-            where: { ativo: true },
-            include: {
-              children: {
-                where: { ativo: true },
-                include: {
-                  children: {
-                    where: { ativo: true },
-                    orderBy: { nome: "asc" }
-                  }
-                },
-                orderBy: { nome: "asc" }
-              }
-            },
-            orderBy: { nome: "asc" }
-          }
-        },
-        orderBy: { nome: "asc" }
-      }
-    },
-    orderBy: {
-      nome: "asc",
-    },
+    select: { id: true, nome: true, parentId: true, empresaId: true, ativo: true },
+    orderBy: { nome: "asc" },
   });
 
-  return categorias as CategoriaWithChildren[];
+  return buildTree(categorias, null);
+}
+
+function buildTree(
+  items: { id: number; nome: string; parentId: number | null; empresaId: number; ativo: boolean }[],
+  parentId: number | null = null
+): CategoriaWithChildren[] {
+  return items
+    .filter((i) => i.parentId === parentId)
+    .map((i) => ({
+      ...i,
+      children: buildTree(items, i.id),
+    }));
 }
 
 export async function getAllCategoriasFlat(): Promise<CategoriaWithChildren[]> {

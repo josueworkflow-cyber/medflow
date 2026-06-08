@@ -94,6 +94,19 @@ model Produto {
   movimentacoes            MovimentacaoEstoque[]
   movimentacoesFiscais     MovimentacaoFiscal[]
   categoriaRef             Categoria?            @relation(fields: [categoriaId], references: [id])
+
+  ncm                   String?   // 8 dígitos
+  cfop                  String?   // 4 dígitos
+  cst                   String?   // regime Normal
+  csosn                 String?   // Simples Nacional
+  origemMercadoria      String?   // 0=nacional, 1=importado
+  aliquotaIcms          Float?
+  aliquotaIpi           Float?
+  aliquotaPis           Float?
+  aliquotaCofins        Float?
+  unidadeFiscal         String?   // UN, CX, FR, KG — pode diferir da unidadeVenda
+
+  @@index([categoriaId])
 }
 
 model Categoria {
@@ -105,6 +118,9 @@ model Categoria {
   produtos  Produto[]
   parent    Categoria? @relation("CategoriaHierarchy", fields: [parentId], references: [id])
   children  Categoria[] @relation("CategoriaHierarchy")
+
+  @@index([parentId])
+  @@index([empresaId])
 }
 
 model Localizacao {
@@ -136,6 +152,9 @@ model Lote {
   movimentacoesFiscais MovimentacaoFiscal[]
 
   @@unique([numeroLote, produtoId])
+  @@index([produtoId])
+  @@index([localizacaoId])
+  @@index([fornecedorId])
 }
 
 model MovimentacaoEstoque {
@@ -160,6 +179,14 @@ model MovimentacaoEstoque {
   usuarioRef         Usuario?            @relation(fields: [usuarioId], references: [id])
   empresaFiscal      EmpresaFiscal?      @relation(fields: [empresaFiscalId], references: [id])
   movimentacaoFiscal MovimentacaoFiscal?
+
+  @@index([produtoId])
+  @@index([loteId])
+  @@index([localizacaoId])
+  @@index([pedidoVendaId])
+  @@index([usuarioId])
+  @@index([empresaFiscalId])
+  @@index([createdAt])
 }
 
 model EstoqueAtual {
@@ -177,6 +204,10 @@ model EstoqueAtual {
   localizacao          Localizacao?  @relation(fields: [localizacaoId], references: [id])
   lote                 Lote?         @relation(fields: [loteId], references: [id])
   produto              Produto       @relation(fields: [produtoId], references: [id])
+
+  @@index([produtoId])
+  @@index([loteId])
+  @@index([localizacaoId])
 }
 
 model Fornecedor {
@@ -219,6 +250,16 @@ model Cliente {
   movimentacoesFiscais MovimentacaoFiscal[]
   pedidosVenda         PedidoVenda[]
   tabelasPreco         TabelaPreco[]
+
+  logradouro            String?
+  numero                String?
+  complemento           String?
+  bairro                String?
+  codigoMunicipio       String?   // IBGE — obrigatório NF-e
+  inscricaoEstadual     String?
+  inscricaoMunicipal    String?
+  contribuinteICMS      Boolean   @default(false)
+  consumidorFinal       Boolean   @default(false)
 }
 
 model Vendedor {
@@ -247,6 +288,8 @@ model PedidoCompra {
   updatedAt    DateTime           @updatedAt
   itens        ItemPedidoCompra[]
   fornecedor   Fornecedor         @relation(fields: [fornecedorId], references: [id])
+
+  @@index([fornecedorId])
 }
 
 model ItemPedidoCompra {
@@ -258,6 +301,9 @@ model ItemPedidoCompra {
   subtotal       Float        @default(0)
   pedidoCompra   PedidoCompra @relation(fields: [pedidoCompraId], references: [id], onDelete: Cascade)
   produto        Produto      @relation(fields: [produtoId], references: [id])
+
+  @@index([pedidoCompraId])
+  @@index([produtoId])
 }
 
 model PedidoVenda {
@@ -285,6 +331,12 @@ model PedidoVenda {
   empresaFiscal        EmpresaFiscal?        @relation(fields: [empresaFiscalId], references: [id])
   vendedor             Vendedor?             @relation(fields: [vendedorId], references: [id])
   separacao            Separacao?
+
+  @@index([clienteId])
+  @@index([vendedorId])
+  @@index([empresaFiscalId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model ItemPedidoVenda {
@@ -297,6 +349,9 @@ model ItemPedidoVenda {
   subtotal      Float       @default(0)
   pedidoVenda   PedidoVenda @relation(fields: [pedidoVendaId], references: [id], onDelete: Cascade)
   produto       Produto     @relation(fields: [produtoId], references: [id])
+
+  @@index([pedidoVendaId])
+  @@index([produtoId])
 }
 
 model TabelaPreco {
@@ -308,6 +363,8 @@ model TabelaPreco {
   updatedAt DateTime          @updatedAt
   itens     ItemTabelaPreco[]
   cliente   Cliente?          @relation(fields: [clienteId], references: [id])
+
+  @@index([clienteId])
 }
 
 model ItemTabelaPreco {
@@ -318,6 +375,9 @@ model ItemTabelaPreco {
   descontoMax   Float       @default(0)
   produto       Produto     @relation(fields: [produtoId], references: [id])
   tabelaPreco   TabelaPreco @relation(fields: [tabelaPrecoId], references: [id], onDelete: Cascade)
+
+  @@index([tabelaPrecoId])
+  @@index([produtoId])
 }
 
 model Separacao {
@@ -342,6 +402,10 @@ model ItemSeparacao {
   lote        Lote?     @relation(fields: [loteId], references: [id])
   produto     Produto   @relation(fields: [produtoId], references: [id])
   separacao   Separacao @relation(fields: [separacaoId], references: [id], onDelete: Cascade)
+
+  @@index([separacaoId])
+  @@index([produtoId])
+  @@index([loteId])
 }
 
 model Conta {
@@ -367,6 +431,12 @@ model Conta {
   fornecedor       Fornecedor?          @relation(fields: [fornecedorId], references: [id])
   pedidoVenda      PedidoVenda?         @relation(fields: [pedidoVendaId], references: [id])
   historicoPagamentos HistoricoPagamento[]
+
+  @@index([clienteId])
+  @@index([fornecedorId])
+  @@index([pedidoVendaId])
+  @@index([status])
+  @@index([dataVencimento])
 }
 
 model HistoricoPagamento {
@@ -378,6 +448,8 @@ model HistoricoPagamento {
   observacao     String?
   createdAt      DateTime        @default(now())
   conta          Conta           @relation(fields: [contaId], references: [id], onDelete: Cascade)
+
+  @@index([contaId])
 }
 
 model EmpresaFiscal {
@@ -394,6 +466,33 @@ model EmpresaFiscal {
   movimentacoesFiscais MovimentacaoFiscal[]
   movimentacoesEstoque MovimentacaoEstoque[]
   pedidosVenda         PedidoVenda[]
+
+  inscricaoMunicipal    String?
+  logradouro            String?
+  numero                String?
+  complemento           String?
+  bairro                String?
+  municipio             String?
+  codigoMunicipio       String?   // código IBGE
+  uf                    String?
+  cep                   String?
+
+  certificadoPfxBase64  String?   // NUNCA expor em API
+  certificadoSenha      String?   // criptografada — NUNCA expor em API
+  certificadoValidade   DateTime?
+
+  serieNFe              String    @default("1")
+  numeroUltimaNFe       Int       @default(0)
+  serieNFSe             String    @default("1")
+  numeroUltimaNFSe      Int       @default(0)
+
+  ambienteSEFAZ         String    @default("homologacao")
+
+  codigoTributacaoIss         String?
+  codigoNbs                   String?
+  aliquotaIss                 Decimal?
+  percentualTributosFederais  String? // Used directly as literal string in payload (e.g. "10.38")
+  percentualTributosEstaduais String? // Used directly as literal string in payload (e.g. "0.00")
 }
 
 model DocumentoFiscal {
@@ -413,6 +512,24 @@ model DocumentoFiscal {
   fornecedor           Fornecedor?           @relation(fields: [fornecedorId], references: [id])
   pedidoVenda          PedidoVenda?          @relation(fields: [pedidoVendaId], references: [id])
   movimentacoesFiscais MovimentacaoFiscal[]
+
+  serie                 String?
+  protocolo             String?
+  xmlAutorizadoBase64   String?   // XML completo — tem validade jurídica
+  danfePdfBase64        String?
+  dataAutorizacao       DateTime?
+
+  codigoRejeicao        String?
+  mensagemRejeicao      String?
+
+  dataCancelamento      DateTime?
+  motivoCancelamento    String?
+  xmlCancelamento       String?
+
+  @@index([empresaFiscalId])
+  @@index([fornecedorId])
+  @@index([clienteId])
+  @@index([pedidoVendaId])
 }
 
 model MovimentacaoFiscal {
@@ -436,6 +553,13 @@ model MovimentacaoFiscal {
   movimentacaoEstoque   MovimentacaoEstoque      @relation(fields: [movimentacaoEstoqueId], references: [id])
   pedidoVenda           PedidoVenda?             @relation(fields: [pedidoVendaId], references: [id])
   produto               Produto                  @relation(fields: [produtoId], references: [id])
+
+  @@index([pedidoVendaId])
+  @@index([clienteId])
+  @@index([empresaFiscalId])
+  @@index([documentoFiscalId])
+  @@index([produtoId])
+  @@index([loteId])
 }
 
 model HistoricoPedido {
@@ -450,6 +574,10 @@ model HistoricoPedido {
   createdAt      DateTime      @default(now())
   pedidoVenda    PedidoVenda   @relation(fields: [pedidoVendaId], references: [id])
   usuario        Usuario?      @relation(fields: [usuarioId], references: [id])
+
+  @@index([pedidoVendaId])
+  @@index([usuarioId])
+  @@index([createdAt])
 }
 
 enum TipoMovimentacao {
@@ -475,18 +603,20 @@ enum StatusEstoque {
 enum TipoDocumentoFiscal {
   NFE_ENTRADA
   NFE_SAIDA
+  NFSE
   AJUSTE
 }
 
 enum StatusDocumentoFiscal {
   PENDENTE
-  EMITIDA
+  AUTORIZADA
+  REJEITADA
   CANCELADA
 }
 
 enum StatusMovimentacaoFiscal {
   PENDENTE
-  EMITIDA
+  AUTORIZADA
   CANCELADA
 }
 

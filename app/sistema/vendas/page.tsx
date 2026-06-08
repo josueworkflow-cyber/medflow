@@ -106,11 +106,13 @@ export default function VendasPage() {
   const carregarPedidos = () =>
     fetch("/api/vendas")
       .then((r) => r.json())
-      .then((d) => setPedidos(Array.isArray(d) ? d : []));
+      .then((d) => setPedidos(Array.isArray(d) ? d : (d && Array.isArray(d.items) ? d.items : [])));
 
   useEffect(() => {
     carregarPedidos();
-    fetch("/api/produto").then((r) => r.json()).then((d) => setProdutos(Array.isArray(d) ? d : []));
+    fetch("/api/produto")
+      .then((r) => r.json())
+      .then((d) => setProdutos(Array.isArray(d) ? d : (d && Array.isArray(d.items) ? d.items : [])));
     fetch("/api/clientes").then((r) => r.json()).then((d) => setClientes(Array.isArray(d) ? d : []));
     fetch("/api/vendedores").then((r) => r.json()).then((d) => setVendedores(Array.isArray(d) ? d : []));
   }, []);

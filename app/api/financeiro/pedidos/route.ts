@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthActor, assertPerfil } from "@/lib/authz";
+import { empresaFiscalSelect } from "@/lib/fiscal-select";
 
 export async function GET(req: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       include: {
         cliente: true,
         vendedor: { select: { nome: true } },
-        empresaFiscal: true,
+        empresaFiscal: { select: empresaFiscalSelect },
         itens: { include: { produto: { select: { descricao: true } } } },
         historico: { orderBy: { createdAt: "desc" }, take: 10, include: { usuario: { select: { nome: true } } } },
       },
@@ -67,7 +68,10 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    const empresas = await prisma.empresaFiscal.findMany({ where: { ativo: true } });
+    const empresas = await prisma.empresaFiscal.findMany({
+      where: { ativo: true },
+      select: empresaFiscalSelect,
+    });
 
     return NextResponse.json({ pedidos, historicoClientes, empresas, filtro });
   } catch (error) {
