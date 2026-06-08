@@ -38,3 +38,11 @@ export interface NFSePayload {
   percentual_total_tributos_municipais: string;
   situacao_tributaria_pis_cofins: string;
 }
+
+export interface RetornoNFSe {
+  autorizada: boolean;
+  chaveAcesso?: string;
+  xmlAutorizado?: string; // Will store the JSON response body of the authorized DPS
+  codigoRejeicao?: string;
+  mensagemRejeicao?: string;
+}
