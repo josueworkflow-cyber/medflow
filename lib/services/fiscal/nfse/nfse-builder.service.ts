@@ -170,7 +170,7 @@ export async function buildNFSePayload(pedidoVendaId: number): Promise<NFSePaylo
     valor_servico: pedido.valorTotal,
 
     // Tributos
-    tributacao_iss: 1, // 1 = Tributado no município
+    tributacao_iss: 1, // Código de tributação padrão: 1 = Operação Tributável (tributado no município)
     tipo_retencao_iss: 1, // 1 = Não retido
     valor_iss,
 
