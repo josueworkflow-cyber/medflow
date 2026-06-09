@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@alexssmusica/node-pdf-nfe": "^1.2.19",
     "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^6.19.2",
     "@xmldom/xmldom": "^0.9.10",
@@ -27,6 +28,7 @@
     "radix-ui": "^1.4.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "resend": "^6.12.4",
     "shadcn": "^4.0.6",
     "sonner": "^2.0.7",
     "swr": "^2.4.1",

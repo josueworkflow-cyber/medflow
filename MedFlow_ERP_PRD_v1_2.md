@@ -1,8 +1,8 @@
 # Documento de Requisitos de Produto (PRD) - MedFlow ERP
 
-**Versão:** 1.4  
+**Versão:** 1.5  
 **Status:** Base oficial de contexto para IA e desenvolvimento  
-**Última atualização:** Sincronização completa com o código atual. Adicionados padrões de validação rigorosos com Zod para rotas críticas de cadastro de produtos e pedidos, paginação no catálogo de produtos e vendas, otimização de árvore de categorias em memória e restauração de índices de banco de dados para evitar drift.
+**Última atualização:** Adicionado módulo fiscal completo (NF-e, NFS-e, DANFe, certificado digital, e-mail provider). Documentadas empresas fiscais pré-configuradas (DAC Hospitalar e PulseMed Hospitalar). Sinalizado status de implementação de cada módulo. Adicionada seção 6.13 expandida de Configurações e seção 7.7 expandida de APIs Fiscais.
 
 ---
 
@@ -31,10 +31,44 @@ O MedFlow ERP é um ERP vertical para uma empresa de distribuição de produtos 
 - Fornecedores
 - Relatórios gerenciais
 - Histórico e auditoria
+- Emissão de NF-e e NFS-e ✅
+- Certificado digital A1 ✅
+- DANFe (PDF) ✅
+- E-mail fiscal automatizado ✅
 
 Regra crítica:
 
 > O ERP não controla entrega, logística, transportadora, rota, rastreio ou confirmação de entrega. Depois que o pedido for marcado como **Entregue**, ele deve ser **Finalizado**.
+
+---
+
+### 0.1 Status de Implementação dos Módulos
+
+| Módulo | Status |
+| :--- | :--- |
+| Pedido de venda (fluxo completo) | ✅ Implementado |
+| Estoque (posição, lote, validade, movimentações) | ✅ Implementado |
+| Financeiro (dashboard, contas, fluxo de caixa, contabilidade) | ✅ Implementado |
+| Clientes | ✅ Implementado |
+| Fornecedores | ✅ Implementado |
+| Produtos e categorias | ✅ Implementado |
+| Vendedores | ✅ Implementado |
+| Dashboard executivo | ✅ Implementado |
+| Funil Kanban de pedidos | ✅ Implementado |
+| Separação e despacho | ✅ Implementado |
+| Emissão NF-e (XML, assinatura digital RSA-SHA1, envio SEFAZ SOAP) | ✅ Implementado |
+| Emissão NFS-e Nacional (DPS JSON, mTLS via https.Agent) | ✅ Implementado |
+| Certificado digital A1 (upload, criptografia AES-256-CBC, node-forge) | ✅ Implementado |
+| DANFe PDF (geração via @alexssmusica/node-pdf-nfe, endpoint download) | ✅ Implementado |
+| E-mail fiscal automatizado (Resend, LogEmail, XML anexado, DANFe como link) | ✅ Implementado |
+| Orquestrador fiscal assíncrono (setImmediate, fora da transação Prisma) | ✅ Implementado |
+| Configurações empresa fiscal (4 abas: dados gerais, NFS-e, certificado, e-mail) | ✅ Implementado |
+| Empresas fiscais pré-configuradas (DAC Hospitalar CNPJ 64025258000125, PulseMed Hospitalar CNPJ 59655623000145) | ✅ Configurado |
+| Importação NF-e de entrada (XML) | ✅ Implementado |
+| Relatórios gerenciais (margem, validade) | ✅ Implementado |
+| Alertas de estoque (vencimento, mínimo) | ✅ Implementado |
+| Giro de estoque | ✅ Implementado |
+| App mobile Android (VENDAS e ESTOQUE) | 🔜 Roadmap pós-MVP |
 
 ---
 
@@ -1318,11 +1352,37 @@ Relatório de controle de validade dos lotes.
 
 ---
 
-### 6.13 Configurações (`/sistema/configuracoes`)
+### 6.13 Configurações (`/sistema/configuracoes`) ✅ Implementado
 
 Página de configurações do sistema, acessível apenas por ADMINISTRADOR.
 
-Centraliza parâmetros gerais do ERP (detalhes a serem definidos conforme necessidade).
+Centraliza parâmetros gerais do ERP, incluindo configuração completa das empresas fiscais emissoras.
+
+#### 6.13.1 Dados da Empresa Fiscal
+
+Componente `<EmpresaFiscalConfig />` com seletor de empresa e 4 abas:
+
+**Aba 1 — Dados Gerais:** razaoSocial, nomeFantasia, cnpj, inscricaoEstadual, inscricaoMunicipal, regimeTributario, ambienteSEFAZ (badge amarelo = Homologação, badge vermelho = Produção), serieNFe, codigoMunicipio, endereço completo.
+
+**Aba 2 — Configurações NFS-e:** codigoTributacaoIss, codigoNbs (9 dígitos), aliquotaIss (Decimal), percentualTributosFederais e percentualTributosEstaduais (Strings literais para payload DPS).
+
+**Aba 3 — Certificado Digital:** Status de validade com alerta se vencer em menos de 30 dias. Upload de .pfx + senha. Validação via node-forge. Senha criptografada AES-256-CBC. Nunca retornados em resposta.
+
+**Aba 4 — E-mail (Resend):** emailRemetente, toggle emailAtivo, API key (oculta se já salva). Botão Testar Envio retorna 400 se emailAtivo = false. API key criptografada AES-256-CBC.
+
+#### 6.13.2 Empresas Fiscais Pré-configuradas
+
+| Empresa | CNPJ | ID | Status |
+| :--- | :--- | :--- | :--- |
+| DAC Hospitalar LTDA | 64.025.258/0001-25 | 2 | ativo: true |
+| PulseMed Hospitalar LTDA | 59.655.623/0001-45 | 3 | ativo: true |
+| MedFlow Distribuidora Hospitalar Ltda | — | 1 | ativo: false |
+
+Endereço: Rua Van Lerbergue, 6378, Lote 3A Quadra15 Loja 31, Jardim Atlântico Oeste, Maricá-RJ, CEP 24935-440, IBGE 3302700.
+
+**Pendente:** Inscrição Estadual, Inscrição Municipal, certificado .pfx, API key Resend.
+
+**Regra:** manter ambienteSEFAZ = homologacao até validação completa. Mudar para producao somente após homologação aprovada.
 
 ---
 
@@ -1568,21 +1628,62 @@ Registra entrada de estoque com lote, validade, quantidade e custo. Cria ou atua
 
 Lista lotes cadastrados.
 
-### 7.7 APIs Fiscais
+### 7.7 APIs Fiscais ✅ Implementado
 
 Rotas sob `app/api/fiscal/`:
 
 #### `GET /api/fiscal/empresas`
+Lista empresas fiscais ativas (DAC Hospitalar, PulseMed Hospitalar). Usa `empresaFiscalSelect` — nunca expõe certificado, emailApiKey ou certificadoSenha.
 
-Lista empresas fiscais (DAC, Pulse).
+#### `GET /api/fiscal/empresa`
+Lista empresas fiscais com flags de segurança: `hasEmailApiKey: boolean`, `hasCertificado: boolean`. Nunca retorna os valores reais.
+
+#### `POST /api/fiscal/empresa`
+Cria nova empresa fiscal. Perfil: ADMINISTRADOR.
+
+#### `PATCH /api/fiscal/empresa/[id]`
+Atualiza dados gerais da empresa fiscal. Perfil: ADMINISTRADOR.
+
+#### `DELETE /api/fiscal/empresa/[id]`
+Soft-delete: atualiza `ativo: false`. Nunca remove do banco. Perfil: ADMINISTRADOR.
+
+#### `POST /api/fiscal/empresa/[id]/certificado`
+Recebe PFX em base64 + senha. Valida via node-forge, extrai data de validade (`notAfter`), criptografa senha com AES-256-CBC, persiste. Nunca retorna PFX ou senha. Perfil: ADMINISTRADOR.
+
+#### `GET /api/fiscal/empresa/[id]/certificado`
+Chama `verificarValidade(id)`. Retorna `{ valido, venceEm, alertar }` ou `{ valido: false, alertar: false, venceEm: null }` se não configurado. Perfil: qualquer autenticado.
+
+#### `POST /api/fiscal/empresa/[id]/email`
+Recebe emailApiKey (opcional), emailRemetente, emailAtivo. Criptografa API key se fornecida. Nunca retorna a key. Perfil: ADMINISTRADOR.
+
+#### `POST /api/fiscal/empresa/[id]/email/teste`
+Envia e-mail de teste para o usuário logado. Retorna 400 com mensagem clara se `emailAtivo = false` ou sem configuração. Perfil: ADMINISTRADOR.
+
+#### `GET /api/fiscal/[id]/danfe`
+Download do DANFe PDF do DocumentoFiscal. Retorna `Content-Type: application/pdf` com `Content-Disposition: attachment; filename="danfe-[chaveAcesso].pdf"`. Retorna 404 se `danfePdfBase64` for null. Perfil: FINANCEIRO ou ADMINISTRADOR.
 
 #### `GET /api/fiscal/relatorio`
-
 Relatório fiscal agregado.
 
 #### `GET /api/fiscal/movimentacoes`
-
 Lista movimentações fiscais vinculadas a documentos fiscais.
+
+#### Serviços fiscais internos (não são rotas HTTP)
+
+| Serviço | Arquivo | Responsabilidade |
+| :--- | :--- | :--- |
+| NF-e Builder | `lib/services/fiscal/nfe/nfe-builder.service.ts` | Gera XML da NF-e (layout 4.00, chave 44 dígitos, Módulo 11, ICMSSN102/ICMS40) |
+| NF-e Signer | `lib/services/fiscal/nfe/nfe-signer.service.ts` | Assina XML com RSA-SHA1, xml-crypto, canonicalization C14N |
+| NF-e Sender | `lib/services/fiscal/nfe/nfe-sender.service.ts` | Envia SOAP para SEFAZ-RJ, parse cStat 100/150 = autorizada |
+| NFS-e Builder | `lib/services/fiscal/nfse/nfse-builder.service.ts` | Monta payload DPS JSON para API Nacional |
+| NFS-e Sender | `lib/services/fiscal/nfse/nfse-sender.service.ts` | Envia via mTLS (https.Agent), HTTP 201 = autorizada |
+| DANFe | `lib/services/fiscal/nfe/nfe-danfe.service.ts` | Gera PDF via @alexssmusica/node-pdf-nfe, retorna base64 |
+| Certificado | `lib/services/fiscal/certificado.service.ts` | Carrega PFX, descriptografa senha, extrai PEM, verifica validade |
+| Email Fiscal | `lib/services/fiscal/nfe/nfe-email.service.ts` | Monta e envia e-mail com XML anexado e link do DANFe |
+| Email Provider | `lib/services/email/email-provider.service.ts` | Integração Resend, LogEmail PENDENTE/ENVIADO/FALHOU, criptografia API key |
+| Orquestrador | `lib/services/fiscal/fiscal-orquestrador.service.ts` | Coordena builder→signer→sender→danfe, atualiza DocumentoFiscal, dispara e-mail |
+
+**Regra do orquestrador:** Chamado via `setImmediate` fora da transação Prisma do `faturarPedido`. DocumentoFiscal criado com status `PENDENTE` e atualizado para `AUTORIZADA` ou `REJEITADA` após resposta do SEFAZ. Em erro inesperado: status `REJEITADA` + `motivoRejeicao` preenchido.
 
 ### 7.8 APIs de Compras
 
@@ -1682,20 +1783,21 @@ Finalizado
 | **Lote** | Rastreabilidade | Único por número de lote e produto. |
 | **EstoqueAtual** | Controle de saldo | Segrega disponível de reservado. Possui custo unitário e status. |
 | **MovimentacaoEstoque** | Auditoria de estoque | Log imutável de entradas, saídas, reservas, cancelamentos e ajustes. |
-| **EmpresaFiscal** | Emissor de NF | Representa DAC ou Pulse no momento da saída/faturamento. |
+| **EmpresaFiscal** | Emissor de NF | Representa DAC Hospitalar ou PulseMed Hospitalar. Campos fiscais: cnpj, crt, ambienteSEFAZ, serieNFe, codigoMunicipio, inscricaoEstadual, inscricaoMunicipal. Certificado: certificadoPfxBase64, certificadoSenha (AES-256-CBC), certificadoValidade. NFS-e: codigoNbs, aliquotaIss (Decimal), codigoTributacaoIss. E-mail: emailApiKey (AES-256-CBC), emailRemetente, emailAtivo. Campos sensíveis NUNCA expostos via API. |
 | **MovimentacaoFiscal** | Vínculo fiscal | Conecta saída física a documento fiscal quando houver NF. |
 | **PedidoVenda** | Comercial | Entidade central do fluxo. Controla tipo do pedido e status atual. |
 | **HistoricoPedido** | Auditoria do pedido | Registra cada transição de status, usuário, setor, data e observação. |
 | **Conta** | Financeiro | Contas a receber/pagar vinculadas a pedidos. Campos: `valorPago`, `formaPagamento`, `categoria`, `parcelaNumero`, `parcelaTotal`. Status: ABERTA, PAGA, VENCIDA, CANCELADA. |
 | **HistoricoPagamento** | Auditoria financeira | Registra cada baixa/pagamento com valor, data, forma de pagamento e observação. Vinculado a `Conta` com cascade delete. |
 | **Separacao** | Separação operacional | Controla picking, conferência, embalagem e despacho interno. |
-| **DocumentoFiscal** | Documento fiscal | NF-e de entrada ou saída. Armazena chave de acesso, número e status. |
+| **DocumentoFiscal** | Documento fiscal | NF-e de entrada ou saída. Campos: `tipo` (NFE_SAIDA, NFE_ENTRADA, NFSE), `status` (PENDENTE, AUTORIZADA, REJEITADA), `chaveAcesso`, `protocolo`, `xmlAutorizadoBase64`, `danfePdfBase64`, `dataAutorizacao`, `motivoRejeicao`, `numero`, `empresaFiscalId`. |
 | **Categoria** | Categoria de produtos | Hierarquia de até 5 níveis via `parentId`. Vinculada a `empresaId`. |
 | **Localizacao** | Localização física | Controle de endereçamento de estoque (prateleira, galpão, etc). |
 | **TabelaPreco** | Preço por cliente | Tabela de preços vinculada opcionalmente a um cliente. |
 | **ItemTabelaPreco** | Preço por produto | Preço e desconto máximo por produto dentro de uma tabela. |
 | **PedidoCompra** | Compra | Pedido de compra com fornecedor. Status: RASCUNHO, ENVIADO, PARCIAL, RECEBIDO, CANCELADO. |
 | **ItemPedidoCompra** | Item de compra | Produto, quantidade e preço unitário do pedido de compra. |
+| **LogEmail** | Log de disparos de e-mail | Registra cada tentativa de envio com status PENDENTE/ENVIADO/FALHOU, destinatario, assunto, erroMensagem. Vinculado a PedidoVenda e DocumentoFiscal. |
 | **Vendedor** | Vendedor | Cadastro de vendedor com meta e comissão. Pode ser vinculado a `Usuario`. |
 
 ---
@@ -1847,6 +1949,10 @@ As seguintes regras não devem ser alteradas sem solicitação explícita:
 14. Baixas financeiras devem ser atômicas: atualização da `Conta` e criação do `HistoricoPagamento` na mesma transação.
 15. O módulo financeiro possui exatamente 5 páginas: Dashboard, Pedidos Financeiros, Contas, Fluxo de Caixa e Contabilidade.
 16. O módulo de estoque de pedidos possui filtros internos por grupo de status, seguindo o mesmo padrão visual de Pedidos Financeiros.
+17. O `DocumentoFiscal` é criado com status `PENDENTE` no faturamento. O orquestrador fiscal atualiza para `AUTORIZADA` ou `REJEITADA` após resposta do SEFAZ. Nunca criar `DocumentoFiscal` já como `AUTORIZADA` diretamente no `PedidoService`.
+18. A emissão fiscal é assíncrona e ocorre fora da transação Prisma do faturamento. Falha na emissão não reverte o faturamento.
+19. Campos sensíveis de `EmpresaFiscal` (`certificadoPfxBase64`, `certificadoSenha`, `emailApiKey`) NUNCA devem ser retornados em respostas de API nem logados no console.
+20. O e-mail fiscal é disparado automaticamente após autorização. Falha no e-mail não reverte a autorização.
 
 ---
 
@@ -1864,6 +1970,8 @@ Sempre que a IA for solicitada a criar, alterar ou melhorar qualquer parte do Me
 8. Essa alteração mantém o módulo financeiro em no máximo 5 páginas (Dashboard, Pedidos Financeiros, Contas, Fluxo de Caixa, Contabilidade)?
 9. Toda baixa financeira gera registro de auditoria em `HistoricoPagamento`?
 10. As APIs financeiras usam transações atômicas para baixas e criação de parcelas?
+11. O `DocumentoFiscal` é criado com status `PENDENTE` e atualizado pelo orquestrador?
+12. Campos sensíveis fiscais (`certificadoPfxBase64`, `certificadoSenha`, `emailApiKey`) estão protegidos e nunca expostos em respostas de API?
 
 Se alguma resposta for "não", a solução deve ser ajustada antes de ser implementada.
 

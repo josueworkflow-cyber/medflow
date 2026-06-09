@@ -8,6 +8,9 @@ import {
   TipoDocumentoFiscal,
   TipoPedido,
 } from "@prisma/client";
+import { FiscalOrquestradorService } from "@/lib/services/fiscal/fiscal-orquestrador.service";
+import { enviarEmailFiscal } from "@/lib/services/fiscal/nfe/nfe-email.service";
+
 
 export type PedidoActor = {
   usuarioId?: number;
@@ -836,7 +839,9 @@ export class PedidoService {
       }
     );
 
-    return this.transicionarEmCadeia(
+    let documentoFiscalId: number | undefined;
+
+    const resultado = await this.transicionarEmCadeia(
       id,
       passos,
       actor,
@@ -846,21 +851,38 @@ export class PedidoService {
           data: { empresaFiscalId },
         });
 
-        await tx.documentoFiscal.create({
+        const docFiscal = await tx.documentoFiscal.create({
           data: {
             tipo: TipoDocumentoFiscal.NFE_SAIDA,
             numero: dadosFiscal?.numero || `NF-${ped.numero}`,
             empresaFiscalId: empresaFiscalId!,
             clienteId: ped.clienteId,
             pedidoVendaId: id,
-            status: StatusDocumentoFiscal.AUTORIZADA,
+            status: StatusDocumentoFiscal.PENDENTE,
             dataEmissao: new Date(),
           },
         });
 
+        documentoFiscalId = docFiscal.id;
+
         await this.gerarContasReceber(tx, ped);
       }
     );
+
+    if (documentoFiscalId) {
+      setImmediate(async () => {
+        try {
+          const fiscal = await FiscalOrquestradorService.emitir(documentoFiscalId!);
+          if (fiscal.autorizada) {
+            await enviarEmailFiscal(documentoFiscalId!);
+          }
+        } catch (err: any) {
+          console.error(`Erro na emissão fiscal do documento ${documentoFiscalId}:`, err.message);
+        }
+      });
+    }
+
+    return resultado;
   }
 
   static async autorizarPedidoInterno(id: number, actor?: PedidoActor) {

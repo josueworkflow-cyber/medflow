@@ -325,6 +325,7 @@ model PedidoVenda {
   documentosFiscais    DocumentoFiscal[]
   historico            HistoricoPedido[]
   itens                ItemPedidoVenda[]
+  logEmails            LogEmail[]
   movimentacoesEstoque MovimentacaoEstoque[]
   movimentacoesFiscais MovimentacaoFiscal[]
   cliente              Cliente               @relation(fields: [clienteId], references: [id])
@@ -493,6 +494,11 @@ model EmpresaFiscal {
   aliquotaIss                 Decimal?
   percentualTributosFederais  String? // Used directly as literal string in payload (e.g. "10.38")
   percentualTributosEstaduais String? // Used directly as literal string in payload (e.g. "0.00")
+
+  emailApiKey                 String?
+  emailRemetente              String?
+  emailAtivo                  Boolean               @default(false)
+  logEmails                   LogEmail[]
 }
 
 model DocumentoFiscal {
@@ -512,6 +518,7 @@ model DocumentoFiscal {
   fornecedor           Fornecedor?           @relation(fields: [fornecedorId], references: [id])
   pedidoVenda          PedidoVenda?          @relation(fields: [pedidoVendaId], references: [id])
   movimentacoesFiscais MovimentacaoFiscal[]
+  logEmails            LogEmail[]
 
   serie                 String?
   protocolo             String?
@@ -521,6 +528,7 @@ model DocumentoFiscal {
 
   codigoRejeicao        String?
   mensagemRejeicao      String?
+  motivoRejeicao        String?
 
   dataCancelamento      DateTime?
   motivoCancelamento    String?
@@ -701,4 +709,31 @@ enum PerfilUsuario {
   VENDAS
   ESTOQUE
   FINANCEIRO
+}
+
+enum StatusEmail {
+  PENDENTE
+  ENVIADO
+  FALHOU
+}
+
+model LogEmail {
+  id                Int              @id @default(autoincrement())
+  destinatario      String
+  remetente         String
+  assunto           String
+  status            StatusEmail      @default(PENDENTE)
+  erroMensagem      String?
+  pedidoVendaId     Int?
+  pedidoVenda       PedidoVenda?     @relation(fields: [pedidoVendaId], references: [id])
+  documentoFiscalId Int?
+  documentoFiscal   DocumentoFiscal? @relation(fields: [documentoFiscalId], references: [id])
+  empresaFiscalId   Int
+  empresaFiscal     EmpresaFiscal    @relation(fields: [empresaFiscalId], references: [id])
+  createdAt         DateTime         @default(now())
+
+  @@index([pedidoVendaId])
+  @@index([documentoFiscalId])
+  @@index([empresaFiscalId])
+  @@index([createdAt])
 }
