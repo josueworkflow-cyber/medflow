@@ -389,4 +389,72 @@ export class EstoqueService {
       orderBy: { createdAt: 'desc' }
     });
   }
+
+  /**
+   * Estorna uma entrada de estoque
+   */
+  static async estornarEntrada(movimentacaoId: number, usuarioId?: number) {
+    return prisma.$transaction(async (tx) => {
+      // 1. Obter a movimentação original com a relação de estorno
+      const mov = await tx.movimentacaoEstoque.findUnique({
+        where: { id: movimentacaoId },
+        include: { estornadoPor: true }
+      });
+
+      if (!mov) {
+        throw new Error("Movimentação não encontrada.");
+      }
+
+      if (mov.tipo !== "ENTRADA") {
+        throw new Error("Apenas movimentações de entrada podem ser estornadas.");
+      }
+
+      if (mov.estornadoPor) {
+        throw new Error("Esta entrada já foi estornada.");
+      }
+
+      // 2. Buscar o EstoqueAtual correspondente
+      const estoque = await tx.estoqueAtual.findFirst({
+        where: {
+          produtoId: mov.produtoId,
+          loteId: mov.loteId,
+          localizacaoId: mov.localizacaoId
+        }
+      });
+
+      const qtdDisponivel = estoque?.quantidadeDisponivel || 0;
+      const qtdReservada = estoque?.quantidadeReservada || 0;
+
+      if (qtdDisponivel < mov.quantidade) {
+        throw new Error(
+          `Estorno bloqueado: apenas ${qtdDisponivel} unidades disponíveis. ${qtdReservada} unidades estão reservadas para pedidos em andamento.`
+        );
+      }
+
+      // 3. Decrementar do EstoqueAtual
+      await tx.estoqueAtual.update({
+        where: { id: estoque!.id },
+        data: {
+          quantidadeDisponivel: { decrement: mov.quantidade }
+        }
+      });
+
+      // 4. Criar a nova movimentação de estorno (tipo AJUSTE)
+      const estornoMov = await tx.movimentacaoEstoque.create({
+        data: {
+          produtoId: mov.produtoId,
+          loteId: mov.loteId,
+          tipo: "AJUSTE",
+          quantidade: mov.quantidade,
+          usuarioId: usuarioId,
+          localizacaoId: mov.localizacaoId,
+          estornoDeMovimentacaoId: mov.id,
+          observacao: `Estorno da entrada #${mov.id}`,
+          origem: "Sistema (Estorno)"
+        }
+      });
+
+      return estornoMov;
+    });
+  }
 }

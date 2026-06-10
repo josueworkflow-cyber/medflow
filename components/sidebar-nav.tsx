@@ -109,10 +109,7 @@ const financeiroItems: NavItem[] = [
 
 const adminItems: NavItem[] = [
   { title: "Usuarios", url: "/sistema/usuarios", icon: UserCircle },
-  { title: "Relatorios", url: "/sistema/relatorios", icon: BarChart3, children: [
-    { title: "Margem", url: "/sistema/relatorios/margem" },
-    { title: "Validade", url: "/sistema/relatorios/validade" },
-  ]},
+  { title: "Relatorios", url: "/sistema/relatorios", icon: BarChart3 },
   { title: "Configuracoes", url: "/sistema/configuracoes", icon: Settings },
 ];
 
@@ -180,9 +177,12 @@ export function AppSidebar() {
       return perfil === "VENDAS" || perfil === "ESTOQUE";
     }
 
+    if (url.startsWith("/sistema/relatorios")) {
+      return true;
+    }
+
     if (
       url.startsWith("/sistema/usuarios") ||
-      url.startsWith("/sistema/relatorios") ||
       url.startsWith("/sistema/configuracoes")
     ) {
       return false;

@@ -53,6 +53,7 @@ export default function FluxoCaixaPage() {
     } else {
       carregar();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [periodo, showPeriodo]);
 
   function handleFiltro(v: string) {

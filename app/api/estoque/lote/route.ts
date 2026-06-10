@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { EstoqueService } from "@/lib/services/estoque.service";
 import { getAuthActor, assertPerfil } from "@/lib/authz";
 
-export async function GET() {
+import { prisma } from "@/lib/prisma";
+
+export async function GET(req: NextRequest) {
   const actor = await getAuthActor();
   if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
@@ -11,6 +13,22 @@ export async function GET() {
     return NextResponse.json({ error: e.message }, { status: 403 });
   }
   try {
+    const { searchParams } = new URL(req.url);
+    const produtoId = searchParams.get("produtoId");
+    const numeroLote = searchParams.get("numeroLote");
+
+    if (produtoId && numeroLote) {
+      const lote = await prisma.lote.findUnique({
+        where: {
+          numeroLote_produtoId: {
+            numeroLote,
+            produtoId: Number(produtoId)
+          }
+        }
+      });
+      return NextResponse.json(lote);
+    }
+
     const saldo = await EstoqueService.getEstoqueAtual({});
     return NextResponse.json(saldo);
   } catch (error) {

@@ -18,6 +18,7 @@ type Produto = {
 export default function EntradaEstoquePage() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isLoteExistente, setIsLoteExistente] = useState(false);
 
   const [form, setForm] = useState({
     produtoId: "",
@@ -30,9 +31,10 @@ export default function EntradaEstoquePage() {
 
   async function carregarProdutos() {
     try {
-      const res = await fetch("/api/produto");
+      const res = await fetch("/api/produto?pageSize=1000");
       const data = await res.json();
-      setProdutos(Array.isArray(data) ? data : []);
+      const list = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
+      setProdutos(list);
     } catch {
       toast.error("Erro ao carregar produtos.");
     }
@@ -41,6 +43,34 @@ export default function EntradaEstoquePage() {
   useEffect(() => {
     carregarProdutos();
   }, []);
+
+  useEffect(() => {
+    if (!form.produtoId || !form.codigoLote) {
+      setIsLoteExistente(false);
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
+      fetch(`/api/estoque/lote?produtoId=${form.produtoId}&numeroLote=${encodeURIComponent(form.codigoLote.trim())}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.validade) {
+            const formattedValidade = new Date(data.validade).toISOString().split("T")[0];
+            setForm((prev) => ({
+              ...prev,
+              validade: formattedValidade,
+            }));
+            setIsLoteExistente(true);
+            toast.info(`Lote existente encontrado. Validade preenchida automaticamente.`);
+          } else {
+            setIsLoteExistente(false);
+          }
+        })
+        .catch(() => setIsLoteExistente(false));
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [form.produtoId, form.codigoLote]);
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +99,7 @@ export default function EntradaEstoquePage() {
         produtoId: "", codigoLote: "", validade: "",
         quantidade: "", custoUnitario: "", observacao: "",
       });
+      setIsLoteExistente(false);
     } catch (err: any) {
       toast.error(err.message || "Erro ao salvar.");
     } finally {
@@ -125,11 +156,14 @@ export default function EntradaEstoquePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-600">Data de Validade</label>
+                <label className="text-xs font-semibold text-slate-600">
+                  Data de Validade {isLoteExistente && <span className="text-amber-600 text-[10px] ml-1">(Lote Existente)</span>}
+                </label>
                 <Input
                   type="date"
                   value={form.validade}
                   onChange={(e) => setForm({ ...form, validade: e.target.value })}
+                  disabled={isLoteExistente}
                 />
               </div>
             </div>

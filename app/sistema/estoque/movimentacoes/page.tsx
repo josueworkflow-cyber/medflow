@@ -13,6 +13,15 @@ import {
   Eye, X, Filter, ChevronDown, ChevronUp, User, FileText, Building2,
   AlertTriangle, Layers, RotateCcw, Ban, Boxes,
 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -37,6 +46,8 @@ type Movimentacao = {
   movimentacaoFiscal: {
     documentoFiscal: { numero: string; tipo: string } | null;
   } | null;
+  estornado?: boolean;
+  isEstorno?: boolean;
 };
 
 type Totais = {
@@ -76,6 +87,35 @@ export default function MovimentacoesPage() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
   const [modalMov, setModalMov] = useState<Movimentacao | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [movToEstornar, setMovToEstornar] = useState<number | null>(null);
+  const [isEstornando, setIsEstornando] = useState(false);
+
+  const handleEstornarClick = (movId: number) => {
+    setMovToEstornar(movId);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmEstorno = async (movId: number) => {
+    setIsEstornando(true);
+    try {
+      const res = await fetch(`/api/estoque/movimentacoes/${movId}/estornar`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Erro ao estornar a entrada.");
+      }
+      toast.success("Entrada estornada com sucesso!");
+      setIsConfirmOpen(false);
+      setModalMov(null);
+      mutate();
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao estornar.");
+    } finally {
+      setIsEstornando(false);
+    }
+  };
 
   function buildUrl() {
     const p = new URLSearchParams();
@@ -284,14 +324,22 @@ export default function MovimentacoesPage() {
                           </div>
                         </td>
                         <td className="px-3">
-                          <Badge className={cn("text-[9px] border", cfg.color)}>{cfg.label}</Badge>
+                          <Badge className={cn("text-[9px] border", mov.isEstorno ? "bg-slate-100 text-slate-600 border-slate-200" : cfg.color)}>
+                            {mov.isEstorno ? "Estorno" : cfg.label}
+                          </Badge>
                         </td>
                         <td className="px-3">
-                          <span className={cn("font-bold text-xs",
-                            isEntrada ? "text-emerald-600" : isSaida ? "text-red-600" : "text-slate-600"
-                          )}>
-                            {isEntrada ? "+" : isSaida ? "-" : ""}{mov.quantidade}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className={cn("font-bold text-xs",
+                              isEntrada ? "text-emerald-600" : isSaida ? "text-red-600" : "text-slate-600",
+                              mov.estornado && "line-through opacity-50"
+                            )}>
+                              {isEntrada ? "+" : isSaida ? "-" : ""}{mov.quantidade}
+                            </span>
+                            {mov.estornado && (
+                              <span className="text-[9px] font-semibold text-amber-600 uppercase">Estornado</span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-3">
                           {mov.lote ? (
@@ -508,10 +556,89 @@ export default function MovimentacoesPage() {
                   <p className="text-sm text-slate-700">{modalMov.localizacao.nome}</p>
                 </div>
               )}
+
+              {modalMov.estornado && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-start gap-2 mt-4">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-amber-800">Entrada Estornada</p>
+                    <p className="text-[11px] text-amber-600">Esta movimentação de entrada foi revertida e seu estoque foi baixado.</p>
+                  </div>
+                </div>
+              )}
+
+              {modalMov.isEstorno && (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-start gap-2 mt-4">
+                  <RotateCcw className="h-4 w-4 text-slate-500 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-semibold text-slate-800">Movimentação de Estorno</p>
+                    <p className="text-[11px] text-slate-500">Este é um ajuste automático para reverter uma entrada incorreta.</p>
+                  </div>
+                </div>
+              )}
+
+              {modalMov.tipo === "ENTRADA" && !modalMov.estornado && !modalMov.isEstorno && (
+                <Button
+                  variant="destructive"
+                  className="w-full mt-6 h-9 gap-1.5 text-xs font-semibold"
+                  onClick={() => handleEstornarClick(modalMov.id)}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Estornar Entrada
+                </Button>
+              )}
             </div>
           </div>
         </div>
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="sm:max-w-[420px] bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600 text-base">
+              <AlertTriangle className="h-5 w-5" />
+              Confirmar Estorno
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500 pt-2 leading-relaxed">
+              Tem certeza que deseja estornar esta entrada de estoque?
+              <br /><br />
+              Esta ação reduzirá a quantidade disponível do produto e lote correspondentes no estoque. Esta operação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsConfirmOpen(false)}
+              disabled={isEstornando}
+              className="text-xs"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                if (movToEstornar !== null) {
+                  confirmEstorno(movToEstornar);
+                }
+              }}
+              disabled={isEstornando}
+              className="gap-1.5 text-xs"
+            >
+              {isEstornando ? (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                "Confirmar Estorno"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

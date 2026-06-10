@@ -176,9 +176,12 @@ model MovimentacaoEstoque {
   lote               Lote?               @relation(fields: [loteId], references: [id])
   pedidoVenda        PedidoVenda?        @relation(fields: [pedidoVendaId], references: [id])
   produto            Produto             @relation(fields: [produtoId], references: [id])
-  usuarioRef         Usuario?            @relation(fields: [usuarioId], references: [id])
-  empresaFiscal      EmpresaFiscal?      @relation(fields: [empresaFiscalId], references: [id])
-  movimentacaoFiscal MovimentacaoFiscal?
+  usuarioRef              Usuario?            @relation(fields: [usuarioId], references: [id])
+  empresaFiscal           EmpresaFiscal?      @relation(fields: [empresaFiscalId], references: [id])
+  movimentacaoFiscal      MovimentacaoFiscal?
+  estornoDeMovimentacaoId Int?                 @unique
+  estornoDeMovimentacao   MovimentacaoEstoque? @relation("EstornoRel", fields: [estornoDeMovimentacaoId], references: [id])
+  estornadoPor            MovimentacaoEstoque? @relation("EstornoRel")
 
   @@index([produtoId])
   @@index([loteId])

@@ -27,7 +27,7 @@ export default function ComprasPage() {
 
   useEffect(() => {
     fetch("/api/compras").then((r) => r.json()).then((d) => setPedidos(Array.isArray(d) ? d : []));
-    fetch("/api/produto").then((r) => r.json()).then((d) => setProdutos(Array.isArray(d) ? d : []));
+    fetch("/api/produto?pageSize=1000").then((r) => r.json()).then((d) => setProdutos(Array.isArray(d) ? d : (d && Array.isArray(d.items) ? d.items : [])));
     fetch("/api/fornecedores").then((r) => r.json()).then((d) => setFornecedores(Array.isArray(d) ? d : []));
   }, []);
 
