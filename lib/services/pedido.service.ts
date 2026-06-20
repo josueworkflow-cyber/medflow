@@ -8,10 +8,45 @@ import {
   TipoDocumentoFiscal,
   TipoPedido,
 } from "@prisma/client";
+import { FiscalOrquestradorService } from "@/lib/services/fiscal/fiscal-orquestrador.service";
+import { enviarEmailFiscal } from "@/lib/services/fiscal/nfe/nfe-email.service";
+import { calculateOrderTaxes } from "@/lib/services/fiscal/tributario/tax-engine.service";
+
 
 export type PedidoActor = {
   usuarioId?: number;
   perfil?: PerfilUsuario | null;
+};
+
+type ClienteFiscalFaturamento = {
+  razaoSocial?: string | null;
+  nomeFantasia?: string | null;
+  cnpjCpf?: string | null;
+  email?: string | null;
+  telefone?: string | null;
+  logradouro?: string | null;
+  numero?: string | null;
+  complemento?: string | null;
+  bairro?: string | null;
+  cidade?: string | null;
+  estado?: string | null;
+  cep?: string | null;
+  codigoMunicipio?: string | null;
+  inscricaoEstadual?: string | null;
+  contribuinteICMS?: boolean;
+  consumidorFinal?: boolean;
+};
+
+type DadosFaturamentoFiscal = {
+  numero?: string;
+  empresaFiscalId?: number;
+  naturezaOperacaoId?: number;
+  naturezaOperacao?: string | null;
+  informacoesComplementares?: string | null;
+  observacao?: string | null;
+  formaPagamento?: FormaPagamento | null;
+  prazoPagamento?: string | null;
+  cliente?: ClienteFiscalFaturamento;
 };
 
 type PassoStatus = {
@@ -27,6 +62,51 @@ type ReservaPendente = {
 };
 
 const TODOS_STATUS: StatusPedido[] = Object.values(StatusPedido);
+
+function nullableTrim(value: string | null | undefined): string | null | undefined {
+  if (value === undefined) return undefined;
+  const trimmed = (value || "").trim();
+  return trimmed ? trimmed : null;
+}
+
+function requiredTrim(value: string | null | undefined): string | undefined {
+  if (value === undefined || value === null) return undefined;
+  const trimmed = value.trim();
+  return trimmed || undefined;
+}
+
+function buildClienteFiscalUpdate(cliente?: ClienteFiscalFaturamento): Prisma.ClienteUpdateInput | null {
+  if (!cliente) return null;
+
+  const logradouro = nullableTrim(cliente.logradouro);
+  const numero = nullableTrim(cliente.numero);
+  const endereco =
+    logradouro !== undefined || numero !== undefined
+      ? [logradouro, numero].filter(Boolean).join(", ") || null
+      : undefined;
+
+  const data: Prisma.ClienteUpdateInput = {
+    razaoSocial: requiredTrim(cliente.razaoSocial),
+    nomeFantasia: nullableTrim(cliente.nomeFantasia),
+    cnpjCpf: nullableTrim(cliente.cnpjCpf),
+    email: nullableTrim(cliente.email),
+    telefone: nullableTrim(cliente.telefone),
+    logradouro,
+    numero,
+    complemento: nullableTrim(cliente.complemento),
+    bairro: nullableTrim(cliente.bairro),
+    cidade: nullableTrim(cliente.cidade),
+    estado: nullableTrim(cliente.estado)?.toUpperCase(),
+    cep: nullableTrim(cliente.cep),
+    codigoMunicipio: nullableTrim(cliente.codigoMunicipio),
+    inscricaoEstadual: nullableTrim(cliente.inscricaoEstadual),
+    endereco,
+    contribuinteICMS: typeof cliente.contribuinteICMS === "boolean" ? cliente.contribuinteICMS : undefined,
+    consumidorFinal: typeof cliente.consumidorFinal === "boolean" ? cliente.consumidorFinal : undefined,
+  };
+
+  return Object.fromEntries(Object.entries(data).filter(([, value]) => value !== undefined)) as Prisma.ClienteUpdateInput;
+}
 
 export class PedidoService {
   private static transicoes: Record<TipoPedido, Partial<Record<StatusPedido, StatusPedido[]>>> = {
@@ -435,15 +515,35 @@ export class PedidoService {
     await this.cancelarReservas(tx, pedido, actor, "Cancelamento antes de nova reserva");
 
     for (const item of pedido.itens) {
+      // Validar se há pelo menos um lote ativo não vencido disponível (FEFO)
+      const loteValido = await tx.lote.findFirst({
+        where: {
+          produtoId: item.produtoId,
+          status: "DISPONIVEL",
+          validade: { gt: new Date() }
+        },
+        include: { produto: true },
+        orderBy: { validade: "asc" }
+      });
+
+      if (!loteValido) {
+        const produtoObj = await tx.produto.findUnique({ where: { id: item.produtoId } });
+        throw new Error(`Produto ${produtoObj?.descricao || item.produtoId} sem lote disponível válido`);
+      }
+
       let restante = item.quantidade;
       const saldos = await tx.estoqueAtual.findMany({
         where: {
           produtoId: item.produtoId,
           quantidadeDisponivel: { gt: 0 },
           status: "DISPONIVEL",
+          lote: {
+            status: "DISPONIVEL",
+            validade: { gt: new Date() }
+          }
         },
         include: { lote: true },
-        orderBy: [{ createdAt: "asc" }],
+        orderBy: [{ lote: { validade: "asc" } }],
       });
 
       for (const saldo of saldos) {
@@ -477,6 +577,15 @@ export class PedidoService {
   }
 
   private static async gerarContasReceber(tx: Prisma.TransactionClient, pedido: any) {
+    const contaExistente = await tx.conta.findFirst({
+      where: {
+        pedidoVendaId: pedido.id,
+        tipo: "RECEBER",
+        status: { not: "CANCELADA" },
+      },
+    });
+    if (contaExistente) return;
+
     const hoje = new Date();
     const formaPagamento = pedido.formaPagamento as FormaPagamento | null;
 
@@ -589,7 +698,14 @@ export class PedidoService {
 
     for (const item of pedido.itens) {
       const sum = await prisma.estoqueAtual.aggregate({
-        where: { produtoId: item.produtoId, status: "DISPONIVEL" },
+        where: {
+          produtoId: item.produtoId,
+          status: "DISPONIVEL",
+          lote: {
+            status: "DISPONIVEL",
+            validade: { gt: new Date() }
+          }
+        },
         _sum: { quantidadeDisponivel: true },
       });
       const totalDisponivel = sum._sum.quantidadeDisponivel || 0;
@@ -598,25 +714,30 @@ export class PedidoService {
     }
 
     if (todosDisponiveis) {
-      return this.transicionarEmCadeia(
-        id,
-        [
-          {
-            status: StatusPedido.ESTOQUE_CONFIRMADO,
-            observacao: opcoes?.automatico
-              ? "Sistema confirmou disponibilidade e reservou produtos"
-              : "Estoque confirmou disponibilidade e reservou produtos",
-            tipoAcao: opcoes?.automatico ? "ESTOQUE_AUTO_CONFIRMADO" : "ESTOQUE_CONFIRMADO",
-          },
-          {
-            status: StatusPedido.AGUARDANDO_APROVACAO_FINANCEIRA,
-            observacao: "Pedido enviado para pre-aprovacao financeira",
-            tipoAcao: "ENVIO_FINANCEIRO",
-          },
-        ],
-        actor,
-        async (tx, ped) => this.reservarItens(tx, ped, actor, opcoes?.automatico ? "Reserva automatica" : "Reserva manual")
-      );
+      try {
+        return await this.transicionarEmCadeia(
+          id,
+          [
+            {
+              status: StatusPedido.ESTOQUE_CONFIRMADO,
+              observacao: opcoes?.automatico
+                ? "Sistema confirmou disponibilidade e reservou produtos"
+                : "Estoque confirmou disponibilidade e reservou produtos",
+              tipoAcao: "ESTOQUE_CONFIRMADO",
+            },
+            {
+              status: StatusPedido.AGUARDANDO_APROVACAO_FINANCEIRA,
+              observacao: "Pedido enviado para pre-aprovacao financeira",
+              tipoAcao: "ENVIO_FINANCEIRO",
+            },
+          ],
+          actor,
+          async (tx, ped) => this.reservarItens(tx, ped, actor, opcoes?.automatico ? "Reserva automatica" : "Reserva manual")
+        );
+      } catch (error: any) {
+        await this.marcarEstoqueIndisponivel(id, actor, error.message);
+        throw error;
+      }
     }
 
     return this.transicionarEmCadeia(
@@ -636,24 +757,48 @@ export class PedidoService {
 
   static async confirmarEstoque(id: number, actor?: PedidoActor) {
     this.assertPerfil(actor, [PerfilUsuario.ESTOQUE]);
-    return this.transicionarEmCadeia(
-      id,
-      [
-        {
-          status: StatusPedido.ESTOQUE_CONFIRMADO,
-          observacao: "Estoque confirmado manualmente e produtos reservados",
-          tipoAcao: "ESTOQUE_CONFIRMADO",
-        },
-        {
-          status: StatusPedido.AGUARDANDO_APROVACAO_FINANCEIRA,
-          observacao: "Pedido enviado para pre-aprovacao financeira",
-          tipoAcao: "ENVIO_FINANCEIRO",
-        },
-      ],
-      actor,
-      async (tx, pedido) => this.reservarItens(tx, pedido, actor, "Reserva manual")
-    );
+    try {
+      return await this.transicionarEmCadeia(
+        id,
+        [
+          {
+            status: StatusPedido.ESTOQUE_CONFIRMADO,
+            observacao: "Estoque confirmado manualmente e produtos reservados",
+            tipoAcao: "ESTOQUE_CONFIRMADO",
+          },
+          {
+            status: StatusPedido.AGUARDANDO_APROVACAO_FINANCEIRA,
+            observacao: "Pedido enviado para pre-aprovacao financeira",
+            tipoAcao: "ENVIO_FINANCEIRO",
+          },
+        ],
+        actor,
+        async (tx, pedido) => this.reservarItens(tx, pedido, actor, "Reserva manual")
+      );
+    } catch (error: any) {
+      await this.marcarEstoqueIndisponivel(id, actor, error.message);
+      throw error;
+    }
   }
+
+  private static async marcarEstoqueIndisponivel(id: number, actor?: PedidoActor, erroMsg?: string) {
+    const pedido = await this.carregarPedido(id);
+    await prisma.$transaction(async (tx) => {
+      await tx.pedidoVenda.update({
+        where: { id },
+        data: { status: StatusPedido.ESTOQUE_INDISPONIVEL }
+      });
+      await this.registrarHistorico(
+        tx,
+        id,
+        pedido.status,
+        StatusPedido.ESTOQUE_INDISPONIVEL,
+        actor,
+        `Estoque indisponível na reserva: ${erroMsg || "Lote indisponível"}`,
+        "ESTOQUE_INDISPONIVEL"
+      );
+    });
+  };
 
   static async aguardarFornecedor(id: number, actor?: PedidoActor, observacao?: string) {
     this.assertPerfil(actor, [PerfilUsuario.ESTOQUE]);
@@ -798,15 +943,18 @@ export class PedidoService {
   static async faturarPedido(
     id: number,
     actor?: PedidoActor,
-    dadosFiscal?: { numero?: string; empresaFiscalId?: number }
+    dadosFiscal?: DadosFaturamentoFiscal
   ) {
     this.assertPerfil(actor, [PerfilUsuario.FINANCEIRO]);
     const pedido = await this.carregarPedido(id);
+    const formaPagamento = dadosFiscal?.formaPagamento !== undefined
+      ? dadosFiscal.formaPagamento
+      : pedido.formaPagamento;
 
     if (pedido.tipoPedido === "PEDIDO_INTERNO") {
       throw new Error("Pedido interno nao emite NF. Use autorizarPedidoInterno.");
     }
-    if (!pedido.formaPagamento) {
+    if (!formaPagamento) {
       throw new Error("Forma de pagamento deve estar definida antes do faturamento.");
     }
     if (!dadosFiscal?.empresaFiscalId && !pedido.empresaFiscalId) {
@@ -814,53 +962,177 @@ export class PedidoService {
     }
 
     const empresaFiscalId = dadosFiscal?.empresaFiscalId || pedido.empresaFiscalId;
-
-    const passos: PassoStatus[] = [];
-    if (pedido.status === StatusPedido.CLIENTE_CONFIRMOU) {
-      passos.push({
-        status: StatusPedido.AGUARDANDO_FATURAMENTO,
-        observacao: "Pedido encaminhado para faturamento",
-        tipoAcao: "ENVIO_FATURAMENTO",
-      });
+    if (!dadosFiscal?.naturezaOperacaoId) {
+      throw new Error("Selecione uma natureza de operacao fiscal configurada.");
     }
-    passos.push(
-      {
-        status: StatusPedido.FATURADO,
-        observacao: "Pedido faturado com NF",
-        tipoAcao: "FATURAMENTO_NF",
-      },
-      {
-        status: StatusPedido.AUTORIZADO_PARA_SEPARACAO,
-        observacao: "Pedido liberado para separacao",
-        tipoAcao: "LIBERACAO_SEPARACAO",
-      }
-    );
+    const calculoTributario = await calculateOrderTaxes({
+      pedidoVendaId: id,
+      empresaFiscalId: empresaFiscalId!,
+      naturezaOperacaoId: dadosFiscal.naturezaOperacaoId,
+      cliente: dadosFiscal.cliente ? {
+        estado: dadosFiscal.cliente.estado,
+        contribuinteICMS: dadosFiscal.cliente.contribuinteICMS,
+        consumidorFinal: dadosFiscal.cliente.consumidorFinal,
+      } : undefined,
+    });
+    const clienteFiscalUpdate = buildClienteFiscalUpdate(dadosFiscal?.cliente);
 
-    return this.transicionarEmCadeia(
+    let documentoFiscalId: number | undefined;
+
+    await prisma.$transaction(async (tx) => {
+      const pedidoTx = await tx.pedidoVenda.findUnique({
+        where: { id },
+        include: { itens: true, movimentacoesEstoque: true },
+      });
+      if (!pedidoTx) throw new Error("Pedido nao encontrado.");
+
+      await tx.pedidoVenda.update({
+        where: { id },
+        data: {
+          empresaFiscalId,
+          formaPagamento,
+          prazoPagamento: dadosFiscal?.prazoPagamento !== undefined ? dadosFiscal.prazoPagamento : undefined,
+          observacao: dadosFiscal?.observacao !== undefined ? dadosFiscal.observacao : undefined,
+        },
+      });
+
+      if (clienteFiscalUpdate && Object.keys(clienteFiscalUpdate).length > 0) {
+        await tx.cliente.update({
+          where: { id: pedidoTx.clienteId },
+          data: clienteFiscalUpdate,
+        });
+      }
+
+      if (pedidoTx.status === StatusPedido.CLIENTE_CONFIRMOU) {
+        await this.aplicarStatus(tx, pedidoTx, {
+          status: StatusPedido.AGUARDANDO_FATURAMENTO,
+          observacao: "Pedido encaminhado para faturamento",
+          tipoAcao: "ENVIO_FATURAMENTO",
+        }, actor);
+      }
+
+      const docFiscal = await tx.documentoFiscal.create({
+        data: {
+          tipo: TipoDocumentoFiscal.NFE_SAIDA,
+          numero: dadosFiscal?.numero || `NF-${pedidoTx.numero}`,
+          empresaFiscalId: empresaFiscalId!,
+          naturezaOperacaoFiscalId: dadosFiscal.naturezaOperacaoId,
+          clienteId: pedidoTx.clienteId,
+          pedidoVendaId: id,
+          status: StatusDocumentoFiscal.PENDENTE,
+          dataEmissao: new Date(),
+          calculoTributario: calculoTributario as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      documentoFiscalId = docFiscal.id;
+
+      await this.registrarHistorico(
+        tx,
+        id,
+        pedidoTx.status,
+        pedidoTx.status,
+        actor,
+        `Tentativa de emissao fiscal iniciada para documento ${docFiscal.id}`,
+        "EMISSAO_NF_TENTATIVA"
+      );
+    });
+
+    let fiscal: { autorizada: boolean };
+    try {
+      fiscal = await FiscalOrquestradorService.emitir(documentoFiscalId!, {
+        naturezaOperacao: calculoTributario.natureza.nome,
+        informacoesComplementares: [
+          dadosFiscal?.informacoesComplementares || dadosFiscal?.observacao,
+          ...calculoTributario.informacoesComplementares,
+        ].filter(Boolean).join(" | "),
+        calculoTributario,
+      });
+    } catch (err: any) {
+      const pedidoAtual = await prisma.pedidoVenda.findUnique({ where: { id }, select: { status: true } });
+      await prisma.historicoPedido.create({
+        data: {
+          pedidoVendaId: id,
+          statusAnterior: pedidoAtual?.status || pedido.status,
+          statusNovo: pedidoAtual?.status || pedido.status,
+          usuarioId: actor?.usuarioId,
+          setor: actor?.perfil || null,
+          tipoAcao: "EMISSAO_NF_ERRO",
+          observacao: `Erro na emissao fiscal do documento ${documentoFiscalId}: ${err.message || err}`,
+        },
+      });
+      throw err;
+    }
+
+    if (!fiscal.autorizada) {
+      const [docRejeitado, pedidoAtual] = await Promise.all([
+        prisma.documentoFiscal.findUnique({
+          where: { id: documentoFiscalId! },
+          select: { codigoRejeicao: true, mensagemRejeicao: true, motivoRejeicao: true },
+        }),
+        prisma.pedidoVenda.findUnique({ where: { id }, select: { status: true } }),
+      ]);
+      const motivo = docRejeitado?.mensagemRejeicao || docRejeitado?.motivoRejeicao || "NF-e rejeitada sem motivo informado.";
+
+      await prisma.historicoPedido.create({
+        data: {
+          pedidoVendaId: id,
+          statusAnterior: pedidoAtual?.status || pedido.status,
+          statusNovo: pedidoAtual?.status || pedido.status,
+          usuarioId: actor?.usuarioId,
+          setor: actor?.perfil || null,
+          tipoAcao: "EMISSAO_NF_REJEITADA",
+          observacao: `NF-e rejeitada${docRejeitado?.codigoRejeicao ? ` (${docRejeitado.codigoRejeicao})` : ""}: ${motivo}`,
+        },
+      });
+
+      throw new Error(`NF-e rejeitada: ${motivo}`);
+    }
+
+    const resultado = await this.transicionarEmCadeia(
       id,
-      passos,
+      [
+        {
+          status: StatusPedido.FATURADO,
+          observacao: "Pedido faturado com NF autorizada",
+          tipoAcao: "FATURAMENTO_NF",
+        },
+        {
+          status: StatusPedido.AUTORIZADO_PARA_SEPARACAO,
+          observacao: "Pedido liberado para separacao apos autorizacao fiscal",
+          tipoAcao: "LIBERACAO_SEPARACAO",
+        },
+      ],
       actor,
       async (tx, ped) => {
-        await tx.pedidoVenda.update({
-          where: { id },
-          data: { empresaFiscalId },
-        });
-
-        await tx.documentoFiscal.create({
-          data: {
-            tipo: TipoDocumentoFiscal.NFE_SAIDA,
-            numero: dadosFiscal?.numero || `NF-${ped.numero}`,
-            empresaFiscalId: empresaFiscalId!,
-            clienteId: ped.clienteId,
-            pedidoVendaId: id,
-            status: StatusDocumentoFiscal.EMITIDA,
-            dataEmissao: new Date(),
-          },
-        });
-
         await this.gerarContasReceber(tx, ped);
       }
     );
+
+    const docAutorizado = await prisma.documentoFiscal.findUnique({
+      where: { id: documentoFiscalId! },
+      select: { chaveAcesso: true },
+    });
+
+    await prisma.historicoPedido.create({
+      data: {
+        pedidoVendaId: id,
+        statusAnterior: StatusPedido.AUTORIZADO_PARA_SEPARACAO,
+        statusNovo: StatusPedido.AUTORIZADO_PARA_SEPARACAO,
+        usuarioId: actor?.usuarioId,
+        setor: actor?.perfil || null,
+        tipoAcao: "EMISSAO_NF_AUTORIZADA",
+        observacao: `NF autorizada${docAutorizado?.chaveAcesso ? ` - chave ${docAutorizado.chaveAcesso}` : ""}`,
+      },
+    });
+
+    try {
+      await enviarEmailFiscal(documentoFiscalId!);
+    } catch (err: any) {
+      console.error(`Erro no envio de e-mail fiscal do documento ${documentoFiscalId}:`, err.message || err);
+    }
+
+    return resultado;
   }
 
   static async autorizarPedidoInterno(id: number, actor?: PedidoActor) {
@@ -906,6 +1178,29 @@ export class PedidoService {
   static async iniciarSeparacao(id: number, actor?: PedidoActor) {
     this.assertPerfil(actor, [PerfilUsuario.ESTOQUE]);
     const pedido = await this.carregarPedido(id);
+
+    // Validar se algum lote das reservas está inválido (VENCIDO, BLOQUEADO, QUARENTENA)
+    const reservas = await prisma.movimentacaoEstoque.findMany({
+      where: {
+        pedidoVendaId: id,
+        tipo: "RESERVA",
+      },
+      include: {
+        lote: {
+          include: { produto: true }
+        }
+      }
+    });
+
+    for (const reserva of reservas) {
+      if (reserva.lote) {
+        const lote = reserva.lote;
+        if (["VENCIDO", "BLOQUEADO", "QUARENTENA"].includes(lote.status)) {
+          throw new Error(`Lote ${lote.numeroLote} do produto ${lote.produto.descricao} está ${lote.status} e não pode ser separado`);
+        }
+      }
+    }
+
     const passos: PassoStatus[] = [];
 
     if (pedido.status === StatusPedido.FATURADO || pedido.status === StatusPedido.PEDIDO_INTERNO_AUTORIZADO) {
@@ -947,6 +1242,30 @@ export class PedidoService {
 
   static async finalizarSeparacao(id: number, actor?: PedidoActor) {
     this.assertPerfil(actor, [PerfilUsuario.ESTOQUE]);
+    const pedido = await this.carregarPedido(id);
+
+    // Validar se algum lote das reservas está inválido (VENCIDO, BLOQUEADO, QUARENTENA)
+    const reservasVal = await prisma.movimentacaoEstoque.findMany({
+      where: {
+        pedidoVendaId: id,
+        tipo: "RESERVA",
+      },
+      include: {
+        lote: {
+          include: { produto: true }
+        }
+      }
+    });
+
+    for (const reserva of reservasVal) {
+      if (reserva.lote) {
+        const lote = reserva.lote;
+        if (["VENCIDO", "BLOQUEADO", "QUARENTENA"].includes(lote.status)) {
+          throw new Error(`Lote ${lote.numeroLote} do produto ${lote.produto.descricao} está ${lote.status} e não pode ser separado`);
+        }
+      }
+    }
+
     return this.transicionarEmCadeia(
       id,
       [
@@ -964,6 +1283,39 @@ export class PedidoService {
             where: { pedidoVendaId: id },
             data: { status: "CONFERIDO" },
           });
+
+          // Atualizar ItemSeparacao correspondente com o loteId da reserva
+          const reservas = this.reservasPendentes(pedido);
+          for (const reserva of reservas) {
+            const itemSeparacaoExistente = await tx.itemSeparacao.findFirst({
+              where: {
+                separacaoId: separacao.id,
+                produtoId: reserva.produtoId,
+                loteId: null
+              }
+            });
+
+            if (itemSeparacaoExistente) {
+              await tx.itemSeparacao.update({
+                where: { id: itemSeparacaoExistente.id },
+                data: {
+                  loteId: reserva.loteId,
+                  quantidade: reserva.quantidade,
+                  conferido: true
+                }
+              });
+            } else {
+              await tx.itemSeparacao.create({
+                data: {
+                  separacaoId: separacao.id,
+                  produtoId: reserva.produtoId,
+                  loteId: reserva.loteId,
+                  quantidade: reserva.quantidade,
+                  conferido: true
+                }
+              });
+            }
+          }
         }
 
         const reservas = this.reservasPendentes(pedido);
@@ -973,7 +1325,7 @@ export class PedidoService {
 
         const documentoFiscal = pedido.tipoPedido === "PEDIDO_NORMAL"
           ? await tx.documentoFiscal.findFirst({
-              where: { pedidoVendaId: id, status: "EMITIDA" },
+              where: { pedidoVendaId: id, status: "AUTORIZADA" },
               orderBy: { createdAt: "desc" },
             })
           : null;
@@ -1031,7 +1383,7 @@ export class PedidoService {
                 loteId: reserva.loteId,
                 quantidade: reserva.quantidade,
                 valorTotal,
-                status: "EMITIDA",
+                status: "AUTORIZADA",
                 dataEmissao: new Date(),
               },
             });

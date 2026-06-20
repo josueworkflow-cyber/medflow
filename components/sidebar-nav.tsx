@@ -109,10 +109,21 @@ const financeiroItems: NavItem[] = [
 
 const adminItems: NavItem[] = [
   { title: "Usuarios", url: "/sistema/usuarios", icon: UserCircle },
-  { title: "Relatorios", url: "/sistema/relatorios", icon: BarChart3, children: [
-    { title: "Margem", url: "/sistema/relatorios/margem" },
-    { title: "Validade", url: "/sistema/relatorios/validade" },
-  ]},
+  {
+    title: "Relatórios",
+    url: "#",
+    icon: BarChart3,
+    children: [
+      { title: "Visão Geral", url: "/sistema/relatorios" },
+      { title: "Vendas", url: "/sistema/relatorios/vendas" },
+      { title: "Margem", url: "/sistema/relatorios/margem" },
+      { title: "Estoque", url: "/sistema/relatorios/estoque" },
+      { title: "Giro de Estoque", url: "/sistema/relatorios/giro" },
+      { title: "Validade", url: "/sistema/relatorios/validade" },
+      { title: "Financeiro", url: "/sistema/relatorios/financeiro" },
+      { title: "Fiscal", url: "/sistema/relatorios/fiscal" },
+    ],
+  },
   { title: "Configuracoes", url: "/sistema/configuracoes", icon: Settings },
 ];
 
@@ -180,9 +191,13 @@ export function AppSidebar() {
       return perfil === "VENDAS" || perfil === "ESTOQUE";
     }
 
+    if (url.startsWith("/sistema/relatorios")) {
+      const p: string = perfil;
+      return p === "FINANCEIRO" || p === "ADMINISTRADOR";
+    }
+
     if (
       url.startsWith("/sistema/usuarios") ||
-      url.startsWith("/sistema/relatorios") ||
       url.startsWith("/sistema/configuracoes")
     ) {
       return false;

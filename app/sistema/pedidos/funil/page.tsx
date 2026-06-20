@@ -199,6 +199,14 @@ export default function FunilPage() {
 
   useEffect(() => {
     carregarFunil();
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const pid = searchParams.get("pedidoId");
+      if (pid) {
+        setPedidoSelecionado(Number(pid));
+        setSheetAberto(true);
+      }
+    }
   }, []);
 
   const filtrarPedidos = (pedidos: Pedido[]) => {

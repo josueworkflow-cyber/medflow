@@ -1,6 +1,18 @@
 -- Alinha o modelo ao PRD v1.1: remove entrega/logistica, adiciona despacho e
 -- reforca auditoria do pedido.
 
+CREATE TABLE IF NOT EXISTS "HistoricoPedido" (
+    "id" SERIAL NOT NULL,
+    "pedidoVendaId" INTEGER NOT NULL,
+    "statusAnterior" TEXT,
+    "statusNovo" TEXT NOT NULL,
+    "usuarioId" INTEGER,
+    "observacao" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "HistoricoPedido_pkey" PRIMARY KEY ("id")
+);
+
 ALTER TABLE "HistoricoPedido"
 ADD COLUMN IF NOT EXISTS "setor" "PerfilUsuario",
 ADD COLUMN IF NOT EXISTS "tipoAcao" TEXT;

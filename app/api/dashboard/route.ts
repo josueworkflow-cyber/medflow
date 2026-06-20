@@ -14,7 +14,6 @@ export async function GET() {
     const [
       skusAtivos,
       estoqueTotal,
-      estoqueComProduto,
       proximosVencer,
       vencidos,
       faturamentoMes,
@@ -23,13 +22,11 @@ export async function GET() {
       aguardandoFinanceiro,
       aguardandoCliente,
       autorizadosSeparacao,
-      produtosComPreco,
       topProdutos,
       vendasPorCliente,
     ] = await Promise.all([
       prisma.produto.count({ where: { ativo: true } }),
       prisma.estoqueAtual.aggregate({ _sum: { quantidadeDisponivel: true } }),
-      prisma.estoqueAtual.findMany({ include: { produto: { select: { precoCustoBase: true } } } }),
       prisma.lote.count({
         where: {
           validade: { gte: hoje, lte: em30dias },
@@ -103,10 +100,6 @@ export async function GET() {
       prisma.pedidoVenda.count({
         where: { status: { in: ["AUTORIZADO_PARA_SEPARACAO", "EM_SEPARACAO", "SEPARADO"] } },
       }),
-      prisma.produto.findMany({
-        where: { ativo: true, precoCustoBase: { gt: 0 }, precoVendaBase: { gt: 0 } },
-        select: { precoCustoBase: true, precoVendaBase: true },
-      }),
       prisma.itemPedidoVenda.groupBy({
         by: ["produtoId"],
         where: {
@@ -132,49 +125,52 @@ export async function GET() {
       }),
     ]);
 
-    const valorEstoque = estoqueComProduto.reduce(
-      (sum, e) => sum + e.quantidadeDisponivel * (e.produto?.precoCustoBase || 0),
-      0
-    );
-
-    const margemMedia =
-      produtosComPreco.length > 0
-        ? produtosComPreco.reduce(
-            (sum, p) => sum + ((p.precoVendaBase - p.precoCustoBase) / p.precoCustoBase) * 100,
-            0
-          ) / produtosComPreco.length
-        : 0;
-
-    const [topProdutosCompletos, vendasPorClienteCompletos] = await Promise.all([
-      Promise.all(
-        topProdutos.map(async (item) => {
-          const produto = await prisma.produto.findUnique({
-            where: { id: item.produtoId },
-            select: { descricao: true },
-          });
-          return {
-            produtoId: item.produtoId,
-            descricao: produto?.descricao || "-",
-            qtdVendida: item._sum.quantidade || 0,
-            valorTotal: item._sum.subtotal || 0,
-          };
-        })
-      ),
-      Promise.all(
-        vendasPorCliente.map(async (item) => {
-          const cliente = await prisma.cliente.findUnique({
-            where: { id: item.clienteId },
-            select: { razaoSocial: true },
-          });
-          return {
-            clienteId: item.clienteId,
-            razaoSocial: cliente?.razaoSocial || "-",
-            totalVendas: item._sum.valorTotal || 0,
-            qtdPedidos: item._count,
-          };
-        })
-      ),
+    const [[estoqueValorResult], [margemResult]] = await Promise.all([
+      prisma.$queryRaw<[{ total: any }]>`
+        SELECT COALESCE(SUM(e."quantidadeDisponivel" * p."precoCustoBase"), 0) as total
+        FROM "EstoqueAtual" e
+        JOIN "Produto" p ON e."produtoId" = p.id
+      `,
+      prisma.$queryRaw<[{ media: any }]>`
+        SELECT COALESCE(AVG(("precoVendaBase" - "precoCustoBase") / NULLIF("precoCustoBase", 0) * 100), 0) as media
+        FROM "Produto"
+        WHERE ativo = true AND "precoCustoBase" > 0 AND "precoVendaBase" > 0
+      `
     ]);
+
+    const valorEstoque = Number(estoqueValorResult?.total || 0);
+    const margemMedia = Number(Number(margemResult?.media || 0).toFixed(1));
+
+    const produtoIds = topProdutos.map(p => p.produtoId);
+    const clienteIds = vendasPorCliente.map(v => v.clienteId);
+
+    const [produtosInfo, clientesInfo] = await Promise.all([
+      prisma.produto.findMany({
+        where: { id: { in: produtoIds } },
+        select: { id: true, descricao: true },
+      }),
+      prisma.cliente.findMany({
+        where: { id: { in: clienteIds } },
+        select: { id: true, razaoSocial: true },
+      }),
+    ]);
+
+    const produtoMap = new Map(produtosInfo.map(p => [p.id, p.descricao]));
+    const clienteMap = new Map(clientesInfo.map(c => [c.id, c.razaoSocial]));
+
+    const topProdutosCompletos = topProdutos.map(item => ({
+      produtoId: item.produtoId,
+      descricao: produtoMap.get(item.produtoId) || "-",
+      qtdVendida: item._sum.quantidade || 0,
+      valorTotal: item._sum.subtotal || 0,
+    }));
+
+    const vendasPorClienteCompletos = vendasPorCliente.map(item => ({
+      clienteId: item.clienteId,
+      razaoSocial: clienteMap.get(item.clienteId) || "-",
+      totalVendas: item._sum.valorTotal || 0,
+      qtdPedidos: item._count,
+    }));
 
     return NextResponse.json({
       skusAtivos,
@@ -189,7 +185,7 @@ export async function GET() {
       aguardandoFinanceiro,
       aguardandoCliente,
       autorizadosSeparacao,
-      margemMedia: Number(margemMedia.toFixed(1)),
+      margemMedia,
       topProdutos: topProdutosCompletos,
       vendasPorCliente: vendasPorClienteCompletos,
     });

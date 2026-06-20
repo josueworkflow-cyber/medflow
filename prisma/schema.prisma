@@ -7,48 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ClasseRisco {
-  I
-  II
-  III
-  IV
-}
-
-enum Apresentacao {
-  AMPOLA
-  FRASCO
-  CAIXA
-  SACHE
-  BOLSA
-  SERINGA
-  TUBO
-  BLISTER
-  BOMBONA
-  LATA
-  GALERIA
-  UNIDADE
-  OUTRA
-}
-
-enum StatusLote {
-  DISPONIVEL
-  QUARENTENA
-  BLOQUEADO
-  VENCIDO
-}
-
 model Usuario {
-  id               Int                   @id @default(autoincrement())
-  nome             String
-  email            String                @unique
-  senha            String
-  perfil           PerfilUsuario         @default(VENDAS)
-  ativo            Boolean               @default(true)
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
-  historicosPedido HistoricoPedido[]
-  movimentacoes    MovimentacaoEstoque[]
-  vendedor         Vendedor?
+  id                  Int                   @id @default(autoincrement())
+  nome                String
+  email               String                @unique
+  senha               String
+  perfil              PerfilUsuario         @default(VENDAS)
+  ativo               Boolean               @default(true)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  historicoAlteracoes HistoricoAlteracao[]
+  historicosPedido    HistoricoPedido[]
+  movimentacoes       MovimentacaoEstoque[]
+  vendedor            Vendedor?
 }
 
 model Produto {
@@ -72,19 +43,41 @@ model Produto {
   updatedAt                DateTime              @updatedAt
   categoriaId              Int?
   estoqueMinimo            Float                 @default(0)
-  
-  cnpjFabricante           String?
-  classeRisco              ClasseRisco?
-  codigoFabricante         String?
   apresentacao             Apresentacao?
-  concentracaoValor        Float?
+  classeRisco              ClasseRisco?
+  cnpjFabricante           String?
+  codigoFabricante         String?
   concentracaoUnidade      String?
-  principioAtivo           String?
-  marca                    String?
+  concentracaoValor        Float?
   conteudoEmbalagem        Int?
   localizacaoEstoque       String?
+  marca                    String?
   pontoReposicao           Float?
-  
+  principioAtivo           String?
+  aliquotaCofins           Float?
+  aliquotaIcms             Float?
+  aliquotaIpi              Float?
+  aliquotaPis              Float?
+  cfop                     String?
+  csosn                    String?
+  cst                      String?
+  ncm                      String?
+  origemMercadoria         String?
+  unidadeFiscal            String?
+  estoqueMaximo            Float?
+  tipoItem                 String?
+  produtoVariado           Boolean               @default(false)
+  pesoBruto                Float?
+  pesoLiquido              Float?
+  observacoes              String?
+  numeroOrdem              String?
+  tamanho                  String?
+  categoriaLegadoId        String?
+  subcategoriaLegadoId     String?
+  dadosOrigem              Json?
+  codigoBeneficioFiscal    String?
+  cest                     String?
+  tipoClassificacaoFiscal  String?
   estoqueAtual             EstoqueAtual[]
   itensCompra              ItemPedidoCompra[]
   itensVenda               ItemPedidoVenda[]
@@ -94,17 +87,25 @@ model Produto {
   movimentacoes            MovimentacaoEstoque[]
   movimentacoesFiscais     MovimentacaoFiscal[]
   categoriaRef             Categoria?            @relation(fields: [categoriaId], references: [id])
+  regrasTributarias        RegraTributaria[]
+
+  @@index([categoriaId])
+  @@index([categoriaLegadoId])
+  @@index([cest])
 }
 
 model Categoria {
-  id        Int        @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   nome      String
-  ativo     Boolean    @default(true)
+  ativo     Boolean     @default(true)
   empresaId Int
   parentId  Int?
-  produtos  Produto[]
-  parent    Categoria? @relation("CategoriaHierarchy", fields: [parentId], references: [id])
+  parent    Categoria?  @relation("CategoriaHierarchy", fields: [parentId], references: [id])
   children  Categoria[] @relation("CategoriaHierarchy")
+  produtos  Produto[]
+
+  @@index([parentId])
+  @@index([empresaId])
 }
 
 model Localizacao {
@@ -123,10 +124,28 @@ model Lote {
   validade             DateTime?
   localizacaoId        Int?
   createdAt            DateTime              @default(now())
-  fornecedorId         Int?
   enderecoEstoque      String?
-  status               StatusLote            @default(DISPONIVEL)
+  fornecedorId         Int?
   precoCusto           Float?
+  status               StatusLote            @default(DISPONIVEL)
+  bloqueadoEm          DateTime?
+  bloqueadoPor         Int?
+  motivoBloqueio       String?
+  codigoProdutoLegado  String?
+  nomeProdutoOrigem    String?
+  fornecedorOrigem     String?
+  fornecedorLegadoId   String?
+  marcaOrigem          String?
+  gtinOrigem           String?
+  unidadeOrigem        String?
+  situacaoOrigem       String?
+  observacoesOrigem    String?
+  estoqueMinimoOrigem  Float?
+  estoqueMaximoOrigem  Float?
+  valorVendaOrigem     Float?
+  valorCustoOrigem     Float?
+  linhaFonteOrigem     Int?
+  dadosOrigem          Json?
   estoqueAtual         EstoqueAtual[]
   itensSeparacao       ItemSeparacao[]
   fornecedor           Fornecedor?           @relation(fields: [fornecedorId], references: [id])
@@ -136,30 +155,52 @@ model Lote {
   movimentacoesFiscais MovimentacaoFiscal[]
 
   @@unique([numeroLote, produtoId])
+  @@index([produtoId])
+  @@index([localizacaoId])
+  @@index([fornecedorId])
+  @@index([codigoProdutoLegado])
+  @@index([linhaFonteOrigem])
 }
 
 model MovimentacaoEstoque {
-  id                 Int                 @id @default(autoincrement())
-  produtoId          Int
-  loteId             Int?
-  localizacaoId      Int?
-  tipo               TipoMovimentacao
-  quantidade         Float
-  usuario            String              @default("Administrador")
-  observacao         String?
-  createdAt          DateTime            @default(now())
-  destino            String?
-  origem             String?
-  pedidoVendaId      Int?
-  usuarioId          Int?
-  empresaFiscalId    Int?
-  localizacao        Localizacao?        @relation(fields: [localizacaoId], references: [id])
-  lote               Lote?               @relation(fields: [loteId], references: [id])
-  pedidoVenda        PedidoVenda?        @relation(fields: [pedidoVendaId], references: [id])
-  produto            Produto             @relation(fields: [produtoId], references: [id])
-  usuarioRef         Usuario?            @relation(fields: [usuarioId], references: [id])
-  empresaFiscal      EmpresaFiscal?      @relation(fields: [empresaFiscalId], references: [id])
-  movimentacaoFiscal MovimentacaoFiscal?
+  id                      Int                  @id @default(autoincrement())
+  produtoId               Int
+  loteId                  Int?
+  localizacaoId           Int?
+  tipo                    TipoMovimentacao
+  quantidade              Float
+  usuario                 String               @default("Administrador")
+  observacao              String?
+  createdAt               DateTime             @default(now())
+  destino                 String?
+  origem                  String?
+  pedidoVendaId           Int?
+  usuarioId               Int?
+  empresaFiscalId         Int?
+  estornoDeMovimentacaoId Int?                 @unique
+  fonteImportacao         String?
+  linhaFonteOrigem        Int?
+  codigoProdutoLegado     String?
+  dadosOrigem             Json?
+  empresaFiscal           EmpresaFiscal?       @relation(fields: [empresaFiscalId], references: [id])
+  estornoDeMovimentacao   MovimentacaoEstoque? @relation("EstornoRel", fields: [estornoDeMovimentacaoId], references: [id])
+  estornadoPor            MovimentacaoEstoque? @relation("EstornoRel")
+  localizacao             Localizacao?         @relation(fields: [localizacaoId], references: [id])
+  lote                    Lote?                @relation(fields: [loteId], references: [id])
+  pedidoVenda             PedidoVenda?         @relation(fields: [pedidoVendaId], references: [id])
+  produto                 Produto              @relation(fields: [produtoId], references: [id])
+  usuarioRef              Usuario?             @relation(fields: [usuarioId], references: [id])
+  movimentacaoFiscal      MovimentacaoFiscal?
+
+  @@index([produtoId])
+  @@index([loteId])
+  @@index([localizacaoId])
+  @@index([pedidoVendaId])
+  @@index([usuarioId])
+  @@index([empresaFiscalId])
+  @@index([createdAt])
+  @@index([fonteImportacao])
+  @@index([linhaFonteOrigem])
 }
 
 model EstoqueAtual {
@@ -177,26 +218,37 @@ model EstoqueAtual {
   localizacao          Localizacao?  @relation(fields: [localizacaoId], references: [id])
   lote                 Lote?         @relation(fields: [loteId], references: [id])
   produto              Produto       @relation(fields: [produtoId], references: [id])
+
+  @@index([produtoId])
+  @@index([loteId])
+  @@index([localizacaoId])
 }
 
 model Fornecedor {
-  id                Int               @id @default(autoincrement())
-  razaoSocial       String
-  nomeFantasia      String?
-  cnpj              String?           @unique
-  email             String?
-  telefone          String?
-  endereco          String?
-  cidade            String?
-  estado            String?
-  cep               String?
-  ativo             Boolean           @default(true)
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  contasPagar       Conta[]
-  documentosFiscais DocumentoFiscal[]
-  pedidosCompra     PedidoCompra[]
+  id                 Int               @id @default(autoincrement())
+  razaoSocial        String
+  nomeFantasia       String?
+  cnpj               String?           @unique
+  email              String?
+  telefone           String?
+  endereco           String?
+  cidade             String?
+  estado             String?
+  cep                String?
+  ativo              Boolean           @default(true)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  bairro             String?
+  codigoMunicipio    String?
+  complemento        String?
+  inscricaoEstadual  String?
+  inscricaoMunicipal String?
+  logradouro         String?
+  numero             String?
+  contasPagar        Conta[]
+  documentosFiscais  DocumentoFiscal[]
   lotes              Lote[]
+  pedidosCompra      PedidoCompra[]
 }
 
 model Cliente {
@@ -214,6 +266,15 @@ model Cliente {
   ativo                Boolean              @default(true)
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
+  bairro               String?
+  codigoMunicipio      String?
+  complemento          String?
+  consumidorFinal      Boolean              @default(false)
+  contribuinteICMS     Boolean              @default(false)
+  inscricaoEstadual    String?
+  inscricaoMunicipal   String?
+  logradouro           String?
+  numero               String?
   contasReceber        Conta[]
   documentosFiscais    DocumentoFiscal[]
   movimentacoesFiscais MovimentacaoFiscal[]
@@ -247,6 +308,8 @@ model PedidoCompra {
   updatedAt    DateTime           @updatedAt
   itens        ItemPedidoCompra[]
   fornecedor   Fornecedor         @relation(fields: [fornecedorId], references: [id])
+
+  @@index([fornecedorId])
 }
 
 model ItemPedidoCompra {
@@ -258,6 +321,9 @@ model ItemPedidoCompra {
   subtotal       Float        @default(0)
   pedidoCompra   PedidoCompra @relation(fields: [pedidoCompraId], references: [id], onDelete: Cascade)
   produto        Produto      @relation(fields: [produtoId], references: [id])
+
+  @@index([pedidoCompraId])
+  @@index([produtoId])
 }
 
 model PedidoVenda {
@@ -271,20 +337,27 @@ model PedidoVenda {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   empresaFiscalId      Int?
-  tipoPedido           TipoPedido            @default(PEDIDO_NORMAL)
-  status               StatusPedido          @default(PEDIDO_CRIADO)
   formaPagamento       FormaPagamento?
   prazoPagamento       String?
+  tipoPedido           TipoPedido            @default(PEDIDO_NORMAL)
+  status               StatusPedido          @default(PEDIDO_CRIADO)
   contasReceber        Conta[]
   documentosFiscais    DocumentoFiscal[]
   historico            HistoricoPedido[]
   itens                ItemPedidoVenda[]
+  logEmails            LogEmail[]
   movimentacoesEstoque MovimentacaoEstoque[]
   movimentacoesFiscais MovimentacaoFiscal[]
   cliente              Cliente               @relation(fields: [clienteId], references: [id])
   empresaFiscal        EmpresaFiscal?        @relation(fields: [empresaFiscalId], references: [id])
   vendedor             Vendedor?             @relation(fields: [vendedorId], references: [id])
   separacao            Separacao?
+
+  @@index([clienteId])
+  @@index([vendedorId])
+  @@index([empresaFiscalId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model ItemPedidoVenda {
@@ -297,6 +370,9 @@ model ItemPedidoVenda {
   subtotal      Float       @default(0)
   pedidoVenda   PedidoVenda @relation(fields: [pedidoVendaId], references: [id], onDelete: Cascade)
   produto       Produto     @relation(fields: [produtoId], references: [id])
+
+  @@index([pedidoVendaId])
+  @@index([produtoId])
 }
 
 model TabelaPreco {
@@ -308,6 +384,8 @@ model TabelaPreco {
   updatedAt DateTime          @updatedAt
   itens     ItemTabelaPreco[]
   cliente   Cliente?          @relation(fields: [clienteId], references: [id])
+
+  @@index([clienteId])
 }
 
 model ItemTabelaPreco {
@@ -318,6 +396,9 @@ model ItemTabelaPreco {
   descontoMax   Float       @default(0)
   produto       Produto     @relation(fields: [produtoId], references: [id])
   tabelaPreco   TabelaPreco @relation(fields: [tabelaPrecoId], references: [id], onDelete: Cascade)
+
+  @@index([tabelaPrecoId])
+  @@index([produtoId])
 }
 
 model Separacao {
@@ -342,31 +423,41 @@ model ItemSeparacao {
   lote        Lote?     @relation(fields: [loteId], references: [id])
   produto     Produto   @relation(fields: [produtoId], references: [id])
   separacao   Separacao @relation(fields: [separacaoId], references: [id], onDelete: Cascade)
+
+  @@index([separacaoId])
+  @@index([produtoId])
+  @@index([loteId])
 }
 
 model Conta {
-  id               Int                  @id @default(autoincrement())
-  tipo             TipoConta
-  descricao        String
-  valor            Float
-  valorPago        Float                @default(0)
-  dataVencimento   DateTime
-  dataPagamento    DateTime?
-  status           StatusConta          @default(ABERTA)
-  observacao       String?
-  formaPagamento   FormaPagamento?
-  categoria        String?
-  parcelaNumero    Int?
-  parcelaTotal     Int?
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-  clienteId        Int?
-  fornecedorId     Int?
-  pedidoVendaId    Int?
-  cliente          Cliente?             @relation(fields: [clienteId], references: [id])
-  fornecedor       Fornecedor?          @relation(fields: [fornecedorId], references: [id])
-  pedidoVenda      PedidoVenda?         @relation(fields: [pedidoVendaId], references: [id])
+  id                  Int                  @id @default(autoincrement())
+  tipo                TipoConta
+  descricao           String
+  valor               Float
+  dataVencimento      DateTime
+  dataPagamento       DateTime?
+  status              StatusConta          @default(ABERTA)
+  observacao          String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  clienteId           Int?
+  fornecedorId        Int?
+  pedidoVendaId       Int?
+  categoria           String?
+  formaPagamento      FormaPagamento?
+  parcelaNumero       Int?
+  parcelaTotal        Int?
+  valorPago           Float                @default(0)
+  cliente             Cliente?             @relation(fields: [clienteId], references: [id])
+  fornecedor          Fornecedor?          @relation(fields: [fornecedorId], references: [id])
+  pedidoVenda         PedidoVenda?         @relation(fields: [pedidoVendaId], references: [id])
   historicoPagamentos HistoricoPagamento[]
+
+  @@index([clienteId])
+  @@index([fornecedorId])
+  @@index([pedidoVendaId])
+  @@index([status])
+  @@index([dataVencimento])
 }
 
 model HistoricoPagamento {
@@ -378,41 +469,160 @@ model HistoricoPagamento {
   observacao     String?
   createdAt      DateTime        @default(now())
   conta          Conta           @relation(fields: [contaId], references: [id], onDelete: Cascade)
+
+  @@index([contaId])
 }
 
 model EmpresaFiscal {
-  id                   Int                   @id @default(autoincrement())
-  razaoSocial          String
-  nomeFantasia         String?
-  cnpj                 String                @unique
-  inscricaoEstadual    String?
-  regimeTributario     RegimeTributario?
-  ativo                Boolean               @default(true)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  documentosFiscais    DocumentoFiscal[]
-  movimentacoesFiscais MovimentacaoFiscal[]
-  movimentacoesEstoque MovimentacaoEstoque[]
-  pedidosVenda         PedidoVenda[]
+  id                          Int                      @id @default(autoincrement())
+  razaoSocial                 String
+  nomeFantasia                String?
+  cnpj                        String                   @unique
+  inscricaoEstadual           String?
+  regimeTributario            RegimeTributario?
+  ativo                       Boolean                  @default(true)
+  createdAt                   DateTime                 @default(now())
+  updatedAt                   DateTime                 @updatedAt
+  ambienteSEFAZ               String                   @default("homologacao")
+  bairro                      String?
+  certificadoPfxBase64        String?
+  certificadoSenha            String?
+  certificadoValidade         DateTime?
+  codigoMunicipio             String?
+  complemento                 String?
+  inscricaoMunicipal          String?
+  logradouro                  String?
+  municipio                   String?
+  numero                      String?
+  numeroUltimaNFSe            Int                      @default(0)
+  numeroUltimaNFe             Int                      @default(0)
+  serieNFSe                   String                   @default("1")
+  serieNFe                    String                   @default("1")
+  uf                          String?
+  cep                         String?
+  aliquotaIss                 Decimal?
+  codigoNbs                   String?
+  codigoTributacaoIss         String?
+  percentualTributosEstaduais String?
+  percentualTributosFederais  String?
+  emailApiKey                 String?
+  emailAtivo                  Boolean                  @default(false)
+  emailRemetente              String?
+  documentosFiscais           DocumentoFiscal[]
+  logEmails                   LogEmail[]
+  movimentacoesEstoque        MovimentacaoEstoque[]
+  movimentacoesFiscais        MovimentacaoFiscal[]
+  naturezasOperacao           NaturezaOperacaoFiscal[]
+  pedidosVenda                PedidoVenda[]
+  regrasTributarias           RegraTributaria[]
 }
 
 model DocumentoFiscal {
-  id                   Int                   @id @default(autoincrement())
-  tipo                 TipoDocumentoFiscal
-  numero               String
-  chaveAcesso          String?
-  empresaFiscalId      Int
-  fornecedorId         Int?
-  clienteId            Int?
-  pedidoVendaId        Int?
-  status               StatusDocumentoFiscal @default(PENDENTE)
-  dataEmissao          DateTime?
-  createdAt            DateTime              @default(now())
-  cliente              Cliente?              @relation(fields: [clienteId], references: [id])
-  empresaFiscal        EmpresaFiscal         @relation(fields: [empresaFiscalId], references: [id])
-  fornecedor           Fornecedor?           @relation(fields: [fornecedorId], references: [id])
-  pedidoVenda          PedidoVenda?          @relation(fields: [pedidoVendaId], references: [id])
-  movimentacoesFiscais MovimentacaoFiscal[]
+  id                       Int                     @id @default(autoincrement())
+  tipo                     TipoDocumentoFiscal
+  numero                   String
+  chaveAcesso              String?
+  empresaFiscalId          Int?
+  fornecedorId             Int?
+  clienteId                Int?
+  pedidoVendaId            Int?
+  status                   StatusDocumentoFiscal   @default(PENDENTE)
+  dataEmissao              DateTime?
+  createdAt                DateTime                @default(now())
+  codigoRejeicao           String?
+  danfePdfBase64           String?
+  dataAutorizacao          DateTime?
+  dataCancelamento         DateTime?
+  mensagemRejeicao         String?
+  motivoCancelamento       String?
+  protocolo                String?
+  serie                    String?
+  xmlAutorizadoBase64      String?
+  xmlCancelamento          String?
+  motivoRejeicao           String?
+  nSeqEventoCancelamento   Int                     @default(1)
+  naturezaOperacaoFiscalId Int?
+  calculoTributario        Json?
+  cliente                  Cliente?                @relation(fields: [clienteId], references: [id])
+  empresaFiscal            EmpresaFiscal?          @relation(fields: [empresaFiscalId], references: [id])
+  fornecedor               Fornecedor?             @relation(fields: [fornecedorId], references: [id])
+  naturezaOperacaoFiscal   NaturezaOperacaoFiscal? @relation(fields: [naturezaOperacaoFiscalId], references: [id])
+  pedidoVenda              PedidoVenda?            @relation(fields: [pedidoVendaId], references: [id])
+  logEmails                LogEmail[]
+  movimentacoesFiscais     MovimentacaoFiscal[]
+
+  @@index([empresaFiscalId])
+  @@index([fornecedorId])
+  @@index([clienteId])
+  @@index([pedidoVendaId])
+  @@index([naturezaOperacaoFiscalId])
+}
+
+model NaturezaOperacaoFiscal {
+  id                Int               @id @default(autoincrement())
+  empresaFiscalId   Int
+  codigo            String
+  nome              String
+  descricao         String?
+  tipoOperacao      String            @default("SAIDA")
+  finalidadeNFe     Int               @default(1)
+  ativa             Boolean           @default(true)
+  padrao            Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  documentosFiscais DocumentoFiscal[]
+  empresaFiscal     EmpresaFiscal     @relation(fields: [empresaFiscalId], references: [id], onDelete: Cascade)
+  regras            RegraTributaria[]
+
+  @@unique([empresaFiscalId, codigo])
+  @@index([empresaFiscalId, ativa])
+}
+
+model RegraTributaria {
+  id                        Int                    @id @default(autoincrement())
+  empresaFiscalId           Int
+  naturezaOperacaoId        Int
+  produtoId                 Int?
+  nome                      String
+  prioridade                Int                    @default(100)
+  ativa                     Boolean                @default(true)
+  ncmPrefixo                String?
+  ufDestino                 String?
+  contribuinteICMS          Boolean?
+  consumidorFinal           Boolean?
+  cfop                      String
+  origemMercadoria          String?
+  cstIcms                   String?
+  csosn                     String?
+  modalidadeBcIcms          String                 @default("3")
+  aliquotaIcms              Decimal                @default(0) @db.Decimal(10, 4)
+  reducaoBaseIcms           Decimal                @default(0) @db.Decimal(10, 4)
+  aliquotaFcp               Decimal                @default(0) @db.Decimal(10, 4)
+  modalidadeBcSt            String                 @default("4")
+  mvaSt                     Decimal                @default(0) @db.Decimal(10, 4)
+  aliquotaIcmsSt            Decimal                @default(0) @db.Decimal(10, 4)
+  aliquotaFcpSt             Decimal                @default(0) @db.Decimal(10, 4)
+  aliquotaInterestadual     Decimal?               @db.Decimal(10, 4)
+  aliquotaInternaDestino    Decimal?               @db.Decimal(10, 4)
+  cstIpi                    String                 @default("53")
+  aliquotaIpi               Decimal                @default(0) @db.Decimal(10, 4)
+  codigoEnquadramentoIpi    String                 @default("999")
+  cstPis                    String                 @default("07")
+  aliquotaPis               Decimal                @default(0) @db.Decimal(10, 4)
+  cstCofins                 String                 @default("07")
+  aliquotaCofins            Decimal                @default(0) @db.Decimal(10, 4)
+  informacoesComplementares String?
+  vigenciaInicio            DateTime?
+  vigenciaFim               DateTime?
+  createdAt                 DateTime               @default(now())
+  updatedAt                 DateTime               @updatedAt
+  empresaFiscal             EmpresaFiscal          @relation(fields: [empresaFiscalId], references: [id], onDelete: Cascade)
+  naturezaOperacao          NaturezaOperacaoFiscal @relation(fields: [naturezaOperacaoId], references: [id], onDelete: Cascade)
+  produto                   Produto?               @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@index([empresaFiscalId, naturezaOperacaoId, ativa])
+  @@index([produtoId])
+  @@index([ncmPrefixo])
 }
 
 model MovimentacaoFiscal {
@@ -436,20 +646,101 @@ model MovimentacaoFiscal {
   movimentacaoEstoque   MovimentacaoEstoque      @relation(fields: [movimentacaoEstoqueId], references: [id])
   pedidoVenda           PedidoVenda?             @relation(fields: [pedidoVendaId], references: [id])
   produto               Produto                  @relation(fields: [produtoId], references: [id])
+
+  @@index([pedidoVendaId])
+  @@index([clienteId])
+  @@index([empresaFiscalId])
+  @@index([documentoFiscalId])
+  @@index([produtoId])
+  @@index([loteId])
 }
 
 model HistoricoPedido {
-  id             Int           @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   pedidoVendaId  Int
-  statusAnterior StatusPedido?
-  statusNovo     StatusPedido
   usuarioId      Int?
+  observacao     String?
+  createdAt      DateTime       @default(now())
   setor          PerfilUsuario?
   tipoAcao       String?
-  observacao     String?
-  createdAt      DateTime      @default(now())
-  pedidoVenda    PedidoVenda   @relation(fields: [pedidoVendaId], references: [id])
-  usuario        Usuario?      @relation(fields: [usuarioId], references: [id])
+  statusAnterior StatusPedido?
+  statusNovo     StatusPedido
+  pedidoVenda    PedidoVenda    @relation(fields: [pedidoVendaId], references: [id])
+  usuario        Usuario?       @relation(fields: [usuarioId], references: [id])
+
+  @@index([pedidoVendaId])
+  @@index([usuarioId])
+  @@index([createdAt])
+}
+
+model LogEmail {
+  id                Int              @id @default(autoincrement())
+  destinatario      String
+  remetente         String
+  assunto           String
+  status            StatusEmail      @default(PENDENTE)
+  erroMensagem      String?
+  pedidoVendaId     Int?
+  documentoFiscalId Int?
+  empresaFiscalId   Int
+  createdAt         DateTime         @default(now())
+  documentoFiscal   DocumentoFiscal? @relation(fields: [documentoFiscalId], references: [id])
+  empresaFiscal     EmpresaFiscal    @relation(fields: [empresaFiscalId], references: [id])
+  pedidoVenda       PedidoVenda?     @relation(fields: [pedidoVendaId], references: [id])
+
+  @@index([pedidoVendaId])
+  @@index([documentoFiscalId])
+  @@index([empresaFiscalId])
+  @@index([createdAt])
+}
+
+model HistoricoAlteracao {
+  id            Int                  @id @default(autoincrement())
+  grupoId       String
+  entidade      TipoEntidadeAuditada
+  entidadeId    Int
+  campo         String
+  valorAnterior String?
+  valorNovo     String?
+  motivo        String
+  usuarioId     Int?
+  createdAt     DateTime             @default(now())
+  usuario       Usuario?             @relation(fields: [usuarioId], references: [id])
+
+  @@index([entidade, entidadeId])
+  @@index([grupoId])
+  @@index([usuarioId])
+  @@index([createdAt])
+}
+
+enum ClasseRisco {
+  I
+  II
+  III
+  IV
+}
+
+enum Apresentacao {
+  AMPOLA
+  FRASCO
+  CAIXA
+  SACHE
+  BOLSA
+  SERINGA
+  TUBO
+  BLISTER
+  BOMBONA
+  LATA
+  GALERIA
+  UNIDADE
+  OUTRA
+}
+
+enum StatusLote {
+  DISPONIVEL
+  QUARENTENA
+  BLOQUEADO
+  VENCIDO
 }
 
 enum TipoMovimentacao {
@@ -476,17 +767,19 @@ enum TipoDocumentoFiscal {
   NFE_ENTRADA
   NFE_SAIDA
   AJUSTE
+  NFSE
 }
 
 enum StatusDocumentoFiscal {
   PENDENTE
-  EMITIDA
+  AUTORIZADA
+  REJEITADA
   CANCELADA
 }
 
 enum StatusMovimentacaoFiscal {
   PENDENTE
-  EMITIDA
+  AUTORIZADA
   CANCELADA
 }
 
@@ -552,6 +845,7 @@ enum StatusSeparacao {
   EM_ANDAMENTO
   CONFERIDO
   DESPACHADO
+  CANCELADA
 }
 
 enum TipoConta {
@@ -571,4 +865,16 @@ enum PerfilUsuario {
   VENDAS
   ESTOQUE
   FINANCEIRO
+}
+
+enum StatusEmail {
+  PENDENTE
+  ENVIADO
+  FALHOU
+}
+
+enum TipoEntidadeAuditada {
+  PRODUTO
+  LOTE
+  MOVIMENTACAO_ESTOQUE
 }

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { PackagePlus } from "lucide-react";
+import Link from "next/link";
 
 type Produto = {
   id: number;
@@ -18,6 +19,7 @@ type Produto = {
 export default function EntradaEstoquePage() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isLoteExistente, setIsLoteExistente] = useState(false);
 
   const [form, setForm] = useState({
     produtoId: "",
@@ -30,9 +32,11 @@ export default function EntradaEstoquePage() {
 
   async function carregarProdutos() {
     try {
-      const res = await fetch("/api/produto");
+      const res = await fetch("/api/produto?pageSize=1000");
+      if (!res.ok) throw new Error("Erro ao carregar produtos.");
       const data = await res.json();
-      setProdutos(Array.isArray(data) ? data : []);
+      const list = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
+      setProdutos(list);
     } catch {
       toast.error("Erro ao carregar produtos.");
     }
@@ -41,6 +45,34 @@ export default function EntradaEstoquePage() {
   useEffect(() => {
     carregarProdutos();
   }, []);
+
+  useEffect(() => {
+    if (!form.produtoId || !form.codigoLote) {
+      setIsLoteExistente(false);
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
+      fetch(`/api/estoque/lote?produtoId=${form.produtoId}&numeroLote=${encodeURIComponent(form.codigoLote.trim())}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.validade) {
+            const formattedValidade = new Date(data.validade).toISOString().split("T")[0];
+            setForm((prev) => ({
+              ...prev,
+              validade: formattedValidade,
+            }));
+            setIsLoteExistente(true);
+            toast.info(`Lote existente encontrado. Validade preenchida automaticamente.`);
+          } else {
+            setIsLoteExistente(false);
+          }
+        })
+        .catch(() => setIsLoteExistente(false));
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [form.produtoId, form.codigoLote]);
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +101,7 @@ export default function EntradaEstoquePage() {
         produtoId: "", codigoLote: "", validade: "",
         quantidade: "", custoUnitario: "", observacao: "",
       });
+      setIsLoteExistente(false);
     } catch (err: any) {
       toast.error(err.message || "Erro ao salvar.");
     } finally {
@@ -102,8 +135,12 @@ export default function EntradaEstoquePage() {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecione o produto..." />
                 </SelectTrigger>
-                <SelectContent>
-                  {produtos.map((p) => (
+              <SelectContent>
+                  {produtos.length === 0 ? (
+                    <SelectItem value="sem-produtos" disabled>
+                      Nenhum produto cadastrado
+                    </SelectItem>
+                  ) : produtos.map((p) => (
                     <SelectItem key={p.id} value={p.id.toString()}>
                       {p.codigoInterno ? `${p.codigoInterno} - ` : ""}
                       {p.descricao}
@@ -111,6 +148,14 @@ export default function EntradaEstoquePage() {
                   ))}
                 </SelectContent>
               </Select>
+              {produtos.length === 0 && (
+                <p className="text-xs text-amber-700">
+                  Cadastre um produto ativo antes de registrar entrada.{" "}
+                  <Link href="/sistema/produtos" className="font-semibold underline underline-offset-2">
+                    Ir para produtos
+                  </Link>
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -125,11 +170,14 @@ export default function EntradaEstoquePage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-600">Data de Validade</label>
+                <label className="text-xs font-semibold text-slate-600">
+                  Data de Validade {isLoteExistente && <span className="text-amber-600 text-[10px] ml-1">(Lote Existente)</span>}
+                </label>
                 <Input
                   type="date"
                   value={form.validade}
                   onChange={(e) => setForm({ ...form, validade: e.target.value })}
+                  disabled={isLoteExistente}
                 />
               </div>
             </div>
@@ -170,7 +218,7 @@ export default function EntradaEstoquePage() {
               />
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-sm font-semibold">
+            <Button type="submit" disabled={loading || produtos.length === 0} className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-sm font-semibold">
               {loading ? "Salvando..." : "Registrar Entrada no Estoque"}
             </Button>
           </form>

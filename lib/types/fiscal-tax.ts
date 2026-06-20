@@ -1,0 +1,126 @@
+export type TaxRuleInput = {
+  id: number;
+  nome: string;
+  prioridade: number;
+  produtoId: number | null;
+  ncmPrefixo: string | null;
+  ufDestino: string | null;
+  contribuinteICMS: boolean | null;
+  consumidorFinal: boolean | null;
+  cfop: string;
+  origemMercadoria: string | null;
+  cstIcms: string | null;
+  csosn: string | null;
+  modalidadeBcIcms: string;
+  aliquotaIcms: number;
+  reducaoBaseIcms: number;
+  aliquotaFcp: number;
+  modalidadeBcSt: string;
+  mvaSt: number;
+  aliquotaIcmsSt: number;
+  aliquotaFcpSt: number;
+  aliquotaInterestadual: number | null;
+  aliquotaInternaDestino: number | null;
+  cstIpi: string;
+  aliquotaIpi: number;
+  codigoEnquadramentoIpi: string;
+  cstPis: string;
+  aliquotaPis: number;
+  cstCofins: string;
+  aliquotaCofins: number;
+  informacoesComplementares: string | null;
+};
+
+export type TaxItemContext = {
+  itemPedidoId: number;
+  produtoId: number;
+  descricao: string;
+  ncm: string;
+  quantidade: number;
+  valorUnitario: number;
+  desconto: number;
+};
+
+export type TaxOperationContext = {
+  regimeTributario: string | null;
+  ufOrigem: string;
+  ufDestino: string;
+  contribuinteICMS: boolean;
+  consumidorFinal: boolean;
+};
+
+export type TaxItemCalculation = {
+  itemPedidoId: number;
+  produtoId: number;
+  descricao: string;
+  ncm: string;
+  quantidade: number;
+  valorBruto: number;
+  desconto: number;
+  valorLiquido: number;
+  regraId: number;
+  regraNome: string;
+  cfop: string;
+  origemMercadoria: string;
+  cstIcms: string | null;
+  csosn: string | null;
+  modalidadeBcIcms: string;
+  baseIcms: number;
+  aliquotaIcms: number;
+  valorIcms: number;
+  reducaoBaseIcms: number;
+  aliquotaFcp: number;
+  valorFcp: number;
+  modalidadeBcSt: string;
+  mvaSt: number;
+  baseIcmsSt: number;
+  aliquotaIcmsSt: number;
+  valorIcmsSt: number;
+  aliquotaFcpSt: number;
+  valorFcpSt: number;
+  aliquotaInterestadual: number | null;
+  aliquotaInternaDestino: number | null;
+  valorDifalDestino: number;
+  cstIpi: string;
+  codigoEnquadramentoIpi: string;
+  baseIpi: number;
+  aliquotaIpi: number;
+  valorIpi: number;
+  cstPis: string;
+  basePis: number;
+  aliquotaPis: number;
+  valorPis: number;
+  cstCofins: string;
+  baseCofins: number;
+  aliquotaCofins: number;
+  valorCofins: number;
+  informacoesComplementares: string | null;
+};
+
+export type TaxCalculationResult = {
+  natureza: {
+    id: number;
+    codigo: string;
+    nome: string;
+    tipoOperacao: string;
+    finalidadeNFe: number;
+  };
+  contexto: TaxOperationContext;
+  itens: TaxItemCalculation[];
+  totais: {
+    valorProdutos: number;
+    desconto: number;
+    baseIcms: number;
+    valorIcms: number;
+    valorFcp: number;
+    baseIcmsSt: number;
+    valorIcmsSt: number;
+    valorFcpSt: number;
+    valorDifalDestino: number;
+    valorIpi: number;
+    valorPis: number;
+    valorCofins: number;
+    valorNota: number;
+  };
+  informacoesComplementares: string[];
+};

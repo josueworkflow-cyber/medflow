@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { EstoqueService } from "@/lib/services/estoque.service";
 import { getAuthActor, assertPerfil } from "@/lib/authz";
 
-export async function GET() {
+import { prisma } from "@/lib/prisma";
+
+export async function GET(req: NextRequest) {
   const actor = await getAuthActor();
   if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
@@ -11,6 +13,22 @@ export async function GET() {
     return NextResponse.json({ error: e.message }, { status: 403 });
   }
   try {
+    const { searchParams } = new URL(req.url);
+    const produtoId = searchParams.get("produtoId");
+    const numeroLote = searchParams.get("numeroLote");
+
+    if (produtoId && numeroLote) {
+      const lote = await prisma.lote.findUnique({
+        where: {
+          numeroLote_produtoId: {
+            numeroLote,
+            produtoId: Number(produtoId)
+          }
+        }
+      });
+      return NextResponse.json(lote);
+    }
+
     const saldo = await EstoqueService.getEstoqueAtual({});
     return NextResponse.json(saldo);
   } catch (error) {
@@ -43,6 +61,22 @@ export async function POST(req: NextRequest) {
       fornecedorId,
       enderecoEstoque,
       status,
+      codigoProdutoLegado,
+      nomeProdutoOrigem,
+      fornecedorOrigem,
+      fornecedorLegadoId,
+      marcaOrigem,
+      gtinOrigem,
+      unidadeOrigem,
+      situacaoOrigem,
+      observacoesOrigem,
+      estoqueMinimoOrigem,
+      estoqueMaximoOrigem,
+      valorVendaOrigem,
+      valorCustoOrigem,
+      linhaFonteOrigem,
+      fonteImportacao,
+      dadosOrigem,
     } = body;
 
     if (!produtoId || !quantidade) {
@@ -64,6 +98,22 @@ export async function POST(req: NextRequest) {
       fornecedorId,
       enderecoEstoque,
       status,
+      codigoProdutoLegado: codigoProdutoLegado || undefined,
+      nomeProdutoOrigem: nomeProdutoOrigem || undefined,
+      fornecedorOrigem: fornecedorOrigem || undefined,
+      fornecedorLegadoId: fornecedorLegadoId || undefined,
+      marcaOrigem: marcaOrigem || undefined,
+      gtinOrigem: gtinOrigem || undefined,
+      unidadeOrigem: unidadeOrigem || undefined,
+      situacaoOrigem: situacaoOrigem || undefined,
+      observacoesOrigem: observacoesOrigem || undefined,
+      estoqueMinimoOrigem: estoqueMinimoOrigem !== undefined ? Number(estoqueMinimoOrigem) : undefined,
+      estoqueMaximoOrigem: estoqueMaximoOrigem !== undefined ? Number(estoqueMaximoOrigem) : undefined,
+      valorVendaOrigem: valorVendaOrigem !== undefined ? Number(valorVendaOrigem) : undefined,
+      valorCustoOrigem: valorCustoOrigem !== undefined ? Number(valorCustoOrigem) : undefined,
+      linhaFonteOrigem: linhaFonteOrigem !== undefined ? Number(linhaFonteOrigem) : undefined,
+      fonteImportacao: fonteImportacao || undefined,
+      dadosOrigem: dadosOrigem || undefined,
     });
 
     return NextResponse.json({ success: true, data: mov });

@@ -1,0 +1,368 @@
+{
+  "report": {
+    "mode": "execute",
+    "empresaId": 1,
+    "dbError": null,
+    "existingCategories": 1,
+    "taxonomyMacros": 5,
+    "taxonomySubcategories": 29,
+    "categoriesCreated": 33,
+    "categoriesToCreate": 0,
+    "operations": [
+      {
+        "action": "reuse",
+        "nome": "Medicamentos",
+        "parent": null,
+        "id": 1
+      },
+      {
+        "action": "create",
+        "nome": "Antibióticos e Antimicrobianos",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Anestésicos, Analgésicos e Sedação",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Anticoagulantes e Hemostáticos",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Cardiovascular e Emergência",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Corticoides e Anti-inflamatórios",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Soluções, Eletrólitos e Diluentes",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Contrastes e Diagnóstico",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Hemoderivados e Biológicos",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Gastrointestinal e Antieméticos",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Outros Medicamentos",
+        "parent": "Medicamentos"
+      },
+      {
+        "action": "create",
+        "nome": "Materiais Médico-Hospitalares",
+        "parent": null
+      },
+      {
+        "action": "create",
+        "nome": "Agulhas e Cateteres",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Seringas e Infusão",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Tubos, Sondas e Via Aérea",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Curativos, Gazes e Compressas",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Luvas",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Paramentação e Proteção",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Kits, Campos e Coberturas Cirúrgicas",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Conectores, Equipos e Extensores",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Drenos, Coletores e Bolsas",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Fios, Suturas e Hemostáticos",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Outros Materiais",
+        "parent": "Materiais Médico-Hospitalares"
+      },
+      {
+        "action": "create",
+        "nome": "Higiene, Antissepsia e Limpeza",
+        "parent": null
+      },
+      {
+        "action": "create",
+        "nome": "Álcool e Antissépticos",
+        "parent": "Higiene, Antissepsia e Limpeza"
+      },
+      {
+        "action": "create",
+        "nome": "Desinfecção e Limpeza",
+        "parent": "Higiene, Antissepsia e Limpeza"
+      },
+      {
+        "action": "create",
+        "nome": "Saneantes e Utilidades",
+        "parent": "Higiene, Antissepsia e Limpeza"
+      },
+      {
+        "action": "create",
+        "nome": "Equipamentos e Instrumentais",
+        "parent": null
+      },
+      {
+        "action": "create",
+        "nome": "Equipamentos de Monitoramento",
+        "parent": "Equipamentos e Instrumentais"
+      },
+      {
+        "action": "create",
+        "nome": "Instrumentais e Acessórios",
+        "parent": "Equipamentos e Instrumentais"
+      },
+      {
+        "action": "create",
+        "nome": "Outros Equipamentos",
+        "parent": "Equipamentos e Instrumentais"
+      },
+      {
+        "action": "create",
+        "nome": "Diversos e Revisão Cadastral",
+        "parent": null
+      },
+      {
+        "action": "create",
+        "nome": "Revisar Classificação",
+        "parent": "Diversos e Revisão Cadastral"
+      },
+      {
+        "action": "create",
+        "nome": "Outros Produtos",
+        "parent": "Diversos e Revisão Cadastral"
+      }
+    ],
+    "categoryCounts": [
+      {
+        "categoria": "Medicamentos > Anestésicos, Analgésicos e Sedação",
+        "quantidade": 58,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Diversos e Revisão Cadastral > Revisar Classificação",
+        "quantidade": 55,
+        "baixaConfianca": 55
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Outros Materiais",
+        "quantidade": 53,
+        "baixaConfianca": 53
+      },
+      {
+        "categoria": "Medicamentos > Soluções, Eletrólitos e Diluentes",
+        "quantidade": 32,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Medicamentos > Antibióticos e Antimicrobianos",
+        "quantidade": 30,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Agulhas e Cateteres",
+        "quantidade": 24,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Luvas",
+        "quantidade": 24,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Tubos, Sondas e Via Aérea",
+        "quantidade": 24,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Paramentação e Proteção",
+        "quantidade": 22,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Curativos, Gazes e Compressas",
+        "quantidade": 18,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Medicamentos > Outros Medicamentos",
+        "quantidade": 18,
+        "baixaConfianca": 18
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Seringas e Infusão",
+        "quantidade": 17,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Medicamentos > Corticoides e Anti-inflamatórios",
+        "quantidade": 17,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Conectores, Equipos e Extensores",
+        "quantidade": 14,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Medicamentos > Anticoagulantes e Hemostáticos",
+        "quantidade": 14,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Medicamentos > Cardiovascular e Emergência",
+        "quantidade": 11,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Medicamentos > Contrastes e Diagnóstico",
+        "quantidade": 9,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Kits, Campos e Coberturas Cirúrgicas",
+        "quantidade": 7,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Medicamentos > Gastrointestinal e Antieméticos",
+        "quantidade": 7,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Drenos, Coletores e Bolsas",
+        "quantidade": 6,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Materiais Médico-Hospitalares > Fios, Suturas e Hemostáticos",
+        "quantidade": 6,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Higiene, Antissepsia e Limpeza > Álcool e Antissépticos",
+        "quantidade": 5,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Higiene, Antissepsia e Limpeza > Desinfecção e Limpeza",
+        "quantidade": 5,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Medicamentos > Hemoderivados e Biológicos",
+        "quantidade": 3,
+        "baixaConfianca": 0
+      },
+      {
+        "categoria": "Equipamentos e Instrumentais > Equipamentos de Monitoramento",
+        "quantidade": 1,
+        "baixaConfianca": 0
+      }
+    ]
+  },
+  "taxonomy": [
+    {
+      "nome": "Medicamentos",
+      "children": [
+        "Antibióticos e Antimicrobianos",
+        "Anestésicos, Analgésicos e Sedação",
+        "Anticoagulantes e Hemostáticos",
+        "Cardiovascular e Emergência",
+        "Corticoides e Anti-inflamatórios",
+        "Soluções, Eletrólitos e Diluentes",
+        "Contrastes e Diagnóstico",
+        "Hemoderivados e Biológicos",
+        "Gastrointestinal e Antieméticos",
+        "Outros Medicamentos"
+      ]
+    },
+    {
+      "nome": "Materiais Médico-Hospitalares",
+      "children": [
+        "Agulhas e Cateteres",
+        "Seringas e Infusão",
+        "Tubos, Sondas e Via Aérea",
+        "Curativos, Gazes e Compressas",
+        "Luvas",
+        "Paramentação e Proteção",
+        "Kits, Campos e Coberturas Cirúrgicas",
+        "Conectores, Equipos e Extensores",
+        "Drenos, Coletores e Bolsas",
+        "Fios, Suturas e Hemostáticos",
+        "Outros Materiais"
+      ]
+    },
+    {
+      "nome": "Higiene, Antissepsia e Limpeza",
+      "children": [
+        "Álcool e Antissépticos",
+        "Desinfecção e Limpeza",
+        "Saneantes e Utilidades"
+      ]
+    },
+    {
+      "nome": "Equipamentos e Instrumentais",
+      "children": [
+        "Equipamentos de Monitoramento",
+        "Instrumentais e Acessórios",
+        "Outros Equipamentos"
+      ]
+    },
+    {
+      "nome": "Diversos e Revisão Cadastral",
+      "children": [
+        "Revisar Classificação",
+        "Outros Produtos"
+      ]
+    }
+  ]
+}

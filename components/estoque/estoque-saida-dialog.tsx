@@ -50,11 +50,11 @@ export function EstoqueSaidaDialog({
     if (isOpen) {
       Promise.all([
         fetch("/api/fiscal/empresas").then(r => r.json()),
-        fetch("/api/produto").then(r => r.json()),
+        fetch("/api/produto?pageSize=1000").then(r => r.json()),
         fetch("/api/cliente").then(r => r.json()),
       ]).then(([e, p, c]) => {
         setEmpresas(e);
-        setProdutos(p);
+        setProdutos(Array.isArray(p) ? p : (p && Array.isArray(p.items) ? p.items : []));
         setClientes(c);
       });
     }

@@ -50,7 +50,7 @@ export async function PUT(
   const actor = await getAuthActor();
   if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
   try {
-    assertPerfil(actor, ["VENDAS"]);
+    assertPerfil(actor, ["VENDAS", "FINANCEIRO"]);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 403 });
   }

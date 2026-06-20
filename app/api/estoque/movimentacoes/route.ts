@@ -113,6 +113,7 @@ export async function GET(req: NextRequest) {
               documentoFiscal: { select: { numero: true, tipo: true } },
             },
           },
+          estornadoPor: { select: { id: true } },
         },
         orderBy: { createdAt: "desc" },
         take: 200,
@@ -152,7 +153,13 @@ export async function GET(req: NextRequest) {
       })(),
     ]);
 
-    return NextResponse.json({ movimentacoes, totais });
+    const movimentacoesComEstorno = movimentacoes.map((mov) => ({
+      ...mov,
+      estornado: !!mov.estornadoPor,
+      isEstorno: !!mov.estornoDeMovimentacaoId,
+    }));
+
+    return NextResponse.json({ movimentacoes: movimentacoesComEstorno, totais });
   } catch (error) {
     console.error("GET /api/estoque/movimentacoes", error);
     return NextResponse.json({ error: "Erro ao buscar movimentacoes." }, { status: 500 });

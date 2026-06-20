@@ -1,28 +1,39 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAuthActor, assertPerfil } from "@/lib/authz";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const actor = await getAuthActor();
   if (!actor) return NextResponse.json({ error: "Nao autorizado." }, { status: 401 });
+  
   try {
     assertPerfil(actor, ["ESTOQUE"]);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 403 });
   }
+
   try {
+    const searchParams = req.nextUrl.searchParams;
+    const diasParam = searchParams.get("dias") || "30";
+    const dias = parseInt(diasParam, 10);
+
+    if (dias !== 30 && dias !== 60 && dias !== 90) {
+      return NextResponse.json({ error: "Parâmetro dias inválido. Deve ser 30, 60 ou 90." }, { status: 400 });
+    }
+
     const hoje = new Date();
-    const em30dias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const emNdias = new Date(hoje.getTime() + dias * 24 * 60 * 60 * 1000);
 
     // Alertas de vencimento
     const lotesVencendo = await prisma.lote.findMany({
       where: {
-        validade: { gte: hoje, lte: em30dias },
+        validade: { gte: hoje, lte: emNdias },
         estoqueAtual: { some: { quantidadeDisponivel: { gt: 0 } } },
       },
       include: {
         produto: { select: { descricao: true, codigoInterno: true } },
         estoqueAtual: { select: { quantidadeDisponivel: true } },
+        localizacaoRef: { select: { nome: true } },
       },
     });
 
@@ -34,6 +45,7 @@ export async function GET() {
       include: {
         produto: { select: { descricao: true, codigoInterno: true, precoCustoBase: true } },
         estoqueAtual: { select: { quantidadeDisponivel: true } },
+        localizacaoRef: { select: { nome: true } },
       },
     });
 
@@ -60,6 +72,7 @@ export async function GET() {
           estoqueMinimo: p.estoqueMinimo,
           estoqueAtual: estoqueDisponivel,
           diferenca: estoqueDisponivel - p.estoqueMinimo,
+          categoria: p.categoria,
         };
       })
       .filter((p) => p.estoqueAtual < p.estoqueMinimo);
@@ -78,6 +91,7 @@ export async function GET() {
         produto: l.produto?.descricao,
         codigo: l.produto?.codigoInterno,
         quantidade: l.estoqueAtual.reduce((s, e) => s + e.quantidadeDisponivel, 0),
+        localizacao: l.localizacaoRef?.nome || "Não informada",
       })),
       vencidos: lotesVencidos.map((l) => ({
         loteId: l.id,
@@ -86,6 +100,7 @@ export async function GET() {
         produto: l.produto?.descricao,
         codigo: l.produto?.codigoInterno,
         quantidade: l.estoqueAtual.reduce((s, e) => s + e.quantidadeDisponivel, 0),
+        localizacao: l.localizacaoRef?.nome || "Não informada",
       })),
       abaixoMinimo,
       valorEmRisco,

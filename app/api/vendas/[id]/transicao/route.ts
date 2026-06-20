@@ -78,7 +78,11 @@ export async function POST(
   } catch (error: any) {
     console.error("POST /api/vendas/[id]/transicao", error);
     const message = error.message || "Erro ao processar transicao.";
-    const status = message.includes("permissao") || message.includes("Autenticacao") ? 403 : 500;
+    const status = message.includes("permissao") || message.includes("Autenticacao")
+      ? 403
+      : message.includes("NF-e rejeitada") || message.includes("emissao fiscal")
+        ? 400
+        : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }

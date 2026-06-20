@@ -46,6 +46,7 @@ export function EstoqueEntradaDialog({
   const [loading, setLoading] = useState(false);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+  const [isLoteExistente, setIsLoteExistente] = useState(false);
   const [formData, setFormData] = useState({
     produtoId: "",
     quantidade: "",
@@ -60,6 +61,7 @@ export function EstoqueEntradaDialog({
 
   useEffect(() => {
     if (isOpen) {
+      setIsLoteExistente(false);
       setFormData({
         produtoId: "",
         quantidade: "",
@@ -72,14 +74,42 @@ export function EstoqueEntradaDialog({
         observacao: "",
       });
       Promise.all([
-        fetch("/api/produto").then(res => res.json()),
+        fetch("/api/produto?pageSize=1000").then(res => res.json()),
         fetch("/api/fornecedores").then(res => res.json()),
       ]).then(([produtosData, fornecedoresData]) => {
-        setProdutos(Array.isArray(produtosData) ? produtosData : []);
+        setProdutos(Array.isArray(produtosData) ? produtosData : (produtosData && Array.isArray(produtosData.items) ? produtosData.items : []));
         setFornecedores(Array.isArray(fornecedoresData) ? fornecedoresData : []);
       });
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!formData.produtoId || !formData.numeroLote) {
+      setIsLoteExistente(false);
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
+      fetch(`/api/estoque/lote?produtoId=${formData.produtoId}&numeroLote=${encodeURIComponent(formData.numeroLote.trim())}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.validade) {
+            const formattedValidade = new Date(data.validade).toISOString().split("T")[0];
+            setFormData((prev) => ({
+              ...prev,
+              validade: formattedValidade,
+            }));
+            setIsLoteExistente(true);
+            toast.info(`Lote existente encontrado. Validade preenchida automaticamente.`);
+          } else {
+            setIsLoteExistente(false);
+          }
+        })
+        .catch(() => setIsLoteExistente(false));
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [formData.produtoId, formData.numeroLote]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -198,12 +228,14 @@ export function EstoqueEntradaDialog({
             <div className="space-y-1.5">
               <label className="text-[10px] font-semibold text-slate-500 uppercase">
                 Validade {selectedProduto?.controlaValidade && <span className="text-red-500">*</span>}
+                {isLoteExistente && <span className="text-amber-600 text-[9px] lowercase ml-1">(Lote Existente)</span>}
               </label>
               <Input
                 type="date"
                 value={formData.validade}
                 onChange={(e) => setFormData({ ...formData, validade: e.target.value })}
                 className="h-9 text-sm"
+                disabled={isLoteExistente}
               />
             </div>
           </div>
