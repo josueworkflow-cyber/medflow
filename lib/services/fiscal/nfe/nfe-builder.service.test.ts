@@ -98,8 +98,9 @@ describe("NF-e XML Builder Service Unit Tests", () => {
         precoVendaBase: 50.0,
         ncm: "30049099",
         cfop: "5102",
-        csosn: "102",
-        origemMercadoria: "0"
+        cst: "00",
+        origemMercadoria: "0",
+        aliquotaIcms: 18
       }
     });
     produtoValidoId = produtoValido.id;
@@ -181,7 +182,7 @@ describe("NF-e XML Builder Service Unit Tests", () => {
         empresaFiscalId: empresaId,
         formaPagamento: "CARTAO_CREDITO",
         desconto: 10.0,
-        valorTotal: 90.0,
+        valorTotal: 80.0,
         status: "AGUARDANDO_FATURAMENTO",
         itens: {
           create: [
@@ -255,6 +256,10 @@ describe("NF-e XML Builder Service Unit Tests", () => {
     // Ambiente homologação (tpAmb = 2)
     assert.match(xml, /<tpAmb>2<\/tpAmb>/);
 
+    // Totais fiscais calculados automaticamente
+    assert.match(xml, /<vBC>100\.00<\/vBC>/);
+    assert.match(xml, /<vICMS>18\.00<\/vICMS>/);
+
     // Valida que a chave de acesso possui 44 dígitos no atributo Id do infNFe
     const idMatch = xml.match(/Id="NFe(\d{44})"/);
     assert.ok(idMatch, "XML deve conter Id da infNFe com a chave de acesso");
@@ -279,6 +284,43 @@ describe("NF-e XML Builder Service Unit Tests", () => {
     // Ocorrências do fechamento de </det> devem ser exatamente 3
     const detOccurrences = (xml.match(/<\/det>/g) || []).length;
     assert.strictEqual(detOccurrences, 3);
+  });
+
+  test("gera XML com snapshot do motor tributario", async () => {
+    const itemPedido = await prisma.itemPedidoVenda.findFirstOrThrow({ where: { pedidoVendaId: pedidoSimplesId } });
+    const xml = await buildNFeXml(pedidoSimplesId, {
+      naturezaOperacao: "Venda de mercadoria",
+      calculoTributario: {
+        natureza: { id: 1, codigo: "VENDA", nome: "Venda de mercadoria", tipoOperacao: "SAIDA", finalidadeNFe: 1 },
+        contexto: { regimeTributario: "SIMPLES_NACIONAL", ufOrigem: "RJ", ufDestino: "RJ", contribuinteICMS: false, consumidorFinal: true },
+        itens: [{
+          itemPedidoId: itemPedido.id, produtoId: produtoValidoId, descricao: "Medicamento Teste 500mg", ncm: "30049099",
+          quantidade: 2, valorBruto: 100, desconto: 0, valorLiquido: 100, regraId: 1, regraNome: "Venda SN",
+          cfop: "5102", origemMercadoria: "0", cstIcms: null, csosn: "102", modalidadeBcIcms: "3",
+          baseIcms: 0, aliquotaIcms: 0, valorIcms: 0, reducaoBaseIcms: 0, aliquotaFcp: 0, valorFcp: 0,
+          modalidadeBcSt: "4", mvaSt: 0, baseIcmsSt: 0, aliquotaIcmsSt: 0, valorIcmsSt: 0,
+          aliquotaFcpSt: 0, valorFcpSt: 0, aliquotaInterestadual: null, aliquotaInternaDestino: null, valorDifalDestino: 0,
+          cstIpi: "50", codigoEnquadramentoIpi: "999", baseIpi: 100, aliquotaIpi: 5, valorIpi: 5,
+          cstPis: "01", basePis: 100, aliquotaPis: 1.65, valorPis: 1.65,
+          cstCofins: "01", baseCofins: 100, aliquotaCofins: 7.6, valorCofins: 7.6,
+          informacoesComplementares: null,
+        }],
+        totais: {
+          valorProdutos: 100, desconto: 0, baseIcms: 0, valorIcms: 0, valorFcp: 0, baseIcmsSt: 0,
+          valorIcmsSt: 0, valorFcpSt: 0, valorDifalDestino: 0, valorIpi: 5, valorPis: 1.65,
+          valorCofins: 7.6, valorNota: 105,
+        },
+        informacoesComplementares: [],
+      },
+    });
+
+    assert.match(xml, /<natOp>Venda de mercadoria<\/natOp>/);
+    assert.match(xml, /<ICMSSN102>/);
+    assert.match(xml, /<IPITrib>/);
+    assert.match(xml, /<pIPI>5\.00<\/pIPI>/);
+    assert.match(xml, /<PISAliq>/);
+    assert.match(xml, /<COFINSAliq>/);
+    assert.match(xml, /<vNF>105\.00<\/vNF>/);
   });
 
   test("Caso de Teste 3: Lançamento de erro descritivo para produto sem NCM", async () => {
@@ -358,14 +400,14 @@ describe("NF-e XML Builder Service Unit Tests", () => {
   test("Caso de Teste 5: Pedido com desconto acumulado e cálculo correto de vNF", async () => {
     const xml = await buildNFeXml(pedidoComDescontoId);
 
-    // Valida que vDesc é 10.00
-    assert.match(xml, /<vDesc>10\.00<\/vDesc>/);
+    // Valida que vDesc total é 20.00 (10 do item + 10 do pedido)
+    assert.match(xml, /<vDesc>20\.00<\/vDesc>/);
 
     // Valida que vProd é 100.00
     assert.match(xml, /<vProd>100\.00<\/vProd>/);
 
-    // Valida que vNF é 90.00 (vProd - vDesc = 100 - 10)
-    assert.match(xml, /<vNF>90\.00<\/vNF>/);
+    // Valida que vNF é 80.00 (vProd - vDesc = 100 - 20)
+    assert.match(xml, /<vNF>80\.00<\/vNF>/);
   });
 
   test("Cálculo do Dígito Verificador Módulo 11 (calcularDV)", () => {

@@ -43,7 +43,7 @@ export async function enviarEmailFiscal(documentoFiscalId: number): Promise<void
   }
 
   const emailDestinatario = cliente.email;
-  const nomeEmpresa = doc.empresaFiscal.nomeFantasia || doc.empresaFiscal.razaoSocial;
+  const nomeEmpresa = doc.empresaFiscal?.nomeFantasia || doc.empresaFiscal?.razaoSocial || "MedFlow";
   const assunto = `Nota Fiscal Eletronica - Pedido #${doc.pedidoVenda?.numero || doc.pedidoVendaId} - ${nomeEmpresa}`;
   
   // Link para download do DANFe em PDF
@@ -54,7 +54,7 @@ export async function enviarEmailFiscal(documentoFiscalId: number): Promise<void
     <html>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2 style="color: #2b6cb0;">Olá, ${cliente.razaoSocial}!</h2>
-        <p>Gostaríamos de informar que a sua Nota Fiscal Eletrônica referente ao pedido <strong>#${doc.pedidoVenda?.numero || doc.pedidoVendaId}</strong> foi emitida com sucesso pela <strong>${doc.empresaFiscal.razaoSocial}</strong>.</p>
+        <p>Gostaríamos de informar que a sua Nota Fiscal Eletrônica referente ao pedido <strong>#${doc.pedidoVenda?.numero || doc.pedidoVendaId}</strong> foi emitida com sucesso pela <strong>${doc.empresaFiscal?.razaoSocial || "MedFlow"}</strong>.</p>
         
         <p>Você pode visualizar e fazer o download do seu DANFe em PDF diretamente pelo link abaixo:</p>
         <p style="margin: 20px 0;">
@@ -79,7 +79,7 @@ export async function enviarEmailFiscal(documentoFiscalId: number): Promise<void
   ];
 
   await emailProvider.EmailProvider.enviarEmail({
-    empresaEmissoraId: doc.empresaFiscalId,
+    empresaEmissoraId: doc.empresaFiscalId || 0,
     destinatario: emailDestinatario,
     assunto,
     html,

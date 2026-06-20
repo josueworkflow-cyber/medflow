@@ -40,11 +40,15 @@ export function canAccessPath(pathname: string, perfil?: PerfilUsuario) {
   if (
     pathname.startsWith("/sistema/usuarios") ||
     pathname.startsWith("/api/usuarios") ||
-    pathname.startsWith("/sistema/relatorios") ||
-    pathname.startsWith("/api/relatorios") ||
     pathname.startsWith("/sistema/configuracoes")
   ) {
     return false;
+  }
+
+  // Relatórios — FINANCEIRO e ADMINISTRADOR
+  if (pathname.startsWith("/sistema/relatorios") || pathname.startsWith("/api/relatorios")) {
+    const p: string = perfil;
+    return p === "FINANCEIRO" || p === "ADMINISTRADOR";
   }
 
   // Financeiro — FINANCEIRO (fornecedores tratado separadamente abaixo)
@@ -54,6 +58,9 @@ export function canAccessPath(pathname: string, perfil?: PerfilUsuario) {
 
   // Estoque — ESTOQUE
   if (pathname.startsWith("/sistema/estoque") || pathname.startsWith("/api/estoque")) {
+    if (pathname.startsWith("/sistema/estoque/lotes") || pathname.includes("/distribuicao")) {
+      return perfil === "ESTOQUE" || perfil === "FINANCEIRO";
+    }
     return perfil === "ESTOQUE";
   }
 

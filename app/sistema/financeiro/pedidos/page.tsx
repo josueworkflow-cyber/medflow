@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import FaturarConfirmModal from "@/components/FaturarConfirmModal";
+import CancelarNFeModal from "@/components/CancelarNFeModal";
 import {
   DollarSign, CheckCircle2, XCircle, FileText, Receipt,
   AlertTriangle, Clock, User, Save, Edit2, Eye,
@@ -85,6 +86,8 @@ export default function FinanceiroPedidosPage() {
   const [empresaFaturarAtual, setEmpresaFaturarAtual] = useState<string>("");
   const [faturando, setFaturando] = useState(false);
   const [enviandoRevisao, setEnviandoRevisao] = useState<Record<number, boolean>>({});
+  const [modalCancelar, setModalCancelar] = useState(false);
+  const [docFiscalCancelando, setDocFiscalCancelando] = useState<any | null>(null);
 
   const pedidos = data?.pedidos || [];
   const historicoClientes = data?.historicoClientes || {};
@@ -408,6 +411,7 @@ export default function FinanceiroPedidosPage() {
                         <th className="px-3">Valor</th>
                         <th className="px-3">Status</th>
                         <th className="px-3">Data</th>
+                        <th className="px-3 text-right">Ações</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -423,6 +427,51 @@ export default function FinanceiroPedidosPage() {
                           <td className="px-3 font-semibold">R$ {p.valorTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
                           <td className="px-3"><Badge className={cn("text-[9px]", statusBadgeColor[p.status] || "bg-slate-100")}>{statusLabel[p.status] || p.status}</Badge></td>
                           <td className="px-3 text-slate-400 text-xs">{new Date(p.updatedAt).toLocaleDateString("pt-BR")}</td>
+                          <td className="px-3 py-2 text-right">
+                             {(() => {
+                               const docNFe = p.documentosFiscais?.find((d: any) => d.tipo === "NFE_SAIDA");
+                               if (!docNFe) return null;
+
+                               if (docNFe.status === "AUTORIZADA") {
+                                 const dataAutorizacao = new Date(docNFe.dataAutorizacao);
+                                 const prazoCancelado = new Date(dataAutorizacao.getTime() + 24 * 60 * 60 * 1000);
+                                 const foraDoPrazo = Date.now() > prazoCancelado.getTime();
+
+                                 if (foraDoPrazo) {
+                                   return (
+                                     <Badge variant="outline" className="text-[10px] bg-red-50 text-red-600 border-red-200">
+                                       Cancelamento indisponível — prazo expirado em {prazoCancelado.toLocaleString("pt-BR")}
+                                     </Badge>
+                                   );
+                                 }
+
+                                 return (
+                                   <Button
+                                     size="sm"
+                                     variant="outline"
+                                     className="text-xs border-red-300 text-red-600 hover:bg-red-50 h-7"
+                                     onClick={() => {
+                                       setDocFiscalCancelando(docNFe);
+                                       setModalCancelar(true);
+                                     }}
+                                   >
+                                     <XCircle className="h-3.5 w-3.5 mr-1" />
+                                     Cancelar NF-e
+                                   </Button>
+                                 );
+                               }
+
+                               if (docNFe.status === "CANCELADA") {
+                                 return (
+                                   <Badge variant="outline" className="text-[10px] bg-slate-100 text-slate-500 border-slate-300">
+                                     NF-e Cancelada
+                                   </Badge>
+                                 );
+                               }
+
+                               return null;
+                             })()}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -447,13 +496,19 @@ export default function FinanceiroPedidosPage() {
         empresaNome={empresas.find((e: any) => e.id.toString() === empresaFaturarAtual)?.nomeFantasia || empresas.find((e: any) => e.id.toString() === empresaFaturarAtual)?.razaoSocial || ""}
         open={modalFaturar}
         onOpenChange={setModalFaturar}
-        onConfirm={async () => {
+        onConfirm={async (dadosEmissao) => {
           if (!pedidoFaturando) return;
           setFaturando(true);
           try {
             const res = await fetch(`/api/vendas/${pedidoFaturando}/transicao`, {
               method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ acao: "faturar", dados: { empresaFiscalId: empresaFaturarAtual ? Number(empresaFaturarAtual) : undefined } }),
+              body: JSON.stringify({
+                acao: "faturar",
+                dados: {
+                  ...dadosEmissao,
+                  empresaFiscalId: empresaFaturarAtual ? Number(empresaFaturarAtual) : undefined,
+                },
+              }),
             });
             const d = await res.json();
             if (!res.ok) throw new Error(d.error);
@@ -463,6 +518,13 @@ export default function FinanceiroPedidosPage() {
           finally { setFaturando(false); }
         }}
         loading={faturando}
+      />
+
+      <CancelarNFeModal
+        open={modalCancelar}
+        onOpenChange={setModalCancelar}
+        documentoFiscal={docFiscalCancelando}
+        onSuccess={() => mutate()}
       />
     </main>
   );

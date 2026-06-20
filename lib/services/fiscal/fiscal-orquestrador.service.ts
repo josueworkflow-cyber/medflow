@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { StatusDocumentoFiscal } from "@prisma/client";
-import { buildNFeXml } from "./nfe/nfe-builder.service";
+import { buildNFeXml, type NFeBuildOptions } from "./nfe/nfe-builder.service";
 import { assinarXML } from "./nfe/nfe-signer.service";
 import { enviarNFe } from "./nfe/nfe-sender.service";
 import { gerarDanfe } from "./nfe/nfe-danfe.service";
@@ -21,7 +21,7 @@ export class FiscalOrquestradorService {
    * 
    * @param documentoFiscalId ID do DocumentoFiscal a ser emitido
    */
-  static async emitir(documentoFiscalId: number): Promise<{ autorizada: boolean }> {
+  static async emitir(documentoFiscalId: number, nfeOptions: NFeBuildOptions = {}): Promise<{ autorizada: boolean }> {
     const doc = await prisma.documentoFiscal.findUnique({
       where: { id: documentoFiscalId },
       include: {
@@ -45,8 +45,11 @@ export class FiscalOrquestradorService {
 
     try {
       if (doc.tipo === "NFE_SAIDA") {
+        if (!doc.empresaFiscalId) {
+          throw new Error(`Documento fiscal ID ${documentoFiscalId} do tipo NFE_SAIDA nao possui empresaFiscalId.`);
+        }
         // Fluxo NF-e
-        const rawXml = await fiscalServices.buildNFeXml(pedidoVendaId);
+        const rawXml = await fiscalServices.buildNFeXml(pedidoVendaId, nfeOptions);
         const signedXml = await fiscalServices.assinarXML(rawXml, doc.empresaFiscalId);
         const retorno = await fiscalServices.enviarNFe(signedXml, doc.empresaFiscalId);
 
@@ -84,6 +87,9 @@ export class FiscalOrquestradorService {
           return { autorizada: false };
         }
       } else {
+        if (!doc.empresaFiscalId) {
+          throw new Error(`Documento fiscal ID ${documentoFiscalId} do tipo NFSE nao possui empresaFiscalId.`);
+        }
         // Fluxo NFS-e
         const retorno = await fiscalServices.enviarNFSe(doc.empresaFiscalId, pedidoVendaId);
 

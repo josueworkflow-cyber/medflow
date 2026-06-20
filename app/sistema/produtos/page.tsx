@@ -2,6 +2,8 @@ import { getProdutos } from "@/lib/services/produtos.service";
 import { getCategorias } from "@/lib/services/categorias.service";
 import { ProdutosClient } from "./components/ProdutosClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProdutosPage() {
   const [produtos, categorias] = await Promise.all([
     getProdutos({ ativo: true }),

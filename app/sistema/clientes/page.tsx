@@ -6,17 +6,29 @@ type Cliente = {
   id: number; razaoSocial: string; nomeFantasia: string | null;
   cnpjCpf: string | null; email: string | null; telefone: string | null;
   cidade: string | null; estado: string | null; limiteCredito: number;
+  logradouro: string | null; numero: string | null; complemento: string | null;
+  bairro: string | null; cep: string | null; codigoMunicipio: string | null;
+  inscricaoEstadual: string | null; inscricaoMunicipal: string | null;
+  contribuinteICMS: boolean; consumidorFinal: boolean;
 };
 
 type Form = {
   razaoSocial: string; nomeFantasia: string; cnpjCpf: string;
-  email: string; telefone: string; endereco: string;
-  cidade: string; estado: string; cep: string; limiteCredito: string;
+  email: string; telefone: string;
+  logradouro: string; numero: string; complemento: string; bairro: string;
+  municipio: string; codigoMunicipio: string; uf: string; cep: string;
+  inscricaoEstadual: string; inscricaoMunicipal: string;
+  contribuinteICMS: boolean; consumidorFinal: boolean;
+  limiteCredito: string;
 };
 
 const blankForm: Form = {
   razaoSocial: "", nomeFantasia: "", cnpjCpf: "", email: "",
-  telefone: "", endereco: "", cidade: "", estado: "", cep: "", limiteCredito: "0",
+  telefone: "", logradouro: "", numero: "", complemento: "", bairro: "",
+  municipio: "", codigoMunicipio: "", uf: "", cep: "",
+  inscricaoEstadual: "", inscricaoMunicipal: "",
+  contribuinteICMS: false, consumidorFinal: false,
+  limiteCredito: "0",
 };
 
 export default function ClientesPage() {
@@ -33,13 +45,48 @@ export default function ClientesPage() {
 
   useEffect(() => { carregar(); }, []);
 
+  async function buscarCep(target: "create" | "edit") {
+    const current = target === "create" ? form : editForm;
+    const cep = current.cep.replace(/\D/g, "");
+    if (cep.length !== 8) {
+      setErro("Informe um CEP com 8 dígitos para buscar.");
+      return;
+    }
+
+    setErro("");
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await res.json();
+      if (!res.ok || data.erro) throw new Error("CEP não encontrado.");
+
+      const update = {
+        cep,
+        logradouro: data.logradouro || current.logradouro,
+        bairro: data.bairro || current.bairro,
+        municipio: data.localidade || current.municipio,
+        codigoMunicipio: data.ibge || current.codigoMunicipio,
+        uf: data.uf || current.uf,
+      };
+
+      if (target === "create") setForm((prev) => ({ ...prev, ...update }));
+      else setEditForm((prev) => ({ ...prev, ...update }));
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : "Erro ao consultar CEP.");
+    }
+  }
+
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true); setErro("");
     try {
       const res = await fetch("/api/clientes", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, limiteCredito: Number(form.limiteCredito) }),
+        body: JSON.stringify({
+          ...form,
+          cidade: form.municipio,
+          estado: form.uf,
+          limiteCredito: Number(form.limiteCredito),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -52,8 +99,13 @@ export default function ClientesPage() {
     setEditId(c.id);
     setEditForm({
       razaoSocial: c.razaoSocial, nomeFantasia: c.nomeFantasia || "", cnpjCpf: c.cnpjCpf || "",
-      email: c.email || "", telefone: c.telefone || "", endereco: "",
-      cidade: c.cidade || "", estado: c.estado || "", cep: "",
+      email: c.email || "", telefone: c.telefone || "",
+      logradouro: c.logradouro || "", numero: c.numero || "", complemento: c.complemento || "",
+      bairro: c.bairro || "", municipio: c.cidade || "", uf: c.estado || "",
+      cep: c.cep || "", codigoMunicipio: c.codigoMunicipio || "",
+      inscricaoEstadual: c.inscricaoEstadual || "", inscricaoMunicipal: c.inscricaoMunicipal || "",
+      contribuinteICMS: c.contribuinteICMS || false,
+      consumidorFinal: c.consumidorFinal || false,
       limiteCredito: String(c.limiteCredito),
     });
   }
@@ -64,7 +116,12 @@ export default function ClientesPage() {
     try {
       const res = await fetch(`/api/clientes/${editId}`, {
         method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...editForm, limiteCredito: Number(editForm.limiteCredito) }),
+        body: JSON.stringify({
+          ...editForm,
+          cidade: editForm.municipio,
+          estado: editForm.uf,
+          limiteCredito: Number(editForm.limiteCredito),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -109,11 +166,30 @@ export default function ClientesPage() {
               <div><label className={label}>Telefone</label><input className={input} value={editForm.telefone} onChange={(e) => setEditForm({...editForm, telefone: e.target.value})} /></div>
             </div>
             <div><label className={label}>E-mail</label><input type="email" className={input} value={editForm.email} onChange={(e) => setEditForm({...editForm, email: e.target.value})} /></div>
-            <div><label className={label}>Endereco</label><input className={input} value={editForm.endereco} onChange={(e) => setEditForm({...editForm, endereco: e.target.value})} /></div>
-            <div className="grid grid-cols-3 gap-3">
-              <div><label className={label}>Cidade</label><input className={input} value={editForm.cidade} onChange={(e) => setEditForm({...editForm, cidade: e.target.value})} /></div>
-              <div><label className={label}>Estado</label><input className={input} value={editForm.estado} onChange={(e) => setEditForm({...editForm, estado: e.target.value})} maxLength={2} /></div>
+            <div className="grid grid-cols-[1fr_auto] gap-2">
               <div><label className={label}>CEP</label><input className={input} value={editForm.cep} onChange={(e) => setEditForm({...editForm, cep: e.target.value})} /></div>
+              <button type="button" onClick={() => buscarCep("edit")} className="self-end rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Buscar CEP</button>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="col-span-2"><label className={label}>Logradouro</label><input className={input} value={editForm.logradouro} onChange={(e) => setEditForm({...editForm, logradouro: e.target.value})} /></div>
+              <div><label className={label}>Número</label><input className={input} value={editForm.numero} onChange={(e) => setEditForm({...editForm, numero: e.target.value})} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={label}>Complemento</label><input className={input} value={editForm.complemento} onChange={(e) => setEditForm({...editForm, complemento: e.target.value})} /></div>
+              <div><label className={label}>Bairro</label><input className={input} value={editForm.bairro} onChange={(e) => setEditForm({...editForm, bairro: e.target.value})} /></div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div><label className={label}>Município</label><input className={input} value={editForm.municipio} onChange={(e) => setEditForm({...editForm, municipio: e.target.value})} /></div>
+              <div><label className={label}>UF</label><input className={input} value={editForm.uf} onChange={(e) => setEditForm({...editForm, uf: e.target.value.toUpperCase()})} maxLength={2} /></div>
+              <div><label className={label}>Código IBGE</label><input className={input} value={editForm.codigoMunicipio} onChange={(e) => setEditForm({...editForm, codigoMunicipio: e.target.value})} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><label className={label}>Inscrição estadual</label><input className={input} value={editForm.inscricaoEstadual} onChange={(e) => setEditForm({...editForm, inscricaoEstadual: e.target.value})} /></div>
+              <div><label className={label}>Inscrição municipal</label><input className={input} value={editForm.inscricaoMunicipal} onChange={(e) => setEditForm({...editForm, inscricaoMunicipal: e.target.value})} /></div>
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={editForm.contribuinteICMS} onChange={(e) => setEditForm({...editForm, contribuinteICMS: e.target.checked})} /> Contribuinte ICMS</label>
+              <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={editForm.consumidorFinal} onChange={(e) => setEditForm({...editForm, consumidorFinal: e.target.checked})} /> Consumidor final</label>
             </div>
             <div><label className={label}>Limite de credito (R$)</label><input type="number" step="0.01" className={input} value={editForm.limiteCredito} onChange={(e) => setEditForm({...editForm, limiteCredito: e.target.value})} /></div>
             <div className="flex gap-3 pt-2">
@@ -134,11 +210,30 @@ export default function ClientesPage() {
             <div><label className={label}>Telefone</label><input className={input} value={form.telefone} onChange={(e) => setForm({...form, telefone: e.target.value})} /></div>
           </div>
           <div><label className={label}>E-mail</label><input type="email" className={input} value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} /></div>
-          <div><label className={label}>Endereco</label><input className={input} value={form.endereco} onChange={(e) => setForm({...form, endereco: e.target.value})} /></div>
-          <div className="grid grid-cols-3 gap-3">
-            <div><label className={label}>Cidade</label><input className={input} value={form.cidade} onChange={(e) => setForm({...form, cidade: e.target.value})} /></div>
-            <div><label className={label}>Estado</label><input className={input} value={form.estado} onChange={(e) => setForm({...form, estado: e.target.value})} maxLength={2} /></div>
+          <div className="grid grid-cols-[1fr_auto] gap-2">
             <div><label className={label}>CEP</label><input className={input} value={form.cep} onChange={(e) => setForm({...form, cep: e.target.value})} /></div>
+            <button type="button" onClick={() => buscarCep("create")} className="self-end rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Buscar CEP</button>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="col-span-2"><label className={label}>Logradouro</label><input className={input} value={form.logradouro} onChange={(e) => setForm({...form, logradouro: e.target.value})} /></div>
+            <div><label className={label}>Número</label><input className={input} value={form.numero} onChange={(e) => setForm({...form, numero: e.target.value})} /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className={label}>Complemento</label><input className={input} value={form.complemento} onChange={(e) => setForm({...form, complemento: e.target.value})} /></div>
+            <div><label className={label}>Bairro</label><input className={input} value={form.bairro} onChange={(e) => setForm({...form, bairro: e.target.value})} /></div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div><label className={label}>Município</label><input className={input} value={form.municipio} onChange={(e) => setForm({...form, municipio: e.target.value})} /></div>
+            <div><label className={label}>UF</label><input className={input} value={form.uf} onChange={(e) => setForm({...form, uf: e.target.value.toUpperCase()})} maxLength={2} /></div>
+            <div><label className={label}>Código IBGE</label><input className={input} value={form.codigoMunicipio} onChange={(e) => setForm({...form, codigoMunicipio: e.target.value})} /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className={label}>Inscrição estadual</label><input className={input} value={form.inscricaoEstadual} onChange={(e) => setForm({...form, inscricaoEstadual: e.target.value})} /></div>
+            <div><label className={label}>Inscrição municipal</label><input className={input} value={form.inscricaoMunicipal} onChange={(e) => setForm({...form, inscricaoMunicipal: e.target.value})} /></div>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={form.contribuinteICMS} onChange={(e) => setForm({...form, contribuinteICMS: e.target.checked})} /> Contribuinte ICMS</label>
+            <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={form.consumidorFinal} onChange={(e) => setForm({...form, consumidorFinal: e.target.checked})} /> Consumidor final</label>
           </div>
           <div><label className={label}>Limite de credito (R$)</label><input type="number" step="0.01" className={input} value={form.limiteCredito} onChange={(e) => setForm({...form, limiteCredito: e.target.value})} /></div>
           <button type="submit" disabled={saving} className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white disabled:opacity-60">{saving ? "Salvando..." : "Cadastrar cliente"}</button>

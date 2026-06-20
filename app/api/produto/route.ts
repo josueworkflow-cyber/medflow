@@ -4,6 +4,16 @@ import { getAuthActor, assertPerfil } from "@/lib/authz";
 import { z } from "zod";
 import { ClasseRisco, Apresentacao } from "@prisma/client";
 
+function onlyDigits(value: string | null | undefined) {
+  return value ? value.replace(/\D/g, "") : "";
+}
+
+const optionalFiscalCode = (size: number, label: string) =>
+  z.string().nullable().optional().refine((value) => {
+    const clean = onlyDigits(value);
+    return clean.length === 0 || clean.length === size;
+  }, `${label} deve conter exatamente ${size} dígitos numéricos.`);
+
 const produtoSchema = z.object({
   codigoInterno: z.string().nullable().optional(),
   codigoBarras: z.string().nullable().optional(),
@@ -20,6 +30,17 @@ const produtoSchema = z.object({
   precoCustoBase: z.coerce.number().optional().default(0),
   precoVendaBase: z.coerce.number().optional().default(0),
   estoqueMinimo: z.coerce.number().optional().default(0),
+  estoqueMaximo: z.coerce.number().nullable().optional(),
+  tipoItem: z.string().nullable().optional(),
+  produtoVariado: z.coerce.boolean().optional().default(false),
+  pesoBruto: z.coerce.number().nullable().optional(),
+  pesoLiquido: z.coerce.number().nullable().optional(),
+  observacoes: z.string().nullable().optional(),
+  numeroOrdem: z.string().nullable().optional(),
+  tamanho: z.string().nullable().optional(),
+  categoriaLegadoId: z.string().nullable().optional(),
+  subcategoriaLegadoId: z.string().nullable().optional(),
+  dadosOrigem: z.any().nullable().optional(),
 
   // Campos adicionais do ProdutosClient
   cnpjFabricante: z.string().nullable().optional(),
@@ -34,6 +55,20 @@ const produtoSchema = z.object({
   localizacaoEstoque: z.string().nullable().optional(),
   pontoReposicao: z.coerce.number().nullable().optional(),
   categoriaId: z.coerce.number().int().nullable().optional(),
+
+  ncm: optionalFiscalCode(8, "NCM"),
+  cfop: optionalFiscalCode(4, "CFOP"),
+  cst: z.string().nullable().optional(),
+  csosn: z.string().nullable().optional(),
+  origemMercadoria: z.string().nullable().optional(),
+  unidadeFiscal: z.string().nullable().optional(),
+  aliquotaIcms: z.coerce.number().nullable().optional(),
+  aliquotaIpi: z.coerce.number().nullable().optional(),
+  aliquotaPis: z.coerce.number().nullable().optional(),
+  aliquotaCofins: z.coerce.number().nullable().optional(),
+  codigoBeneficioFiscal: z.string().nullable().optional(),
+  cest: optionalFiscalCode(7, "CEST"),
+  tipoClassificacaoFiscal: z.string().nullable().optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -99,6 +134,17 @@ export async function POST(req: NextRequest) {
       precoCustoBase: data.precoCustoBase,
       precoVendaBase: data.precoVendaBase,
       estoqueMinimo: data.estoqueMinimo,
+      estoqueMaximo: data.estoqueMaximo ?? null,
+      tipoItem: data.tipoItem || null,
+      produtoVariado: data.produtoVariado,
+      pesoBruto: data.pesoBruto ?? null,
+      pesoLiquido: data.pesoLiquido ?? null,
+      observacoes: data.observacoes || null,
+      numeroOrdem: data.numeroOrdem || null,
+      tamanho: data.tamanho || null,
+      categoriaLegadoId: data.categoriaLegadoId || null,
+      subcategoriaLegadoId: data.subcategoriaLegadoId || null,
+      dadosOrigem: data.dadosOrigem ?? undefined,
       ativo: true,
 
       cnpjFabricante: data.cnpjFabricante || null,
@@ -113,6 +159,20 @@ export async function POST(req: NextRequest) {
       localizacaoEstoque: data.localizacaoEstoque || null,
       pontoReposicao: data.pontoReposicao ?? null,
       categoriaId: data.categoriaId ?? null,
+
+      ncm: onlyDigits(data.ncm) || null,
+      cfop: onlyDigits(data.cfop) || null,
+      cst: data.cst || null,
+      csosn: data.csosn || null,
+      origemMercadoria: data.origemMercadoria || null,
+      unidadeFiscal: data.unidadeFiscal || null,
+      aliquotaIcms: data.aliquotaIcms ?? null,
+      aliquotaIpi: data.aliquotaIpi ?? null,
+      aliquotaPis: data.aliquotaPis ?? null,
+      aliquotaCofins: data.aliquotaCofins ?? null,
+      codigoBeneficioFiscal: data.codigoBeneficioFiscal || null,
+      cest: onlyDigits(data.cest) || null,
+      tipoClassificacaoFiscal: data.tipoClassificacaoFiscal || null,
     });
 
     return NextResponse.json(produto, { status: 201 });

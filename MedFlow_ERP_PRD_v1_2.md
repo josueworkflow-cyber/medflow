@@ -2,7 +2,7 @@
 
 **Versão:** 1.5  
 **Status:** Base oficial de contexto para IA e desenvolvimento  
-**Última atualização:** Adicionado módulo fiscal completo (NF-e, NFS-e, DANFe, certificado digital, e-mail provider). Documentadas empresas fiscais pré-configuradas (DAC Hospitalar e PulseMed Hospitalar). Sinalizado status de implementação de cada módulo. Adicionada seção 6.13 expandida de Configurações e seção 7.7 expandida de APIs Fiscais.
+**Última atualização:** Catálogo de produtos e estoque revisados: criada taxonomia de categorias/subcategorias para a base `produtos_854968.csv`, cadastrados 480 produtos com vínculo de categoria, ampliados campos do cadastro de produto e definida regra de que importação de catálogo não lança entrada/saldo de estoque automaticamente.
 
 ---
 
@@ -51,7 +51,7 @@ Regra crítica:
 | Financeiro (dashboard, contas, fluxo de caixa, contabilidade) | ✅ Implementado |
 | Clientes | ✅ Implementado |
 | Fornecedores | ✅ Implementado |
-| Produtos e categorias | ✅ Implementado |
+| Produtos e categorias | ✅ Implementado + carga inicial `produtos_854968` |
 | Vendedores | ✅ Implementado |
 | Dashboard executivo | ✅ Implementado |
 | Funil Kanban de pedidos | ✅ Implementado |
@@ -61,8 +61,9 @@ Regra crítica:
 | Certificado digital A1 (upload, criptografia AES-256-CBC, node-forge) | ✅ Implementado |
 | DANFe PDF (geração via @alexssmusica/node-pdf-nfe, endpoint download) | ✅ Implementado |
 | E-mail fiscal automatizado (Resend, LogEmail, XML anexado, DANFe como link) | ✅ Implementado |
-| Orquestrador fiscal assíncrono (setImmediate, fora da transação Prisma) | ✅ Implementado |
-| Configurações empresa fiscal (4 abas: dados gerais, NFS-e, certificado, e-mail) | ✅ Implementado |
+| Orquestrador fiscal com bloqueio de faturamento até autorização | ✅ Implementado |
+| Configurações empresa fiscal (5 abas, incluindo motor tributário) | ✅ Implementado |
+| Motor tributário configurável com snapshot por documento | ✅ Implementado |
 | Empresas fiscais pré-configuradas (DAC Hospitalar CNPJ 64025258000125, PulseMed Hospitalar CNPJ 59655623000145) | ✅ Configurado |
 | Importação NF-e de entrada (XML) | ✅ Implementado |
 | Relatórios gerenciais (margem, validade) | ✅ Implementado |
@@ -727,6 +728,49 @@ Lógica de funcionamento:
   - Markup automático: `((Venda - Custo) / Custo) * 100`.
   - Controle sanitário: flags para `controlaValidade` e `controlaLote` determinam se o sistema exigirá esses dados em futuras entradas.
   - SWR para atualização instantânea após cadastro ou exclusão sem recarregar a página.
+  - Modal de edição otimizado como painel largo responsivo, com cabeçalho e rodapé fixos, área central rolável e layout em duas colunas apenas em telas grandes.
+
+#### 6.2.1 Cadastro Mestre de Produtos
+
+O catálogo de produtos é a base mestre do ERP. Ele define quais itens podem ser vendidos, comprados, movimentados ou usados em pedido, mas **não representa por si só saldo físico em estoque**.
+
+Campos suportados no cadastro de produto:
+
+- Identificação: `codigoInterno`, `codigoBarras`, `descricao`, `fabricante`, `marca`, `codigoFabricante`
+- Categoria: `categoriaId` e texto legado `categoria`
+- Unidade/embalagem: `unidadeVenda`, `unidadeCompra`, `fatorConversao`, `conteudoEmbalagem`, `pesoBruto`, `pesoLiquido`, `tamanho`
+- Controle operacional: `controlaLote`, `controlaValidade`, `estoqueMinimo`, `estoqueMaximo`, `pontoReposicao`, `localizacaoEstoque`
+- Dados sanitários/técnicos: `registroAnvisa`, `temperaturaArmazenamento`, `classeRisco`, `apresentacao`, `concentracaoValor`, `concentracaoUnidade`, `principioAtivo`
+- Dados fiscais: `ncm`, `cfop`, `cst`, `csosn`, `origemMercadoria`, `unidadeFiscal`, `aliquotaIcms`, `aliquotaIpi`, `aliquotaPis`, `aliquotaCofins`, `cest`, `codigoBeneficioFiscal`, `tipoClassificacaoFiscal`
+- Dados complementares/legado: `tipoItem`, `produtoVariado`, `numeroOrdem`, `observacoes`, `categoriaLegadoId`, `subcategoriaLegadoId`, `dadosOrigem`
+
+Regra:
+
+> Cadastrar produto não deve criar lote, movimentação ou saldo em `EstoqueAtual`. Entrada de estoque só ocorre por fluxo próprio de entrada manual, importação de NF-e de entrada, compra/recebimento ou ajuste autorizado.
+
+#### 6.2.2 Carga Inicial `produtos_854968.csv`
+
+Foi processada a lista legada `produtos_854968.csv` para estruturar o catálogo inicial.
+
+Resultado atual:
+
+- 480 produtos cadastrados a partir da base legada.
+- 480 produtos com `categoriaId` vinculado.
+- Categorias/subcategorias criadas antes da carga para evitar produtos sem organização.
+- Situação ativo/inativo da base legada preservada; a listagem padrão do catálogo mostra produtos ativos.
+- Dados legados preservados em campos próprios (`categoriaLegadoId`, `subcategoriaLegadoId`, `dadosOrigem`, códigos e metadados fiscais/operacionais).
+- Nenhuma entrada de estoque, lote ou saldo físico deve permanecer dessa carga de catálogo.
+
+Arquivos de apoio preservados no projeto:
+
+- `outputs/produtos_854968/mapa_produtos_categorias_854968.csv`
+- `outputs/produtos_854968/produtos_organizados_para_cadastro.xlsx`
+- `outputs/produtos_854968/importacao_estoque_pendencias.csv`
+- `outputs/produtos_854968/importacao_estoque_saldos_negativos.csv`
+
+Regra de importação:
+
+> Importações de catálogo vindas de planilhas/CSV devem priorizar cadastro, normalização e categorização. Qualquer saldo físico encontrado nesses arquivos deve virar pendência de revisão, não lançamento automático de estoque.
 
 ### 6.3 Pipeline de Pedidos e Funil Kanban (`/sistema/vendas` e `/sistema/pedidos/funil`)
 
@@ -779,6 +823,15 @@ O estoque deve controlar:
 - Separação
 - Despacho
 
+Regra de separação entre catálogo e estoque:
+
+- `Produto` é cadastro mestre do item.
+- `Categoria` organiza o catálogo.
+- `Lote`, `EstoqueAtual` e `MovimentacaoEstoque` representam estoque físico.
+- Importar/cadastrar produtos não deve criar saldo físico.
+- Saldo físico só deve nascer a partir de uma operação explícita de estoque: entrada manual, recebimento de compra, NF-e de entrada importada ou ajuste autorizado.
+- Toda entrada real precisa deixar rastreabilidade em lote/movimentação quando o produto exigir lote ou validade.
+
 ### 6.6 Estoque Operacional e Camada Fiscal
 
 O sistema trabalha com duas camadas:
@@ -811,6 +864,60 @@ Uma saída/faturamento exige vínculo com:
 Regra:
 
 > A entrada de estoque não precisa definir DAC ou Pulse. A empresa emissora deve ser definida na saída/faturamento.
+
+### 6.6.1 Arquitetura Fiscal Operacional
+
+O módulo fiscal é uma camada de emissão e rastreabilidade acoplada ao fluxo de pedidos, mas isolada em serviços próprios. O `PedidoService` não monta XML, não assina certificado e não conhece detalhes de SOAP, mTLS ou DANFe. Ele cria a intenção fiscal, chama o orquestrador e decide se o pedido pode avançar.
+
+Fluxo oficial de NF-e de saída:
+
+```text
+Financeiro confirma faturamento
+↓
+PedidoService valida forma de pagamento e empresa emissora
+↓
+Motor tributário resolve uma regra por item e calcula os tributos
+↓
+Cria DocumentoFiscal PENDENTE com natureza e snapshot do cálculo
+↓
+Registra HistoricoPedido: EMISSAO_NF_TENTATIVA
+↓
+FiscalOrquestradorService.emitir(documentoFiscalId)
+↓
+NF-e builder monta XML 4.00
+↓
+NF-e signer assina XML com certificado A1
+↓
+NF-e sender envia SOAP para SEFAZ/SVRS
+↓
+Autorizada?
+  sim: salva XML autorizado, protocolo, chave, DANFe e data de autorização
+  não: marca DocumentoFiscal como REJEITADA com código/mensagem
+↓
+Somente se AUTORIZADA: Pedido avança para FATURADO e AUTORIZADO_PARA_SEPARACAO
+↓
+Conta a receber é criada e e-mail fiscal é tentado
+```
+
+Regras de manutenção:
+
+- `DocumentoFiscal` nasce como `PENDENTE`; nunca deve nascer autorizado.
+- Pedido normal com NF só pode avançar para `FATURADO` e `AUTORIZADO_PARA_SEPARACAO` depois que o retorno fiscal for `AUTORIZADA`.
+- Rejeição fiscal mantém o pedido sem liberação para separação e registra histórico com motivo.
+- A chamada externa ao SEFAZ/API Nacional não deve ficar dentro de uma transação longa do Prisma, mas a regra de negócio continua bloqueando o avanço do pedido até a autorização.
+- O envio de e-mail fiscal ocorre depois da autorização. Falha no e-mail não cancela a NF nem desfaz o faturamento autorizado.
+- Pedido interno não cria NF-e/NFS-e; usa autorização financeira própria.
+- A emissão é bloqueada quando não houver natureza, NCM válido ou uma única regra tributária compatível para cada item.
+- Regras empatadas em prioridade e especificidade são consideradas ambíguas e bloqueiam a emissão.
+- O XML usa o snapshot salvo no `DocumentoFiscal`; alterações posteriores no cadastro não modificam a memória fiscal daquela tentativa.
+
+Cadastros fiscais necessários:
+
+- Produto deve possuir NCM válido e unidade fiscal. Os antigos campos de CFOP/CST/alíquotas permanecem para compatibilidade, mas a emissão pelo fluxo oficial usa `RegraTributaria`.
+- Cliente deve possuir endereço estruturado: `logradouro`, `numero`, `bairro`, `cep`, `municipio/cidade`, `uf/estado`, `codigoMunicipio`; e dados fiscais: `inscricaoEstadual`, `inscricaoMunicipal`, `contribuinteICMS`, `consumidorFinal`.
+- Empresa fiscal deve possuir dados cadastrais, endereço, regime tributário, ambiente SEFAZ, séries e certificado A1 válido para emissão real.
+- `NaturezaOperacaoFiscal` descreve venda, devolução, remessa ou ajuste e guarda a finalidade da NF-e; ela não contém uma alíquota única.
+- `RegraTributaria` combina natureza, empresa, produto/NCM, UF, contribuinte e consumidor final para produzir CFOP, CST/CSOSN e parâmetros de ICMS, FCP, ST, DIFAL, IPI, PIS e COFINS.
 
 ### 6.7 Módulo Financeiro (Reorganizado v1.2)
 
@@ -1210,6 +1317,8 @@ Página para visualização completa do histórico de movimentações de estoque
 
 Página para registro de entrada de produtos no estoque com controle de lote e validade.
 
+Esta página **não cadastra produto mestre**. Ela seleciona produtos já existentes no catálogo e registra uma entrada física real.
+
 **Formulário de entrada:**
 
 | Campo | Tipo | Obrigatório |
@@ -1230,6 +1339,8 @@ Página para registro de entrada de produtos no estoque com controle de lote e v
 - Se o produto tem `controlaLote = true`, o lote é obrigatório
 - Se o produto tem `controlaValidade = true`, a validade é obrigatória
 - Formulário limpa após submissão com sucesso
+- Não deve ser usada implicitamente por importação de catálogo.
+- Futuras importações de CSV de produtos devem oferecer revisão antes de gerar qualquer entrada física.
 
 **API:** `POST /api/estoque/lote/entrada`
 
@@ -1332,6 +1443,28 @@ Gerenciamento de categorias de produtos com hierarquia de até 5 níveis.
 
 **Serviço:** `lib/services/categorias.service.ts`
 
+#### 6.11.1 Taxonomia Inicial de Produtos
+
+A base `produtos_854968.csv` foi organizada em uma taxonomia inicial para cadastro de produtos hospitalares.
+
+Estado atual:
+
+- 5 macrogrupos principais.
+- 29 subcategorias operacionais.
+- 34 categorias no total, considerando macros e subcategorias.
+- Produtos importados vinculados por `categoriaId`, preservando também IDs legados em `categoriaLegadoId` e `subcategoriaLegadoId`.
+
+Objetivo da taxonomia:
+
+- Separar medicamentos, materiais, equipamentos, higiene/limpeza e itens administrativos/serviços.
+- Permitir busca e gestão por macro e microcategoria.
+- Evitar duplicidade conceitual entre produtos parecidos, mas diferentes por dosagem, volume, apresentação, marca ou embalagem.
+- Servir como base para relatórios, compras, giro, alertas e margens por grupo.
+
+Regra:
+
+> A categoria oficial do ERP é `categoriaId`. O texto `categoria` e os campos legados existem para compatibilidade, auditoria e rastreabilidade da importação.
+
 ---
 
 ### 6.12 Relatórios (`/sistema/relatorios`)
@@ -1360,15 +1493,17 @@ Centraliza parâmetros gerais do ERP, incluindo configuração completa das empr
 
 #### 6.13.1 Dados da Empresa Fiscal
 
-Componente `<EmpresaFiscalConfig />` com seletor de empresa e 4 abas:
+Componente de configuração com seletor de empresa e 5 abas:
 
 **Aba 1 — Dados Gerais:** razaoSocial, nomeFantasia, cnpj, inscricaoEstadual, inscricaoMunicipal, regimeTributario, ambienteSEFAZ (badge amarelo = Homologação, badge vermelho = Produção), serieNFe, codigoMunicipio, endereço completo.
 
 **Aba 2 — Configurações NFS-e:** codigoTributacaoIss, codigoNbs (9 dígitos), aliquotaIss (Decimal), percentualTributosFederais e percentualTributosEstaduais (Strings literais para payload DPS).
 
-**Aba 3 — Certificado Digital:** Status de validade com alerta se vencer em menos de 30 dias. Upload de .pfx + senha. Validação via node-forge. Senha criptografada AES-256-CBC. Nunca retornados em resposta.
+**Aba 3 — Motor Tributário:** cadastro de naturezas, definição da natureza padrão e CRUD de regras com prioridade, produto/NCM, UF, perfil do destinatário, CFOP, CST/CSOSN e alíquotas.
 
-**Aba 4 — E-mail (Resend):** emailRemetente, toggle emailAtivo, API key (oculta se já salva). Botão Testar Envio retorna 400 se emailAtivo = false. API key criptografada AES-256-CBC.
+**Aba 4 — Certificado Digital:** Status de validade com alerta se vencer em menos de 30 dias. Upload de `.pfx` + senha via `multipart/form-data`. O backend converte o arquivo para base64, valida via `node-forge`, extrai validade e criptografa a senha com AES-256-CBC. PFX, senha e chave privada nunca retornam em resposta.
+
+**Aba 5 — E-mail (Resend):** emailRemetente, toggle emailAtivo, API key (oculta se já salva). Botão Testar Envio retorna 400 se emailAtivo = false. API key criptografada AES-256-CBC.
 
 #### 6.13.2 Empresas Fiscais Pré-configuradas
 
@@ -1380,7 +1515,7 @@ Componente `<EmpresaFiscalConfig />` com seletor de empresa e 4 abas:
 
 Endereço: Rua Van Lerbergue, 6378, Lote 3A Quadra15 Loja 31, Jardim Atlântico Oeste, Maricá-RJ, CEP 24935-440, IBGE 3302700.
 
-**Pendente:** Inscrição Estadual, Inscrição Municipal, certificado .pfx, API key Resend.
+**Pendente por empresa real:** Inscrição Estadual, Inscrição Municipal, certificado `.pfx`, senha do certificado e API key Resend devem ser fornecidos/validados para emissão em homologação e produção.
 
 **Regra:** manter ambienteSEFAZ = homologacao até validação completa. Mudar para producao somente após homologação aprovada.
 
@@ -1402,7 +1537,7 @@ Funções principais:
 
 - `getProdutos(filtros)`: busca produtos com filtros dinâmicos.
 - `criarProduto(data)`: cria produto convertendo corretamente os tipos vindos do frontend.
-- `atualizarProduto(id, data)`: atualiza informações cadastrais do produto.
+- `atualizarProdutoComAuditoria(id, data, motivo, usuarioId)`: atualiza informações cadastrais e fiscais do produto com histórico obrigatório.
 - `inativarProduto(id)`: inativa produto sem apagar histórico.
 
 Regras:
@@ -1412,6 +1547,14 @@ Regras:
 - Produto com controle de validade deve exigir validade nas entradas de estoque.
 - Produto com controle de lote deve exigir lote nas entradas de estoque.
 - Produtos inativos não devem aparecer para novas vendas, mas devem permanecer no histórico.
+- Campos fiscais do produto fazem parte do cadastro oficial e devem ser preservados em criação e edição.
+- Campos complementares do produto (`estoqueMaximo`, `tipoItem`, `produtoVariado`, `pesoBruto`, `pesoLiquido`, `observacoes`, `numeroOrdem`, `tamanho`, `categoriaLegadoId`, `subcategoriaLegadoId`, `codigoBeneficioFiscal`, `cest`, `tipoClassificacaoFiscal`) devem ser preservados em criação, edição e importação.
+- `dadosOrigem` é campo técnico para auditoria/importação e não deve ser tratado como campo manual obrigatório da tela.
+- `categoriaId` deve ser usado como vínculo oficial de categoria/subcategoria. O campo textual `categoria` permanece para compatibilidade e leitura.
+- `ncm` deve conter exatamente 8 dígitos quando informado.
+- `cfop` deve conter exatamente 4 dígitos quando informado.
+- `cest` deve conter exatamente 7 dígitos quando informado.
+- Alterações fiscais do produto devem entrar no histórico de auditoria (`HistoricoAlteracao`).
 
 ---
 
@@ -1648,7 +1791,7 @@ Atualiza dados gerais da empresa fiscal. Perfil: ADMINISTRADOR.
 Soft-delete: atualiza `ativo: false`. Nunca remove do banco. Perfil: ADMINISTRADOR.
 
 #### `POST /api/fiscal/empresa/[id]/certificado`
-Recebe PFX em base64 + senha. Valida via node-forge, extrai data de validade (`notAfter`), criptografa senha com AES-256-CBC, persiste. Nunca retorna PFX ou senha. Perfil: ADMINISTRADOR.
+Recebe PFX + senha por `multipart/form-data`. O backend converte o arquivo para base64, valida via node-forge, extrai data de validade (`notAfter`), criptografa senha com AES-256-CBC e persiste. Mantém compatibilidade com payload JSON legado contendo PFX em base64. Nunca retorna PFX ou senha. Perfil: ADMINISTRADOR.
 
 #### `GET /api/fiscal/empresa/[id]/certificado`
 Chama `verificarValidade(id)`. Retorna `{ valido, venceEm, alertar }` ou `{ valido: false, alertar: false, venceEm: null }` se não configurado. Perfil: qualquer autenticado.
@@ -1662,6 +1805,15 @@ Envia e-mail de teste para o usuário logado. Retorna 400 com mensagem clara se 
 #### `GET /api/fiscal/[id]/danfe`
 Download do DANFe PDF do DocumentoFiscal. Retorna `Content-Type: application/pdf` com `Content-Disposition: attachment; filename="danfe-[chaveAcesso].pdf"`. Retorna 404 se `danfePdfBase64` for null. Perfil: FINANCEIRO ou ADMINISTRADOR.
 
+#### `GET|POST /api/fiscal/naturezas` e `PATCH|DELETE /api/fiscal/naturezas/[id]`
+Lista e mantém naturezas de operação por empresa. Exclusão é lógica (`ativa = false`). Apenas ADMINISTRADOR altera; FINANCEIRO consulta.
+
+#### `GET|POST /api/fiscal/regras` e `PATCH|DELETE /api/fiscal/regras/[id]`
+Mantém a matriz tributária. Valida regime tributário, CFOP, CST/CSOSN, percentuais, vigência e parâmetros de DIFAL/ST.
+
+#### `POST /api/fiscal/tributacao/simular`
+Resolve e calcula a tributação do pedido antes da emissão, considerando empresa, natureza e dados fiscais atuais do destinatário.
+
 #### `GET /api/fiscal/relatorio`
 Relatório fiscal agregado.
 
@@ -1672,7 +1824,8 @@ Lista movimentações fiscais vinculadas a documentos fiscais.
 
 | Serviço | Arquivo | Responsabilidade |
 | :--- | :--- | :--- |
-| NF-e Builder | `lib/services/fiscal/nfe/nfe-builder.service.ts` | Gera XML da NF-e (layout 4.00, chave 44 dígitos, Módulo 11, ICMSSN102/ICMS40) |
+| Motor tributário | `lib/services/fiscal/tributario/` | Seleciona regra por prioridade/especificidade, calcula tributos por item, detecta ausência/ambiguidade e produz snapshot imutável |
+| NF-e Builder | `lib/services/fiscal/nfe/nfe-builder.service.ts` | Gera XML 4.00 a partir do snapshot: CFOP, ICMS00/10/20/40/41/50, CSOSN 102/103/300/400, FCP, ST, DIFAL, IPI, PIS e COFINS |
 | NF-e Signer | `lib/services/fiscal/nfe/nfe-signer.service.ts` | Assina XML com RSA-SHA1, xml-crypto, canonicalization C14N |
 | NF-e Sender | `lib/services/fiscal/nfe/nfe-sender.service.ts` | Envia SOAP para SEFAZ-RJ, parse cStat 100/150 = autorizada |
 | NFS-e Builder | `lib/services/fiscal/nfse/nfse-builder.service.ts` | Monta payload DPS JSON para API Nacional |
@@ -1681,9 +1834,51 @@ Lista movimentações fiscais vinculadas a documentos fiscais.
 | Certificado | `lib/services/fiscal/certificado.service.ts` | Carrega PFX, descriptografa senha, extrai PEM, verifica validade |
 | Email Fiscal | `lib/services/fiscal/nfe/nfe-email.service.ts` | Monta e envia e-mail com XML anexado e link do DANFe |
 | Email Provider | `lib/services/email/email-provider.service.ts` | Integração Resend, LogEmail PENDENTE/ENVIADO/FALHOU, criptografia API key |
-| Orquestrador | `lib/services/fiscal/fiscal-orquestrador.service.ts` | Coordena builder→signer→sender→danfe, atualiza DocumentoFiscal, dispara e-mail |
+| Orquestrador | `lib/services/fiscal/fiscal-orquestrador.service.ts` | Coordena builder→signer→sender→danfe/NFS-e, atualiza `DocumentoFiscal` para AUTORIZADA ou REJEITADA |
+| PedidoService | `lib/services/pedido.service.ts` | Controla o gate de negócio: só avança pedido para FATURADO/AUTORIZADO_PARA_SEPARACAO após autorização fiscal |
 
-**Regra do orquestrador:** Chamado via `setImmediate` fora da transação Prisma do `faturarPedido`. DocumentoFiscal criado com status `PENDENTE` e atualizado para `AUTORIZADA` ou `REJEITADA` após resposta do SEFAZ. Em erro inesperado: status `REJEITADA` + `motivoRejeicao` preenchido.
+#### 7.7.1 Fluxo de Faturamento Fiscal no Código
+
+Responsável principal: `PedidoService.faturarPedido`.
+
+Passos:
+
+1. Valida perfil FINANCEIRO, forma de pagamento, empresa emissora e natureza.
+2. Resolve uma regra para cada item e calcula o snapshot tributário; qualquer ausência ou ambiguidade interrompe o fluxo.
+3. Atualiza `pedidoVenda.empresaFiscalId`.
+4. Se o pedido estava em `CLIENTE_CONFIRMOU`, move apenas para `AGUARDANDO_FATURAMENTO`.
+5. Cria `DocumentoFiscal` PENDENTE com `naturezaOperacaoFiscalId` e `calculoTributario`.
+6. Registra `HistoricoPedido` com `tipoAcao = EMISSAO_NF_TENTATIVA`.
+7. Chama `FiscalOrquestradorService.emitir(documentoFiscalId)`.
+8. Se o orquestrador retornar `autorizada: false`, o pedido não avança para `FATURADO`; o histórico registra `EMISSAO_NF_REJEITADA`.
+9. Se ocorrer erro inesperado, o documento é marcado como `REJEITADA` pelo orquestrador e o histórico registra `EMISSAO_NF_ERRO`.
+10. Somente se `autorizada: true`, o pedido passa por `FATURADO` e depois `AUTORIZADO_PARA_SEPARACAO`.
+11. A conta a receber é criada depois da autorização fiscal.
+12. O e-mail fiscal é tentado após autorização; erro de e-mail é logado e não desfaz a NF.
+
+Regra central de manutenção:
+
+> Nunca reintroduzir emissão fiscal em `setImmediate` que libere o pedido antes da autorização. O envio ao governo pode acontecer fora de uma transação Prisma longa, mas a transição para faturado/liberado depende do retorno autorizado.
+
+#### 7.7.2 Segurança Fiscal
+
+- `empresaFiscalSelect` é a seleção segura padrão para respostas de API.
+- Campos sensíveis (`certificadoPfxBase64`, `certificadoSenha`, `emailApiKey`) só podem ser selecionados em rotinas internas específicas.
+- Logs fiscais não devem conter XML completo, PFX, senha, chave privada, API key ou dados sensíveis desnecessários.
+- `CERT_ENCRYPTION_KEY` é obrigatório para criptografar/descriptografar senha de certificado e API key.
+- `ambienteSEFAZ` controla homologação/produção por empresa fiscal.
+- XML autorizado (`xmlAutorizadoBase64`) tem valor jurídico e não deve ser apagado.
+
+#### 7.7.3 Como Aprimorar o Módulo Fiscal
+
+Ao evoluir NF-e/NFS-e:
+
+- Manter a fronteira: `PedidoService` decide o fluxo do pedido; serviços fiscais cuidam de XML, assinatura, envio, retorno, DANFe e e-mail.
+- Criar testes unitários no mesmo diretório do serviço fiscal alterado.
+- Não chamar SEFAZ/API Nacional em testes unitários; usar mocks para respostas 100/150, rejeições e falhas HTTP.
+- Toda nova resposta fiscal relevante deve ser persistida em `DocumentoFiscal` e refletida em `HistoricoPedido`.
+- Qualquer endpoint novo de download/consulta deve validar perfil e nunca expor campos sensíveis.
+- Para produção, manter checklist operacional separado: certificado válido, liberação no portal fiscal, ambiente correto, série/numeração conferida e validação com contador/cliente.
 
 ### 7.8 APIs de Compras
 
@@ -1721,7 +1916,7 @@ Operações por ID.
 
 #### `GET /api/vendas/[id]/nfe`
 
-Gera NF-e de saída para o pedido. Usa `lib/nfe-generator.ts`.
+Baixa exclusivamente o XML autorizado mais recente do pedido. Retorna 409 para documento pendente ou rejeitado; não possui gerador tributário paralelo.
 
 #### `GET /api/relatorios/margem`
 
@@ -1733,7 +1928,7 @@ Relatório de margem por produto/período.
 
 #### Validação de Inputs com Zod
 Para garantir a integridade dos dados inseridos no sistema e evitar erros silenciosos ou drift de tipos, os endpoints de criação de registros críticos utilizam esquemas de validação robustos com a biblioteca `zod`:
-- **`POST /api/produto`**: Valida a descrição mínima obrigatória, códigos, preços, flags de controle de lote/validade, e todos os metadados do produto enviadas pelo client (CNPJ do fabricante, classe de risco, apresentação, princípio ativo, etc.). Utiliza coerção (`z.coerce`) de valores numéricos e booleanos e validações por enums nativos (`ClasseRisco` e `Apresentacao`).
+- **`POST /api/produto`**: Valida a descrição mínima obrigatória, códigos, preços, flags de controle de lote/validade, categoria oficial (`categoriaId`), campos sanitários, fiscais, complementares e legados do produto. Utiliza coerção (`z.coerce`) de valores numéricos e booleanos, validações por enums nativos (`ClasseRisco` e `Apresentacao`) e valida códigos fiscais (`ncm`, `cfop`, `cest`) por tamanho quando informados.
 - **`POST /api/vendas`**: Valida ID do cliente, ID do vendedor, tipo de pedido (através de `z.nativeEnum(TipoPedido)`), desconto não negativo, e um array de itens contendo ID do produto válido, quantidade maior que zero, preço não negativo e array não vazio.
 
 #### Paginação de Listagens (Prevenção de Gargalos)
@@ -1780,17 +1975,20 @@ Finalizado
 
 | Entidade | Propósito | Regra de Negócio |
 | :--- | :--- | :--- |
+| **Produto** | Cadastro mestre do item | Guarda identificação, categoria oficial (`categoriaId`), dados sanitários, fiscais, embalagem, preços base, controle de lote/validade e metadados legados. Não representa saldo físico por si só. |
 | **Lote** | Rastreabilidade | Único por número de lote e produto. |
 | **EstoqueAtual** | Controle de saldo | Segrega disponível de reservado. Possui custo unitário e status. |
 | **MovimentacaoEstoque** | Auditoria de estoque | Log imutável de entradas, saídas, reservas, cancelamentos e ajustes. |
 | **EmpresaFiscal** | Emissor de NF | Representa DAC Hospitalar ou PulseMed Hospitalar. Campos fiscais: cnpj, crt, ambienteSEFAZ, serieNFe, codigoMunicipio, inscricaoEstadual, inscricaoMunicipal. Certificado: certificadoPfxBase64, certificadoSenha (AES-256-CBC), certificadoValidade. NFS-e: codigoNbs, aliquotaIss (Decimal), codigoTributacaoIss. E-mail: emailApiKey (AES-256-CBC), emailRemetente, emailAtivo. Campos sensíveis NUNCA expostos via API. |
+| **NaturezaOperacaoFiscal** | Contexto da operação | Nome/código por empresa, tipo de entrada/saída, finalidade NF-e, status e indicador de padrão. Não define sozinha a tributação. |
+| **RegraTributaria** | Matriz fiscal | Critérios opcionais de produto, NCM, UF e destinatário; produz CFOP, CST/CSOSN e parâmetros dos tributos. Prioridade e especificidade determinam a regra vencedora. |
 | **MovimentacaoFiscal** | Vínculo fiscal | Conecta saída física a documento fiscal quando houver NF. |
 | **PedidoVenda** | Comercial | Entidade central do fluxo. Controla tipo do pedido e status atual. |
 | **HistoricoPedido** | Auditoria do pedido | Registra cada transição de status, usuário, setor, data e observação. |
 | **Conta** | Financeiro | Contas a receber/pagar vinculadas a pedidos. Campos: `valorPago`, `formaPagamento`, `categoria`, `parcelaNumero`, `parcelaTotal`. Status: ABERTA, PAGA, VENCIDA, CANCELADA. |
 | **HistoricoPagamento** | Auditoria financeira | Registra cada baixa/pagamento com valor, data, forma de pagamento e observação. Vinculado a `Conta` com cascade delete. |
 | **Separacao** | Separação operacional | Controla picking, conferência, embalagem e despacho interno. |
-| **DocumentoFiscal** | Documento fiscal | NF-e de entrada ou saída. Campos: `tipo` (NFE_SAIDA, NFE_ENTRADA, NFSE), `status` (PENDENTE, AUTORIZADA, REJEITADA), `chaveAcesso`, `protocolo`, `xmlAutorizadoBase64`, `danfePdfBase64`, `dataAutorizacao`, `motivoRejeicao`, `numero`, `empresaFiscalId`. |
+| **DocumentoFiscal** | Documento fiscal | NF-e de entrada/saída ou NFS-e. Além de autorização e cancelamento, guarda `naturezaOperacaoFiscalId` e o JSON `calculoTributario`, snapshot imutável usado para montar o XML. |
 | **Categoria** | Categoria de produtos | Hierarquia de até 5 níveis via `parentId`. Vinculada a `empresaId`. |
 | **Localizacao** | Localização física | Controle de endereçamento de estoque (prateleira, galpão, etc). |
 | **TabelaPreco** | Preço por cliente | Tabela de preços vinculada opcionalmente a um cliente. |
@@ -1950,7 +2148,7 @@ As seguintes regras não devem ser alteradas sem solicitação explícita:
 15. O módulo financeiro possui exatamente 5 páginas: Dashboard, Pedidos Financeiros, Contas, Fluxo de Caixa e Contabilidade.
 16. O módulo de estoque de pedidos possui filtros internos por grupo de status, seguindo o mesmo padrão visual de Pedidos Financeiros.
 17. O `DocumentoFiscal` é criado com status `PENDENTE` no faturamento. O orquestrador fiscal atualiza para `AUTORIZADA` ou `REJEITADA` após resposta do SEFAZ. Nunca criar `DocumentoFiscal` já como `AUTORIZADA` diretamente no `PedidoService`.
-18. A emissão fiscal é assíncrona e ocorre fora da transação Prisma do faturamento. Falha na emissão não reverte o faturamento.
+18. Pedido normal com NF só pode avançar para `FATURADO` e `AUTORIZADO_PARA_SEPARACAO` após autorização fiscal. Rejeição ou erro de emissão mantém o pedido sem liberação para separação.
 19. Campos sensíveis de `EmpresaFiscal` (`certificadoPfxBase64`, `certificadoSenha`, `emailApiKey`) NUNCA devem ser retornados em respostas de API nem logados no console.
 20. O e-mail fiscal é disparado automaticamente após autorização. Falha no e-mail não reverte a autorização.
 
@@ -1972,6 +2170,7 @@ Sempre que a IA for solicitada a criar, alterar ou melhorar qualquer parte do Me
 10. As APIs financeiras usam transações atômicas para baixas e criação de parcelas?
 11. O `DocumentoFiscal` é criado com status `PENDENTE` e atualizado pelo orquestrador?
 12. Campos sensíveis fiscais (`certificadoPfxBase64`, `certificadoSenha`, `emailApiKey`) estão protegidos e nunca expostos em respostas de API?
+13. Pedido com NF só é liberado para separação após `DocumentoFiscal.status = AUTORIZADA`?
 
 Se alguma resposta for "não", a solução deve ser ajustada antes de ser implementada.
 

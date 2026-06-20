@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { PackagePlus } from "lucide-react";
+import Link from "next/link";
 
 type Produto = {
   id: number;
@@ -32,6 +33,7 @@ export default function EntradaEstoquePage() {
   async function carregarProdutos() {
     try {
       const res = await fetch("/api/produto?pageSize=1000");
+      if (!res.ok) throw new Error("Erro ao carregar produtos.");
       const data = await res.json();
       const list = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
       setProdutos(list);
@@ -133,8 +135,12 @@ export default function EntradaEstoquePage() {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecione o produto..." />
                 </SelectTrigger>
-                <SelectContent>
-                  {produtos.map((p) => (
+              <SelectContent>
+                  {produtos.length === 0 ? (
+                    <SelectItem value="sem-produtos" disabled>
+                      Nenhum produto cadastrado
+                    </SelectItem>
+                  ) : produtos.map((p) => (
                     <SelectItem key={p.id} value={p.id.toString()}>
                       {p.codigoInterno ? `${p.codigoInterno} - ` : ""}
                       {p.descricao}
@@ -142,6 +148,14 @@ export default function EntradaEstoquePage() {
                   ))}
                 </SelectContent>
               </Select>
+              {produtos.length === 0 && (
+                <p className="text-xs text-amber-700">
+                  Cadastre um produto ativo antes de registrar entrada.{" "}
+                  <Link href="/sistema/produtos" className="font-semibold underline underline-offset-2">
+                    Ir para produtos
+                  </Link>
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -204,7 +218,7 @@ export default function EntradaEstoquePage() {
               />
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-sm font-semibold">
+            <Button type="submit" disabled={loading || produtos.length === 0} className="w-full bg-emerald-600 hover:bg-emerald-700 h-11 text-sm font-semibold">
               {loading ? "Salvando..." : "Registrar Entrada no Estoque"}
             </Button>
           </form>

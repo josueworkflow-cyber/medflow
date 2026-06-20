@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
+import { computeDiff, registrarAlteracao } from "./auditoria.service";
 
 export type ProdutoComCategoria = Prisma.ProdutoGetPayload<{
   include: { categoriaRef: true };
@@ -61,6 +62,90 @@ export async function atualizarProduto(
   return await prisma.produto.update({
     where: { id },
     data,
+  });
+}
+
+export const CAMPOS_AUDITAVEIS_PRODUTO = [
+  "codigoInterno",
+  "codigoBarras",
+  "descricao",
+  "categoria",
+  "categoriaId",
+  "fabricante",
+  "unidadeVenda",
+  "unidadeCompra",
+  "fatorConversao",
+  "registroAnvisa",
+  "temperaturaArmazenamento",
+  "controlaValidade",
+  "controlaLote",
+  "precoCustoBase",
+  "precoVendaBase",
+  "estoqueMinimo",
+  "estoqueMaximo",
+  "tipoItem",
+  "produtoVariado",
+  "pesoBruto",
+  "pesoLiquido",
+  "observacoes",
+  "numeroOrdem",
+  "tamanho",
+  "categoriaLegadoId",
+  "subcategoriaLegadoId",
+  "cnpjFabricante",
+  "classeRisco",
+  "codigoFabricante",
+  "conteudoEmbalagem",
+  "pontoReposicao",
+  "localizacaoEstoque",
+  "apresentacao",
+  "concentracaoValor",
+  "concentracaoUnidade",
+  "principioAtivo",
+  "marca",
+  "ncm",
+  "cfop",
+  "cst",
+  "csosn",
+  "origemMercadoria",
+  "aliquotaIcms",
+  "aliquotaIpi",
+  "aliquotaPis",
+  "aliquotaCofins",
+  "unidadeFiscal",
+  "codigoBeneficioFiscal",
+  "cest",
+  "tipoClassificacaoFiscal",
+] as const;
+
+export async function atualizarProdutoComAuditoria(
+  id: number,
+  data: Prisma.ProdutoUncheckedUpdateInput,
+  motivo: string,
+  usuarioId?: number
+): Promise<ProdutoListItem> {
+  return prisma.$transaction(async (tx) => {
+    const produtoAtual = await tx.produto.findUnique({ where: { id } });
+    if (!produtoAtual) throw new Error("Produto não encontrado.");
+
+    const diffs = computeDiff(produtoAtual, data as any, CAMPOS_AUDITAVEIS_PRODUTO as any);
+
+    const produtoAtualizado = await tx.produto.update({
+      where: { id },
+      data,
+    });
+
+    if (diffs.length > 0) {
+      await registrarAlteracao(tx, {
+        entidade: "PRODUTO",
+        entidadeId: id,
+        diffs,
+        motivo,
+        usuarioId,
+      });
+    }
+
+    return produtoAtualizado;
   });
 }
 

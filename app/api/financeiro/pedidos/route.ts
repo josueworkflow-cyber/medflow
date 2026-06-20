@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
         empresaFiscal: { select: empresaFiscalSelect },
         itens: { include: { produto: { select: { descricao: true } } } },
         historico: { orderBy: { createdAt: "desc" }, take: 10, include: { usuario: { select: { nome: true } } } },
+        documentosFiscais: true,
       },
       orderBy: { createdAt: "asc" },
     });

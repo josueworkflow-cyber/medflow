@@ -1,0 +1,481 @@
+codigo,descricao,macroCategoria,subcategoria,categoriaId,confianca,regra,marca,ncm,categoriaLegadoId,subcategoriaLegadoId,linhasFonte
+AT50006,ACIDO TRANEXAMICO 250MG/5ML - CX/50 - ZYDUS,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,ZYDUS,30049039,324597,533512,2
+AT50005,ACIDO TRANEXAMICO 50MG/5ML - CX/100 - HIPOLABOR (TRANSAMIN),Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,HIPOLABOR,30049039,324597,533512,3
+AT50011,ACIDO TRANEXAMICO 50MG/5ML - CX/5 - ZIDUS (TRANSAMIN),Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,ZIDUS,30049039,324597,533512,4 | 5
+AT50004,ACIDO TRANEXAMICO 50MG/5ML - CX/50 - BLAU (TRANSAMIN),Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,BLAU,30049039,324597,533512,6 | 7 | 8
+AA50002,ACTILYSE ALTEPLASE 50MG/50ML - BOEHRINGER,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,BOEHRINGER,,324597 | 0,,9 | 10 | 11
+AH10001,ADRENALINA HYFREN 1ML AP CX/100 - HYPOFARMA,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,HYPOFARMA,30049099,0,,12
+ÁD10004,ÁGUA BIDESTILADA 1000ML BOLSA P/ INJ - HALEXISTAR,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,HALEXISTAR,30049099,0,,13
+CS00019,AGUA BIDESTILADA P/ INJEÇÃO 1000ML FR - FRESENIUS,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,FRESENIUS,28470000,324598,,14
+ÁD10006,ÁGUA DESTILADA 10ML AP - FARMACE - CX/200,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FARMACE,30049099,0,,15
+ÁD10001,ÁGUA DESTILADA 10ML AP P/ INJ - EQUIPLEX - CX/200,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,EQUIPLEX,30049099,0,,16 | 17 | 18 | 19
+ÁD10005,ÁGUA DESTILADA 5000ML GL - FACILIMPE,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FACILIMPE,30049099,0,,20
+ÁO30001,ÁGUA OXIGENADA 3% 10VL 1L - CX/12 - RIOQUÍMICA,"Higiene, Antissepsia e Limpeza",Desinfecção e Limpeza,26,média,limpeza/desinfecção,RIOQUÍMICA,28470000,0,,21
+ÁPI0001,ÁGUA PARA INJEÇÃO 10ML - FARMACE CX/200,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FARMACE,28470000,324598,,22
+CS00008,ÁGUA PARA INJEÇÃO 500ML - CX/50 - FRESENIUS,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,324598,,23
+A1C0001,"AGULHA 13X0,45MM CX/100 DESCARPACK",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SOLIDOR,90183219,370704,527290,24
+AH20004,"AGULHA 20X0,55MM CX/100 LABOR IMPORT",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,LABOR IMPORT,90183219,370704,527290,25
+A2C0002,"AGULHA 20X5,5MM (24GX3/4) CX/100 - DESCARPACK",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,DESCARPACK,90183219,370704,527290,26
+A2C0001,"AGULHA 20X5,5MM C/ NR32 CX/100 - DESCARPACK",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,DESCARPACK,90183219,370704,527290,27
+A3X0003,"AGULHA 25X0,7MM CX/100 SOLIDOR",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SOLIDOR,90183219,370704,527290,28
+A3X0007,"AGULHA 30X0,8MM CX/100 DESCARPACK",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SOLIDOR,90183219,370704,527290,29
+A3X0002,"AGULHA 30X0,8MM CX/100 SOLIDOR",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SOLIDOR,90183219,370704,527290,30
+A3C0001,"AGULHA 30X7,0MM CX/100 - SR",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SR,90183219,370704,527290,31
+A3C0003,AGULHA 40X12 (18GX1-1/2) CX/100 - WILTEX,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,WILTEX,90183219,370704,527290,32
+A3C0002,"AGULHA HIPODÉRMICA ESTÉRIL 40X1,20MM CX/100 - MEDIX",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,MEDIX,90183219,370704,527290,33
+AP10001,"AGULHA PERICAN 16GX31,7X80MM - BBRAUN",Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,BBRAUN,90183213,0,,34
+AH20009,ALBUMINA HUMANA 20% 10G/50ML CX/01 - GRIFOLS,Medicamentos,Hemoderivados e Biológicos,9,alta,biológico/hemoderivado,GRIFOLS,30049079,324597,,35 | 36 | 37 | 38 | 39
+AH20001,ALBUMINA HUMANA 200G/L FR 50 ML - KEDRION,Medicamentos,Hemoderivados e Biológicos,9,alta,biológico/hemoderivado,KEDRION,30049079,324597,,40 | 41 | 42
+A7A0003,ALCOOL 70% 1000ML SEPTPRO - CX/12 - PROLINK,"Higiene, Antissepsia e Limpeza",Álcool e Antissépticos,25,alta,antisséptico,PROLINK,38089429,360748,,43
+AEG0001,ALCOOL EM GEL 500ML C/ PUMP - TOP BEL,"Higiene, Antissepsia e Limpeza",Álcool e Antissépticos,25,alta,antisséptico,TOP BEL,38089429,0,,44
+AE70002,ALCOOL ETILICO 70% 1000ML - CX/12 - PROLINK,"Higiene, Antissepsia e Limpeza",Álcool e Antissépticos,25,alta,antisséptico,PROLINK,38089429,360748,,45
+AE70003,ALCOOL ETILICO 70% 1000ML- CX/12 - RIALCOOL 70 - RIOQUÍMICA,"Higiene, Antissepsia e Limpeza",Álcool e Antissépticos,25,alta,antisséptico,RIOQUÍMICA,38089429,360748,,46
+A(H0004,ALFAPOETINA ( HEMAX ERITRON) 4000 UI - ACHE - CX/1,Medicamentos,Hemoderivados e Biológicos,9,alta,biológico/hemoderivado,ACHE,35040090,324597,533512,47 | 48 | 49 | 50 | 51
+A+C0004,AMOXICILINA + CLAVULANATO 1000MG + 200MG - CX/20 - BLAU,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BLAU,30041012,324597,527299,52 | 53 | 54 | 55 | 56 | 57
+A+C0010,AMOXICILINA + CLAVULANATO 1G + 200MG - CX/10 - EUGIA,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,EUGIA,30041012,324597,527299,58 | 59 | 60 | 61
+A+C0037,AMOXICILINA + CLAVULANATO 1G + 200MG - CX/10 - EUROFARMA,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,EUROFARMA,30041012,324597,527299,62
+APV0001,APARELHO DE PRESSÃO VELCRO S/ESTETO - ACCUMED,Equipamentos e Instrumentais,Equipamentos de Monitoramento,29,alta,equipamento monitoramento,ACCUMED,90189069,377045,,63
+AA20001,ARTERIOFIX CONJ. DE CATETERIZAÇÃO ARTERIAL 20G/80MM (RADIAL) - BBRAUM - LOT: 24I0484402,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BBRAUM,90183924,0,,64
+ABG0001,AVENTAL AZUL S/ MANGA 30GR - PCT/10 - DEJAMARO,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,DEJAMARO,39262000,326542,527303,65
+ABG0004,AVENTAL BRANCO GR 30 MEDIA S/M - PCT10 - DEJAMARO,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,DEJAMARO,39262000,326542,527303,66
+ACE0001,AVENTAL CIRURGICO ESTERIL AZUL ML 40GR C/TOALHA - CX/35 - PION G,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,63079010,326542,527303,67
+ACE0002,AVENTAL CIRURGICO ESTERIL STANDARD AZUL ML 40GR C/TOALHA - CX/40 - PION G,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,63079010,326542,527303,68
+ACS0001,AVENTAL CIRÚRGICO SMS GR40 ESTÉRIL MANGA LONGA TAM G AZUL CX/50 - WINNER,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,WINNER,62101000,0,,69
+ACS0002,AVENTAL CIRÚRGICO SMS GR50 ESTÉRIL MANGA LONGA TAM G AZUL CX/50 - WINNER,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,WINNER,62101000,0,,70
+AAS0001,AVENTAL DESCARTÁVEL AZUL S/ MANGA 30GR - PCT/10 - LIVE,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,LIVE,39262000,326542,527303,71
+ABG0006,AVENTAL VERDE GR MEDIA S/M - PCT/10 - DEJAMARO,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,DEJAMARO,39262000,326542,527303,72
+ADA0001,AZITROMICINA DI-HIDRATADA AZICIN 500MG CX/10 - CRISTÁLIA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CRISTÁLIA,30042029,324597,,73 | 74
+ADA0003,AZITROMICINA DI-HIDRATADA AZICIN 500MG CX/10 - GLOBO,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,GLOBO,30042029,324597,,75
+BS80001,"BICABORNATO DE SÓDIO 8,4% 10ML - SAMTEC",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,SAMTEC,30049099,0,,76
+BPT0002,BOLSA PARA TRANSPORTE REANIMADOR PROTEC UND,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,PROTEC,39162000,326542,,77
+BR10002,BROMETO DE ROCURONIO 10MG/5ML - CX/25 - CRISTALIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTALIA,30049079,324597 | 0,,78 | 79 | 80
+BR10001,BROMETO DE ROCURONIO 10MG/5ML - CX/25 - VOLPHARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,VOLPHARMA,30049079,0,,81
+BE20001,BUTILBROMETO DE ESCOPOLAMINA 20MG/ML FR 1ML CX/ 100 - FARMACE,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,FARMACE,30049069,324597,,82
+BE40001,BUTILBROMETO DE ESCOPOLAMINA 4MG/ML 5ML CX/50 AP - HYPOFARMA,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,HYPORFARMA,29397911,0,,83
+CBS0001,CALÇA E BLUSA SMS AZUL C/ELASTICO G N/ESTERIL (PIJAMA) - CX/50 - PION G,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,PION G,62101000,326542,527303,84
+CBS0003,CALÇA E BLUSA SMS AZUL C/ELASTICO M N/ESTERIL (PIJAMA) - CX/50 - PION G,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,PION G,62101000,326542,527303,85
+CCE0004,"CAMPO CIRURGICO ESTERIL SMS 0,50X0,50 C/FENESTRA - CX/300 - PION G",Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,30059090,326542,527304,86
+CCF0001,"CAMPO CIRURGICO FEN (10CM) 0,60X0,60M - BEST FABRIL",Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,BEST FABRIL,63079010,326542,,87
+COE0003,CAMPO OPERATÓRIO ESTÉRIL 23X25CM RADIOPACK 8G ANTONELLA PCT/50 - AMED,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,AMED,30059090,326542,527304,88
+COE0001,CAMPO OPERATÓRIO ESTÉRIL 25X28CM - PCT/5 - POLAR FIX,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,POLAR FIX,30059090,326542,527304,89
+COE0002,CAMPO OPERATÓRIO ESTÉRIL 25X28CM RADIOPACK - AMED,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,AMED,30059090,326542,527304,90
+CGN0001,CANULA DE GUEDEL N°01 70MM ESTERIL CX/ 50UN- SEVEN,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,SEVEN,90183929,0,,91
+CGN0002,CANULA DE GUEDEL N°02 80MM ESTERIL CX/ 50UN- SEVEN,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,SEVEN,90183929,0,,92
+CA20002,CATETER ARTERIAL 20GA 5CM (RADIAL) - ARROW - LOT: 71F22C0184,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ARROW,90183929,0,,93
+CA20001,CATETER ARTERIAL 20GA 5CM (RADIAL) - ARROW - LOT: 71F23D0018,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ARROW,90183929,0,,94
+CDL0014,CATETER DUPLO LUMEN 5FRX13CM INFANTIL - MEDIKA IND,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,MEDIKATH,90183921,370704,527297,95 | 96
+CDL0011,CATETER DUPLO LUMEN 7FRX20CM - ALIVE HEART,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ALIVE HEART,90183921,370704,527297,97
+CTL0004,CATETER DUPLO LUMEN 7FRX20CM - BIOMEDICAL,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BIOMEDICAL,90183929,370704,527296,98
+CDL0003,CATETER DUPLO LUMEN 7FRX20CM - MEDIKA IND,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,MEDIKATH,90183921,370704,527297,99 | 100 | 101 | 102 | 103
+CDL0020,CATETER DUPLO LUMEN 7FRX20CM - SAFECATH,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,SAFECATH,90183929,0,,104
+CP10001,CATETER JELCO 14G - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,DESCARPACK,90183921,370704,527291,105
+ED20002,CATETER JELCO 16G - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,DESCARPACK,90183921,370704,527291,106
+CJ10001,CATETER JELCO 16G - CX/100 - SEVEN CARE,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SEVEN CARE,90183921,370704,527291,107
+CJ10003,CATETER JELCO 18G - CX/100 - SEVEN CARE,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SEVEN CARE,90183921,370704,527291,108
+CJ20002,CATETER JELCO 20G - DESCARPACK,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,DESCARPACK,90183921,370704,527291,109
+CJ20001,CATETER JELCO 20G - POLYMED,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,POLYMED,90183921,370704,527291,110
+CJ10002,CATETER JELCO 22G - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,DESCARPACK,90183921,370704,527291,111
+CJ20003,CATETER JELCO 24G - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,DESCARPACK,90183921,370704,527291,112
+CPP0003,CATÉTER P/ PUNÇÃO ARTERIAL 3FX8CM EM PEBAX MICROSELD (RADIAL) - INTRA GMBH,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,INTRA GMBH,90183929,0,,113
+CPP0002,CATÉTER P/ PUNÇÃO ARTERIAL 4FX11CM 18G EM PEBAX MICROSELD (FEMURAL) - INTRA GMBH,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,INTRA GMBH,90183929,0 | 370704,,114 | 115
+C(20009,CATETER PAM RADIAL 20GX80MM - B BRAUN,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BBRAUN,90183922,370704,527294,116
+CTL0010,CATETER TRIPLO LUMEN 7FRX20CM - ALIVE HEART,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ALIVE HEART,90183921,370704,527297,123 | 124
+CTL0007,CATETER TRIPLO LUMEN 7FRX20CM - ARROW,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ARROW,90183929,370704,527296,125
+CTL0009,CATETER TRIPLO LUMEN 7FRX20CM - B BRAUN,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,B BRAUN,90183929,370704,527296,117 | 118 | 119 | 120 | 121
+CTL0003,CATETER TRIPLO LUMEN 7FRX20CM - BIOMEDICAL,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BIOMEDICAL,90183929,370704,527296,122 | 126
+CS20006,CAVILON SPRAY 28ML - 3M,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,3M,30051090,324597,536267,127 | 128 | 129 | 130 | 131 | 132 | 133 | 134 | 135
+C5C0001,CEFALEXINA 500MG - CX/50 CART/10CP - TEUTO,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,TEUTO,30042052,324597,527299,136
+CS10001,CEFAZOLINA SÓDICA 1G C/50 - BIOCHIMICO,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,EUGIA,30042059,0,,137
+CS10025,CEFAZOLINA SÓDICA 1G C/50 - BLAU,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BLAU,30042059,0,,138 | 139 | 140 | 141 | 142 | 143 | 144 | 145 | 146 | 147 | 148 | 149
+CS10004,CEFAZOLINA SÓDICA 1G C/50 - EUGIA,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,EUGIA,30042059,0,,150 | 151 | 152 | 153 | 154 | 155
+CAS0001,CEFTAZIDIMA E AVIBACTAM SÓDICO TORGENA 2000MG+500MG - CX/10 - PFIZER,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,PFIZER,30042079,0,,156
+CP10002,CEFTAZIDIMA PENTAIDRATADA 1G - CX/50 - FRESENIUS,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,FRESENIUS,30042059,324597,527299,157 | 158
+CAS0002,CEFTAZIDIMA PENTAIDRATADA 1G CX/25 - ABL,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,ABL,30042079,0,,159
+C1A0005,CEFTRIAXONA 1G - ABL - CX/50,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,ABL,29419031,324597,,160 | 161
+C1-0002,CEFTRIAXONA 1G - TEUTO - CX/50,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,TEUTO,29419031,324597,,162
+C1-0017,CEFTRIAXONA DISSÓDICA 1000MG - BLAU - CX/100,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BLAU,29419031,324597,,163
+C7-0001,CEFUROXIMA 750MG - CX/25 - BIOCHIMICO,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,BIOCHIMICO,30042059,324597,527299,164
+C7-0006,CEFUROXIMA 750MG - CX/25 - EUGIA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,EUGIA,30042059,324597,527299,165 | 166
+T2C0001,CETOPROFENO 100MG CX/50 - EUROFARMA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,EUROFARMA,30049073,324597,,167
+C1I0002,CETOPROFENO 100MG IV - CX/50 - CRISTALIA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,UNIAO QUIMICA,30049068,324597,527570,168 | 169 | 170 | 171 | 172
+C1I0004,CETOPROFENO 100MG IV - CX/50 - UNIÃO QUIMICA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,UNIAO QUIMICA,30049068,324597,527570,173 | 174
+C2C0008,CIPROFLOXACINO 2MG/100ML - CX/60 - HALEXISTAR,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,HALEXISTAR,30042099,324597,527299,175
+C2-0001,CIPROFLOXACINO 2MG/100ML - CX/80 - FRESENIUS,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,FRESENIUS,30042099,324597,527299,176 | 177
+C2C0009,CIPROFLOXACINO 2MG/100ML CX/60 - ISOFARMA,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,ISOFARMA,30042099,324597,,178
+CF10001,"CITRATO DE FENTANILA 0,05MG/ML 2ML AP - CX/25 - CRISTÁLIA",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,29333363,324597,"527570;527573",179
+CF10002,"CITRATO DE FENTANILA 0,05MG/ML 2ML AP CX/25 - HIPOLABOR",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,29333363,324597,"527570;527573",180 | 181
+CF00002,"CITRATO DE FENTANILA 0,05MG/ML 2ML AP CX/50 - HIPOLABOR",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,29333363,324597,"527570;527573",182
+CF10014,"CITRATO DE FENTANILA 10ML/0,05MG - CX/25 - UNIÃO QUÍMICA",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,UNIÃO QUÍMICA,29333363,324597,"527570;527573",183
+CF00003,CITRATO DE FENTANILA 50MCG/ML 2ML AP CX/50 - HIPOLABOR,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,29333363,324597,"527570;527573",184
+CFF0002,"CITRATO DE FENTANILA FENTANEST 0,0785MG/ML 0,05 MG/ML 10ML CX/25 - CRISTÁLIA",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,30049032,0,,185
+CFF0001,"CITRATO DE FENTANILA FENTANEST 0,0785MG/ML 0,05 MG/ML CX/25 - CRISTÁLIA",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,30049032,0,,186
+C5C0004,CLARITROMICINA 500MG CLARILIB - CX/25 - BLAU,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,BLAU,29415010,324597,527299,187 | 188
+C5-0004,CLARITROMICINA 500MG CLINBACTER - CX/1 - UNIÃO QUÍMICA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,UNIÃO QUÍMICA,29415010,324597,527299,189
+C5F0001,CLARITROMICINA 500MG FR CX/01 - MANDALA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,GUFIC,30042029,324597,,190 | 191
+C5F0003,CLARITROMICINA 500MG FR CX/10 - ABL,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,ABL,30042029,324597,,192
+C5C0003,CLARITROMICINA 500MG KLARICID - CX/1 - ABBOTT,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,ABBOTT,29415010,324597,527299,193
+E2-0003,CLEXANE ENOXAPARINA 20MG - CX/10 - SANOFI,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,SANOFI,30049099,324597,528558,194
+C220001,CLONAZEPAM 2.5MG/ML 20ML GTS FR CX/05 - HIPOLABOR,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,HIPOLABOR,29339113,0,,195
+,CLOPIDOGREL (BISSULFATO) 75MG CX/ 30CP- AUROBINDO,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,AUROBINDO,30049079,0,,196
+CS00013,"CLORETO DE SODIO 0,9% 1000ML - BASAL",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,BASAL,28470000,324598,,197 | 198
+CS00005,"CLORETO DE SODIO 0,9% 100ML CX/50 - FRESENIUS",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,324598,,199
+CS00022,"CLORETO DE SODIO 0,9% 100ML CX/80 - FRESENIUS",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,0,,200 | 201 | 202 | 203
+CS00002,"CLORETO DE SODIO 0,9% 100ML FR - FARMARIN",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FARMARIN,28470000,324598,,226
+CS00009,"CLORETO DE SODIO 0,9% 10ML AP - CX/200 - EQUIPLEX",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,EQUIPLEX,30049099,324598,,227 | 228 | 229
+CS00004,"CLORETO DE SODIO 0,9% 250ML CX/50 - FRESENIUS",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,324598,,204 | 205 | 206 | 207 | 208
+CS00016,"CLORETO DE SODIO 0,9% 500ML - CX/16 FARMACE",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,324598,,209
+CS00079,"CLORETO DE SODIO 0,9% 500ML - CX/16 FARMARIN",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,324598,,210
+CS00073,"CLORETO DE SODIO 0,9% 500ML - CX/16 FRC. - FARMARIN",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FARMARIN,28470000,324598,,230
+CS00010,"CLORETO DE SODIO 0,9% 500ML - CX/30 (BOLSA) BAXTER",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,324598,,211 | 212 | 213 | 214 | 215 | 216 | 217 | 218 | 219 | 220 | 221 | 222 | 223 | 224
+CS00006,"CLORETO DE SODIO 0,9% 500ML - CX/50 - ACULIFE",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,ACULIFE,28470000,324598,,225
+CS00007,"CLORETO DE SODIO 0,9% 500ML - CX/50 - FRESENIUS",Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,324598,,231
+CS10027,CLORETO DE SUXAMETÔNIO 100MG - CX/1 - UNIAO QUIMICA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,UNIAO QUIMICA,30049069,324597,"527577;536370 | 527577",232 | 233 | 234 | 235 | 236 | 237 | 238 | 239
+CS10035,CLORETO DE SUXAMETÔNIO 100MG - CX/10 - BLAU,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,BLAU,30049069,324597,527577,240 | 241 | 242 | 243 | 244
+13384,CLOREXIDINA DEGERMANTE 2% 1000ML - CX/12 - VIC PHARMA,"Higiene, Antissepsia e Limpeza",Álcool e Antissépticos,25,alta,antisséptico,VIC PHARMA,30039099,360748,,245
+CA50007,CLORIDRATO DE AMIODARONA 50MG/ML - CX/100 - HIPOLABOR,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,HIPOLABOR,30049054,324597,527587,246 | 247
+CA50001,CLORIDRATO DE AMIODARONA 50MG/ML 3ML FR - CX/50 - FRESENIUS,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,FRESENIUS,30049054,324597,527587,248
+CB+0003,"CLORIDRATO DE BUPIVACAINA 0,5% 5MG/ML 20ML C/ EPINEFRINA - CX/10 - CRISTALIA",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,29333983,324597,527300,249
+CB50005,CLORIDRATO DE BUPIVACAINA 5MG/ML + GLICOSE 80MG/ML 4ML - CX/100 - HIPOLABOR,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,29333983,324597,527300,250 | 251
+CB50003,CLORIDRATO DE BUPIVACAINA 5MG/ML 20ML - CX/25 - HIPOLABOR,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,29333983,324597,527300,252
+CB50002,CLORIDRATO DE BUPIVACAINA 5MG/ML 20ML - CX/25 - HYPOFARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOFARMA,29333983,324597,527300,253
+CC10002,CLORIDRATO DE CEFEPIMA 1G - CX/50 - EUGIA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,EUGIA,30042059,324597,527299,254
+CC10018,CLORIDRATO DE CEFEPIMA 1G - CX/50 - TEUTO,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,TEUTO,30042059,324597,527299,255 | 256 | 257 | 258
+CD(0014,CLORIDRATO DE DEXMEDETOMIDINA (PRECEDEX) 100MCG/2ML - CX/05 - VOLPHARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,VOLPHARMA,30049069,324597,"527570;536368",259 | 260
+CD10014,CLORIDRATO DE DEXMEDETOMIDINA 100MCG/2ML - CX/5 - CRISTÁLIA (PRECEDEX),Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,30049069,324597,527573,261
+CD(0010,CLORIDRATO DE DEXMEDETOMIDINA 100MCG/2ML - CX/5 - VOLPHARMA (PRECEDEX),Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,VOLPHARMA,30049069,324597,527573,262
+CD20001,CLORIDRATO DE DOBUTAMINA 250MG/20ML CX/10 - HYPOFARMA,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,HYPOFARMA,30049039,0,,263
+CD20002,CLORIDRATO DE DOBUTAMINA 250MG/20ML CX/50 - TEUTO,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,TEUTO,30049039,0,,264
+CEK0001,CLORIDRATO DE ESCETAMINA KETAMIN 50MG/ML AP 10ML CX/25 - CRISTÁLIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,30049032,0,,265 | 266 | 267 | 268 | 269 | 270
+CEK0003,CLORIDRATO DE ESCETAMINA KETAMIN 50MG/ML AP 2ML CX/25 - CRISTÁLIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,30049032,0,,271 | 272 | 273
+CH(0004,CLORIDRATO DE HIDRALAZINA (NEPRASOL) 20MG/1ML CX/50 CRISTALIA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CRISTALIA,30049065,324597,,274
+CL20013,CLORIDRATO DE LIDOCAINA 2% 20ML SV CX/25 - CRISTALIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTALIA,30049043,324597,,275 | 276 | 277 | 278 | 279 | 280 | 281 | 282 | 283 | 284
+CL20004,CLORIDRATO DE LIDOCAINA 2% 20ML SV CX/25 - HYPOFARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOFARMA,30049043,324597,,285 | 286 | 287
+CLG0021,CLORIDRATO DE LIDOCAINA GELEIA 2% - 20MG - 1 BISNAGA 30G - CRISTALIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTALIA,30049043,324597,527300,288
+CLG0011,CLORIDRATO DE LIDOCAINA GELEIA 2% - 20MG - 1 BISNAGA 30G - PHARLAB,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,PHARLAB,30049043,324597,527300,289 | 290
+CLG0005,CLORIDRATO DE LIDOCAINA GELEIA 2%/20MG - 1 BISNAGA 30G - NEOQUIMICA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,NEOQUIMICA,30049043,324597,527300,291 | 292 | 293 | 294 | 295 | 296 | 297 | 298 | 299 | 300
+CO40001,CLORIDRATO DE ONDANSETRONA 4MG/2ML AP - UNIÃO QUIMICA,Medicamentos,Gastrointestinal e Antieméticos,10,alta,gastrointestinal/antiemético,UNIÃO QUIMICA,30049069,0,,301
+CON0001,CLORIDRATO DE ONDANSETRONA 4MG/ML 2ML AP CX/50 - HIPOLABOR,Medicamentos,Gastrointestinal e Antieméticos,10,alta,gastrointestinal/antiemético,HIPOLABOR,30049069,0,,302
+CO40002,CLORIDRATO DE ONDANSETRONA NAUSEDRON 2MG/ML 4ML AP CX/50 - CRISTÁLIA,Medicamentos,Gastrointestinal e Antieméticos,10,alta,gastrointestinal/antiemético,UNIÃO QUIMICA,30049069,0,,303
+CP20001,CLORIDRATO DE PROMETAZINA 25MG/ML FR 2ML CX/ 100 - HIPOLABOR,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,HIPOLABOR,29343030,0,,304
+CR20006,CLORIDRATO DE REMIFENTANILA 2MG - CX/5 - CRISTALIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTALIA,30049069,324597,527300,305 | 306 | 307 | 308 | 309 | 310 | 311 | 312 | 313 | 314 | 315
+CR20010,CLORIDRATO DE REMIFENTANILA 2MG - CX/5 - UNIÃO QUÍMICA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,UNIÃO QUÍMICA,30049069,324597,527300,316
+CV10002,CLORIDRATO DE VANCOMICINA 1G - CX/25 - ABL,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,ABL,30042071,324597,527299,317
+CV50014,CLORIDRATO DE VANCOMICINA 500MG - CX/20 - BLAU,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BLAU,30042071,324597,527299,318 | 319 | 320
+CV50002,CLORIDRATO DE VANCOMICINA 500MG - CX/25 - ABL,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,ABL,30042071,324597,527299,321 | 322 | 323
+CV50017,CLORIDRATO DE VANCOMICINA 500MG CX/50 - TEUTO,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,TEUTO,30042071,324597,,324
+CL20002,CLORIDRATO LIDOCAINA 2% 20ML CV CX/25 - HYPOFARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOFARMA,30049043,324597,,325
+CL20001,CLORIDRATO LIDOCAINA 2% 20ML SV CX/25 - HYPOFARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOFARMA,30049043,324597,,326 | 327
+CIM0001,"COBERTURA ESTERIL DE MESA AUXILIAR 1,30X1,30 PION G CX/80",Materiais Médico-Hospitalares,"Kits, Campos e Coberturas Cirúrgicas",19,alta,kit/campo cirúrgico,PION G,30059090,326542,527304,328
+CMM0001,"COBERTURA ESTÉRIL DE MESA MAYO 0,60X 1,30M COM REFORÇO - CX/150 - PION G",Materiais Médico-Hospitalares,"Kits, Campos e Coberturas Cirúrgicas",19,alta,kit/campo cirúrgico,PION G,30059020,326542,527304,329
+C0+0001,"COLAGENASE 0,6U/G + CLORANFENICOL 0,01G/G 30G - CRISTÁLIA",Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CRISTÁLIA,30049019,0,,330 | 331
+CCO0002,COLCHÃO CX DE OVO 85X185X4CM D13 - CHUMBO - ORTOBOM,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,ORTOBOM,94042900,326542,,332
+CP00001,COLETOR DE PERFUROCORTANTE 03LT (AMARELO) - DESCARBOX,Materiais Médico-Hospitalares,"Drenos, Coletores e Bolsas",21,alta,dreno/coletor,DESCARBOX,48191000,0,,333
+CP00002,COLETOR DE PERFUROCORTANTE 07LT (AMARELO) CX/40 - DESCARBOX,Materiais Médico-Hospitalares,"Drenos, Coletores e Bolsas",21,alta,dreno/coletor,DESCARBOX,48191000,326542,,334
+CUS0004,COLETOR DE URINA SIST. FECHADO 2000ML BOLSA C/P COLETA ESTERIL - CX/90 - LABOR IMPORT,Materiais Médico-Hospitalares,"Drenos, Coletores e Bolsas",21,alta,dreno/coletor,LABOR IMPORT,39269030,326542,,335
+CUS0005,COLETOR DE URINA SIST. FECHADO 2000ML BOLSA C/P COLETA ESTERIL - MEDIX - CX/100,Materiais Médico-Hospitalares,"Drenos, Coletores e Bolsas",21,alta,dreno/coletor,MEDIX,39269030,326542,,336
+CG70004,"COMPRESSAS DE GAZE 7,5 X 7,5 09 FIOS LÍVIA ESTERIL - PCT/10 - AMED",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,AMED,30059090,326542,533511,337
+CG70008,"COMPRESSAS DE GAZE 7,5 X 7,5 11 FIOS ESTERIL - PCT/5 - AMED",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,AMED,30059090,326542,533511,338
+CG70002,"COMPRESSAS DE GAZE 7,5 X 7,5 11 FIOS ESTERIL - PCT/5 - BELA INDUS",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,BELA INDUS,30059090,326542,533511,339
+CG70003,"COMPRESSAS DE GAZE 7,5 X 7,5 11 FIOS ESTERIL LIVIA - PCT/10 - AMED",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,AMED,30059090,326542,533511,340
+CG70006,"COMPRESSAS DE GAZE 7,5 X 7,5 13 FIOS ESTERIL - PCT/05 - NEVE",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,NEVE,30059090,326542,533511,341
+CG70009,"COMPRESSAS DE GAZE 7,5 X 7,5 13 FIOS ESTERIL - PCT/10 - FORTCLEAN",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,FORTCLEAN,30059090,326542,533511,342
+CG70001,"COMPRESSAS DE GAZE 7,5 X 7,5 13 FIOS ESTERIL - PCT/10- AMED",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,AMED,30059090,326542,533511,343
+CG70005,"COMPRESSAS DE GAZE 7,5 X 7,5 13 FIOS ESTERIL LIVIA - PCT/10 - AMED",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,AMED,30059090,326542,533511,344
+CGH0001,"COMPRESSAS DE GAZE HIDROFILA 7,5CM X 7,5CM 9FIOS - IRIS - PCT/500 - CREMMER",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,CREMER,30059090,326542,533511,345
+CYA0001,CONECTOR Y AD PSU COM FURO AUTOCLAVEL 134 PROTEC,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,PROTEC,90192010,326542,,346
+CNI0007,CONTRASTE NÃO IONICO 300/50ML - HENETIX,Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,HENITIX,29242964,324597,533418,347 | 348 | 349
+CNI0006,CONTRASTE NÃO IONICO 300MG/1000ML - OMNIPAQUE,Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,OMNIPAQUE,30049099,324597,,350
+CNI0039,CONTRASTE NÃO IONICO 300MG/100ML - GE HEALTHCARE (OMNIPAQUE),Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,GE HEALTHCARE,30049099,324597,533418,352
+CNI0058,CONTRASTE NÃO IONICO 300MG/100ML - OMNIPAQUE,Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,OMNIPAQUE,30049099,324597,,351
+CNI0002,CONTRASTE NÃO IONICO 300MG/50ML - OMNIPAQUE,Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,OMNIPAQUE,30049099,324597,,353
+CNI0004,CONTRASTE NÃO IONICO HENETIX 300/100ML,Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,HENETIX,30049099,324597,533418,354 | 355 | 356
+CNI0018,CONTRASTE NÃO IONICO HENETIX 350/100ML,Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,HENETIX,30049099,324597,533418,357
+CB60001,CREME BARREIRA 60G - CX/12 - PROLINK,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,PROLINK,33049990,360902,,358 | 359 | 360
+C1C0001,CURATIVO 10X12 CM - SMITH&NEPHEW,Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,SMITH&NEPHEW,30051010,0,,361 | 362 | 363
+C1C0004,CURATIVO 10X12 CM TEGADERM - 3M,Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,3M,30051010,0,,364
+CBU0001,"CURATIVO BOTA UNNA 10,2CMX9,14M - CASEX",Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,CASEX,30051010,377045,,365
+CS(0029,CURATIVO HIDROCOLOIDE 10CMX10CM - CX/10 - (KANGLI DERM) VITAMEDICAL,Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,VITAMEDICAL,30051030,360902,,366
+CS(0002,CURATIVO SURGICEL (1951) 5.1CM X 35.6CM 2INX14IN - ETHICON,Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,ETHICON,30051030,360902,,367 | 368
+CS(0038,CURATIVO SURGICEL (1952) 10.2CM X 20.3CM 4X8 ETHICON,Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,ETHICON,30051030,360902,,369 | 370 | 371 | 372
+CS(0033,CURATIVO SURGICEL (1952) 10.2CMX20.3CM 4X8 - ETHICON,Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,SURGISEL,30051030,360902,,373 | 374 | 375
+CS(0037,CURATIVO SURGICEL (1953) 5.1CM X 7.6CM 2X3 ETHICON,Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,ETHICON,30051030,360902,,376
+DAN0001,DESINFETANTE DE ALTO NÍVEL GLUTAMAX 2% 5LT CX4GL- COSMODERMA,"Higiene, Antissepsia e Limpeza",Desinfecção e Limpeza,26,média,limpeza/desinfecção,COSMODERMA,38089499,0,,377
+DPS0003,DESINFETANTE FLORAL CORDEX 5L,"Higiene, Antissepsia e Limpeza",Desinfecção e Limpeza,26,média,limpeza/desinfecção,CORDEX,38089419,338247,,378
+DPS0002,DESINFETANTE PINHO SOL 1LT,"Higiene, Antissepsia e Limpeza",Desinfecção e Limpeza,26,média,limpeza/desinfecção,PINHO,38089419,338247,,379
+DFC0001,DETERGENTE NEUTRO CLEAN CORDEX 5L,"Higiene, Antissepsia e Limpeza",Desinfecção e Limpeza,26,média,limpeza/desinfecção,CORDEX,38089419,338247,,380
+D(D0003,"DEXAMETASONA (FOSF. DISSÓDICO) 4MG/ML 2,5ML AP - FARMACE - CX/100",Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,FARMACE,30043290,0,,381 | 382
+D(D0002,"DEXAMETASONA (FOSF. DISSÓDICO) 4MG/ML 2,5ML AP - HYPOFARMA - CX/50",Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,HYPOFARMA,30043290,0,,383
+P2B0006,DIAZEPAM 10MG/2ML - CX/100 - SANTISA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,SANTISA,30039095,324597,"536368;527573",384
+DS50004,DIPIRONA MONOIDRATADA 500MG CP CX/ 200 - PRATI,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,PRATI,30049069,0,,385
+DS50002,DIPIRONA SÓDICA 1G/ML 2ML AP CX/100 - SANTISA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,SANTISA,30049099,0,,386
+DS50003,DIPIRONA SÓDICA 500MG/ML 2ML AP CX/100 - FARMACE,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,FARMACE,30049099,0,,387 | 388 | 389 | 390
+DS10001,DIPIRONA SÓDICA 500MG/ML 2ML AP CX/100 - SANTISA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,SANTISA,30049099,0,,391 | 392
+DPR0001,DISPENSER PAPEL ROLAO 300/500 ASC BR - NOBRE,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,NOBRE,39229000,0,,393
+DS40001,DRENO DE SUCCAO 4.8MM (3/16) 500ML SEROVAC - CX/20 SEROPLAST,Materiais Médico-Hospitalares,"Drenos, Coletores e Bolsas",21,alta,dreno/coletor,SEROPLAST,90183929,0,,394
+DPS0001,DRENO P/ SUCÇÃO 14FRX54CM HAIBREATH - SHAOXING HAITECH,Materiais Médico-Hospitalares,"Drenos, Coletores e Bolsas",21,alta,dreno/coletor,SHAOXING HAITECH,90183929,0,,395
+E2-0002,ENOXAPARINA 20MG - CX/10 - VIATRIS,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,VIATRIS,30049099,324597,"528558 | 528558;533512",396 | 397 | 398 | 399
+E4-0008,ENOXAPARINA 40MG - CX/10 - CRISTÁLIA,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,CRISTÁLIA,30049099,324597,"528558;533512",400 | 401
+E4-0009,ENOXAPARINA 40MG - CX/10 - VIATRIS,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,VIATRIS,30049099,324597,"528558;533512",402 | 403 | 404 | 405 | 406 | 407 | 408
+E6-0010,ENOXAPARINA 60MG - CX/02 - BLAU,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,BLAU,30049099,324597,"528558;533512",409
+E4-0007,ENOXAPARINA 60MG - CX/10 - VIATRIS,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,VIATRIS,30049099,324597,"528558;533512",410
+E2-0001,ENOXAPARINA 80MG - CX/02 - VIATRIS,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,VIATRIS,30049099,324597,528558,411
+E1C0001,EPINEFRINA 1MG/1ML CX/100 HYPOFARMA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,HIPOFARMA,30043999,324597,,412 | 413
+ENP0002,EQUIPO DE NUTRIÇÃO P/ BOMBA DE INFUSUSORA (NUTRI-HART PLUS 2 VIAS) - CX/50 - HARTMANN CÓD.150.138,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,HARTMANN,90189010,326542,534988,414
+ENP0001,EQUIPO DE NUTRIÇÃO P/ BOMBA DE INFUSUSORA (NUTRI-HART PLUS 2 VIAS) - CX/50 - HARTMANN CÓD.171.110,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,HARTMANN,84439931,326542,534988,415
+EMC0005,EQUIPO INFUSÃO 2 VIAS C/ CLAMP LS PCT/25 - DESCARPACK,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,DESCARPACK,90189010,326542,534988,416
+EIM0001,EQUIPO INFUSOR MULTIPLO 2 VIAS C/ CLAMP ADULTO LOCK/SLIP PCT/40 UND - DESCARPACK,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,DESCARPACK,90189010,0,,417
+EMF0002,EQUIPO MACRO FOTOSENSSÍVEL - CX/100 - LAMEDID,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,LAMEDID,90189010,326542,534988,418
+EMC0006,EQUIPO MACROGOTAS C/INJ LATERAL LUER LOCK - PCT/25 - LABOR IMPORT,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,LABOR IMPORT,90189010,326542,534988,419
+EMC0004,EQUIPO MACROGOTAS C/INJ LATERAL LUER LOCK PCT/25 DESCARPACK,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,DESCARPACK,90189010,326542,534988,420
+EMC0003,EQUIPO MACROGOTAS C/INJ LATERAL LUER SLIP PCT/25 - MEDIX,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,MEDIX,90189010,326542,534988,421
+EMC0001,EQUIPO MACROGOTAS C/INJ LATERAL LUER SLIP PCT/25 DESCARPACK,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,DESCARPACK,90189010,326542,534988,422
+EMC0002,EQUIPO MICROGOTAS C/INJ LATERAL LUER LOCK - PCT/25 - LABOR IMPORT,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,LABOR IMPORT,90189010,326542,534988,423
+EMF0001,EQUIPO MICROGOTAS FOTOSENSSÍVEL P/ BOMBA INFUSORA (EV-HART AIR MINIMAX FILTRO 15 MICRA) - CX/50 - HARTMANN CÓD. 170.151,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,HARTMANN,90189010,326542,534988,424
+EMP0001,EQUIPO MICROGOTAS P/ BOMBA INFUSORA (EV-HART AIR MINIMAX FILTRO 15 MICRA) - CX/50 - HARTMANN CÓD. 170.102,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,HARTMANN,90189010,326542,534988,425
+EDC0001,ESCOVA DESC. C/ CLORHEXIDINA 2% 22 ML - VIC PHARMA,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,VIC PHARMA,30049047,0,,426
+EI10001,"ESPARADRAPO IMPERMEÁVEL 10CMX4,5M - HAIBRETH",Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,HAIBRETH,30051090,326542,,427
+EI50001,"ESPARADRAPO IMPERMEÁVEL 10CMX4,5M - MISSNER",Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,MISSNER,30051090,326542,,428
+EI10002,"ESPARADRAPO IMPÉRMEAVEL 5X4,5 - MISSNER - ADPELE",Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,MISSNER,30051090,326542,,429
+ESL0001,ESPECULO S/ LUB ESTÉRIL TAM P UN - CRAL,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CRAL,90189099,0,,430
+EH10001,ESPONJA HEMOSTATICA 125X80X10MM - CUTANPLAST,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,CUTANPLAST,30061090,360902,,431
+EH10006,ESPONJA HEMOSTATICA 125X80X10MM - MAQUIRA (HEMOSPON),Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,MAQUIRA,30061090,360902,,432 | 433 | 434 | 435 | 436 | 437 | 438 | 439 | 440 | 441 | 442 | 443 | 444 | 445 | 446 | 447 | 448
+E10001,ETILEFRINA 10MG/1ML AP CX6 UNIÃO QUIMICA,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,UNIÃO QUIMICA,30049039,324597,,449
+ECA0001,EXTENSOR CATÉTER AD 12FR X 120CM P/ INFUSÃO ADULTO - MEDSONDA,Materiais Médico-Hospitalares,"Conectores, Equipos e Extensores",20,alta,infusão/conector,MEDSONDA,90183929,0,,450
+FS50002,FENITOÍNA SÓDICA 50MG/ML 5ML - CX/72 - TEUTO,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,TEUTO,30049079,324597,527573,451 | 452 | 453
+F1C0001,FENOBARBITAL 100MG - CX/200 - CART/10CP - (FENOCRIS) CRISTALIA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CRISTALIA,30049069,324597,536368,454
+F370002,FIO BIOLINE SB10X20CM ABSORVIVEL,Materiais Médico-Hospitalares,"Fios, Suturas e Hemostáticos",22,média,fio/sutura/hemostático,BIOLINE,81029600,326542,536220,455 | 456
+F210001,FIO DE ALGODÃO COM POLIÉSTER 2.0 15X45CM AZUL TORCIDO SEM AGULHA - CX/24 - BIOLINE,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,BIOLINE,81029600,326542,536220,457
+F070001,FIO DE POLIPROPILENO 0 C/ AGULHA 1/2 CILINDRICA 35MM 75CM MONOFILAMENTO AZUL - CX/24 - SUTUMED,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SUTUMED,81029600,326542,536220,458
+F370001,FIO DE POLIPROPILENO 3.0 C/2AG CILÍNDRICAS 1/2 25MM 75CM MONOFILAMENTO AZUL - CX/24 - SUTUMED,Materiais Médico-Hospitalares,"Fios, Suturas e Hemostáticos",22,média,fio/sutura/hemostático,SUTUMED,81029600,326542,536220,459
+FP40001,FIO DE POLIPROPILENO 4.0 C/AG 1/2 25MM 75CM - C/24 - UND (PP47MR25) TECHNOFIO,Materiais Médico-Hospitalares,"Fios, Suturas e Hemostáticos",22,média,fio/sutura/hemostático,TECHNOFIO,54023400,326542,536220,460
+FSN0007,FIO DE SUTURA DE NYLON 3.0 C/AG 30MM 3/8 - CX/24 - TECHNOFIO,Materiais Médico-Hospitalares,"Fios, Suturas e Hemostáticos",22,média,fio/sutura/hemostático,TECHNOFIO,30061090,326542,536220,461
+FSN0009,FIO DE SUTURA DE NYLON 5.0 C/AG 20MM 3/8 45CM - CX/24 - TECHNOFIO,Materiais Médico-Hospitalares,"Fios, Suturas e Hemostáticos",22,média,fio/sutura/hemostático,TECHNOFIO,30061090,326542,536220,462
+FEV0001,FITOMENADIONA ESKAVIT VITAMINA K 10MG/ML 01ML FR CX/50 - HIPOLABOR,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,HIPOLABOR,30049099,0,,463
+FC10001,FIXADOR CELULAR 100ML FR - CRAL,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,CRAL,38229000,0,,464
+CT80001,FIXADOR DE ACESSO VENOSO 8.5CM X 11.5CM 3.4 X 4.6,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,PHARMAPORE,30051030,360902,,465
+F050001,"FLUMAZENIL 0,5MG/ML 5ML AP CX/20 - TEUTO",Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,TEUTO,30049099,0,,466 | 467 | 468
+F0L0002,FLUXÔMETRO 0-15 LPM FÊMEA O2 - PROTEC,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,PROTEC,90192010,326542 | 0,,469 | 470
+FPA0002,FOLHA DE PAPEL A4 - CX/500 - GOOFFICE,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,REPORT,48025610,326542,,471
+FPA0001,FOLHA DE PAPEL A4 - CX/500 - REPORT,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,REPORT,48025610,326542,,472
+FGD0005,FRALDA GERIATRICA DESC - EG - PCT/08 - ALFASOFT,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,ALFAMA,96190000,326542,534913,473
+FGD0001,FRALDA GERIATRICA DESC - EG - PCT/08 - GERIA SUPER,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,GERIA SUPER,96190000,326542,534913,474
+FGD0003,FRALDA GERIATRICA DESC - XG - PCT/07 - MAIS CONFORTO BIG,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,MAIS CONFORTO,96190000,326542,534913,475
+F100001,FUROSEMIDA 10MG/ML 02ML FR CX/100 - HYPOFARMA,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,HYPOFARMA,29359021,0,,476
+G510001,GLICOSE 25% 10ML AP HIPERTONICA - CX/200 - HALEXISTAR,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,HALEXISTAR,28470000,324598,,477
+CS00114,GLICOSE 5% 100ML - CX/50 - BAXTER,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,BAXTER,28470000,324598,,478
+CS00012,GLICOSE 5% 250ML CX/48 - FRESENIUS,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,28470000,324598,,479
+G550001,GLICOSE 5% 500ML CX/30 FRESENIUS,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,FRESENIUS,30049099,324598,,480
+G510002,GLICOSE 50% 10ML AP - CX/200 - SAMTEC,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,SAMTEC,28470000,324598,,481
+HN20002,HEMITARTARATO DE NOREPINEFRINA 2MG/ML FR 4ML - HIPOLABOR - CX/50,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,HIPOLABOR,30043999,324597,,482
+HN20001,HEMITARTARATO DE NOREPINEFRINA 2MG/ML FR 4ML - HYPOFARMA - CX/50,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,HYPOFARMA,30043999,324597,,483 | 484
+HS50002,HEPARINA SÓDICA 5.000UI/ML 5ML CX/25 - BLAU,Medicamentos,Anticoagulantes e Hemostáticos,4,alta,coagulação/hemostasia,BLAU,30049099,0,,485 | 486 | 487 | 488
+H1-0004,HIDROCORTISONA 100MG - BLAU CX/50,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,BLAU,29372120,324597,,489 | 490
+H1-0003,HIDROCORTISONA 500MG - BLAU CX/50,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,BLAU,29372120,324597,,491 | 492 | 493 | 494 | 495 | 496
+H5F0004,HIDROCORTISONA 500MG - CX/50 - BLAU,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,BLAU,29372120,324597,535505,497
+H5A0003,HIDROCORTISONA 500MG ANDROCORTIL - TEUTO CX/50,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,TEUTO,29372120,324597,,498 | 499 | 500 | 501
+HS10001,HIPOCLORITO DE SODIO 1% 5L CORDEX,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,CORDEX,28289011,338247,,502
+HS10002,HIPOCLORITO DE SODIO 5% 5L CORDEX,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,CORDEX,28289011,338247,,503
+HL20001,HYPOCAÍNA LIDOCAINA 2% 20MG/ML 20ML CV - CX/25 - HYPOFARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOFARMA,30049043,324597,527300,504 | 505 | 506
+IN50001,IBUPROFENO 50MG/30ML SAB FLAMBOESA - NATULAB,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,NATULAB,29163920,324597,527570,507
+IHR0005,INSULINA HUMANA 100MG/10ML INSUNORM N - ASPEN PHARMA,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ASPEN PHARMA,29371200,324597,,508
+IHN0001,INSULINA HUMANA NPH 100UI/ML 10ML - ELI LILLY,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,ELI LILLY,29371200,324597,,509
+IHN0008,INSULINA HUMANA NPH 100UI/ML 10ML - NOVO NORDISK (NOVOLIN),Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,NOVO NORDISK,29371200,324597,,510 | 511
+IHR0002,INSULINA HUMANA REGULAR 100MG/10ML - NOVO NORDISK (NOVOLIN),Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,NOVO NORDISK,29371200,324597,,512 | 513 | 514
+CNI0005,IOPAMIDIOL CONTRASTE NÃO IONICO 300MG/50ML - PATHEON ITALIA,Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,PATHEON ITALIA,30049099,324597,,515
+KP+0003,KABIVEN POLIAMINOACIDOS + GLICOSE + EMULSAO LIPIDICA - CX 4 - 2053ML,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,DESCARPAK,30049099,324597,527572,516 | 517
+CEK0010,KETAMIN 10 ML - HIPOLABOR - CX/50,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,30049032,0,,518
+PCU0002,KIT CIRURGICO UNIVERSAL ESTÉRIL - PCT/1 KIT - CX/10 - PION G,Materiais Médico-Hospitalares,"Kits, Campos e Coberturas Cirúrgicas",19,alta,kit/campo cirúrgico,PION G,30059020,326542,527304,519
+KCU0005,KIT CIRURGICO UNIVERSAL ESTÉRIL C/ AVENTAL E BORNAL - CX/06 - PION G,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,30059020,326542,527304,520
+KCU0002,KIT CIRURGICO UNIVERSAL LAMINADO IMPERMEÁVEL GR50 C/02 AVENTAIS ESTÉRIL - CX/10 - WINNER,Materiais Médico-Hospitalares,"Kits, Campos e Coberturas Cirúrgicas",19,alta,kit/campo cirúrgico,WINNER,30059020,326542,527304,521
+KCU0001,KIT CIRURGICO UNIVERSAL LAMINADO IMPERMEÁVEL GR50 C/02 AVENTAIS ESTÉRIL - CX/12 - WINNER,Materiais Médico-Hospitalares,"Kits, Campos e Coberturas Cirúrgicas",19,alta,kit/campo cirúrgico,WINNER,30059020,326542,527304,522
+KCU0004,KIT CIRURGICO UNIVERSAL LAMINADO IMPERMEÁVEL GR50 C/02 AVENTAIS ESTÉRIL - CX/17 - WINNER,Materiais Médico-Hospitalares,"Kits, Campos e Coberturas Cirúrgicas",19,alta,kit/campo cirúrgico,WINNER,30059020,326542,527304,523
+KCU0003,KIT CIRURGICO UNIVERSAL LAMINADO IMPERMEÁVEL GR50 ESTÉRIL - CX/17 - WINNER,Materiais Médico-Hospitalares,"Kits, Campos e Coberturas Cirúrgicas",19,alta,kit/campo cirúrgico,WINNER,30059020,326542,527304,524
+KC10002,KIT DE CATETERIZAÇÃO 18GAX08CM (RADIAL) - ALIVE HEART,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ALIVE HEART,90183999,0,,525
+KC10003,KIT DE CATETERIZAÇÃO 18GAX12CM (FEMURAL) - ALIVE HEART,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ALIVE HEART,90183999,0,,526 | 527 | 528
+KGP0001,KIT GINECOLOGICO PAPANICOLAU ESTERIL TAM P 602P - CRAL,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CRAL,39269040,0,,529
+LDC0001,"LENÇOL DESCARTÁVEL C/ ELÁSTICO BRANCO GR LEVE 2,00X0,90 PCT/10 - DEJAMARO",Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,DEJAMARO,63079010,0,,530
+L120002,LIDOCAINA 1% 20ML SV CX/25 - CRISTÁLIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,30049043,324597,,531
+L120001,LIDOCAINA 1% 20ML SV CX/25 - HYPOFARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOLABOR,30049043,324597,,532 | 533
+L1(0003,LIDOCAINA 10% (100MG/ML) SPRAY 50ML - CRISTALIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTALIA,30049043,324597,527300,534
+L1(0001,LIDOCAINA 10% (100MG/ML) SPRAY 50ML - HIPOLABOR,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,30049043,324597,527300,535 | 536 | 537
+L220025,LIDOCAINA 2% 20MG/ML CV - CX/10 - CRISTALIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTALIA,30049043,324597,527300,538 | 539
+L220022,LIDOCAINA 2% 20MG/ML SV - CX/10 - CRISTALIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTALIA,30049043,324597,527300,540 | 541 | 542 | 543 | 544 | 545
+L220029,LIDOCAINA 2% 20MG/ML SV - CX/25 - HIPOLABOR,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,30049043,324597,527300,546 | 547 | 548
+LLB0003,"LINEZOLIDA LIZBI BOLSA 2MG/ML 0,2% CX/10 - HALEXISTAR",Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,HALEXISTAR,30049099,0,,549 | 550 | 551 | 552
+LPA0001,LOSARTANA POTASSICA 50MG - CX/450 - 1C/15CP - GEOLAB - (ARARTAN),Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,GEOLAB,30049021,324597,,553
+LCT0002,LUVA CIR LATEX C/ PO TAM. 7.5 ESTÉRIL - MEDIX,Materiais Médico-Hospitalares,Luvas,17,alta,luva,MEDIX,40151200,0,,554
+LCL0001,LUVA CIR LATEX C/ PO TAM. 8.0 ESTÉRIL - DESCARPACK,Materiais Médico-Hospitalares,Luvas,17,alta,luva,DESCARPACK,40151200,0,,555
+LCT0001,LUVA CIR TAM 7 1/2 ESTÉRIL SENSICARE BECARE 1 PAR - TIANCHANG MEDICAL,Materiais Médico-Hospitalares,Luvas,17,alta,luva,TIANCHANG MEDICAL,40151200,0,,556
+LPE0006,LUVA DE PROCEDIMENTO EM LATEX G COM PÓ - CX/100 - ABL,Materiais Médico-Hospitalares,Luvas,17,alta,luva,ABL,62160000,326542,527301,557
+LPE0003,LUVA DE PROCEDIMENTO EM LATEX G COM PÓ - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Luvas,17,alta,luva,DESCARPACK,62160000,326542,527301,558
+LPE0008,LUVA DE PROCEDIMENTO EM LATEX G COM PÓ - CX/100 - MEDIX,Materiais Médico-Hospitalares,Luvas,17,alta,luva,MEDIX,62160000,326542,527301,559
+LPE0004,LUVA DE PROCEDIMENTO EM LATEX G COM PÓ - CX/100 - PROCED,Materiais Médico-Hospitalares,Luvas,17,alta,luva,PROCED,62160000,326542,527301,560
+LPE0012,LUVA DE PROCEDIMENTO EM LATEX M COM PÓ - CX/100 - ABL,Materiais Médico-Hospitalares,Luvas,17,alta,luva,ABL,62160000,326542,527301,561
+LPE0002,LUVA DE PROCEDIMENTO EM LATEX M COM PÓ - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Luvas,17,alta,luva,DESCARPACK,62160000,326542,527301,562
+LPE0001,LUVA DE PROCEDIMENTO EM LATEX M COM PÓ - CX/100 - GLOMED,Materiais Médico-Hospitalares,Luvas,17,alta,luva,GLOMED,62160000,326542,527301,563
+LPE0010,LUVA DE PROCEDIMENTO EM LATEX M COM PÓ - CX/100 - LATEX BR,Materiais Médico-Hospitalares,Luvas,17,alta,luva,LATEX BR,62160000,326542,527301,564
+LPE0009,LUVA DE PROCEDIMENTO EM LATEX M COM PÓ - CX/100 - MEDIX,Materiais Médico-Hospitalares,Luvas,17,alta,luva,MEDIX,62160000,326542,527301,565 | 566
+LPE0005,LUVA DE PROCEDIMENTO EM LATEX P COM PÓ - CX/100 - MEDIX,Materiais Médico-Hospitalares,Luvas,17,alta,luva,MEDIX,62160000,326542,527301,567
+LVG0001,LUVA DE VINIL G COM PÓ - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Luvas,17,alta,luva,DESCARPACK,62160000,326542,527301,568
+LNP0002,LUVA NITRÍLICA AZUL M S/ PÓ - CX/10 - GLOMED,Materiais Médico-Hospitalares,Luvas,17,alta,luva,GLOMED,40151900,326542,527301,569
+LNA0001,LUVA NITRÍLICA AZUL M S/ PÓ - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Luvas,17,alta,luva,DESCARPACK,40151900,326542,527301,570
+LNA0002,LUVA NITRÍLICA AZUL M S/ PÓ - CX/100 - SECUREMED,Materiais Médico-Hospitalares,Luvas,17,alta,luva,SECUREMED,40151900,326542,527301,571
+LNP0004,LUVA NITRÍLICA P/ PROCEDIMENTO G S/PÓ NÃO ESTÉRIL - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Luvas,17,alta,luva,DESCARPACK,40151900,326542,527301,572
+LNP0001,LUVA NITRÍLICA P/ PROCEDIMENTO G S/PÓ NÃO ESTÉRIL - CX/100 - MEDIX,Materiais Médico-Hospitalares,Luvas,17,alta,luva,MEDIX,40151900,326542,527301,573
+LNP0005,LUVA NITRÍLICA P/ PROCEDIMENTO G S/PÓ NÃO ESTÉRIL - CX/100 - ZELARA,Materiais Médico-Hospitalares,Luvas,17,alta,luva,ZELARA,40151900,326542,527301,574
+LNP0003,LUVA NITRÍLICA P/ PROCEDIMENTO M S/PÓ NÃO ESTÉRIL - CX/100 - MEDIX,Materiais Médico-Hospitalares,Luvas,17,alta,luva,MEDIX,40151900,326542,527301,575
+LPE0007,LUVA NITRÍLICA P/ PROCEDIMENTO M S/PÓ NÃO ESTÉRIL - CX/100 - SAFE MAX,Materiais Médico-Hospitalares,Luvas,17,alta,luva,SAFE MAX,40151900,326542,527301,576
+LPE0011,LUVA VOLK SLIM AMARELA LATEX G,Materiais Médico-Hospitalares,Luvas,17,alta,luva,VOLK,62160000,326542,527301,577
+LVS0001,LUVA VOLK SLIM AMARELA LATEX M,Materiais Médico-Hospitalares,Luvas,17,alta,luva,VOLK,62160000,326542,527301,578
+MD10001,MALEATO DE DEXCLORFENIRAMINA 120ML (POLARAX) - AIRELA,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,AIRELA,30039083,324597,527604,579
+MT10001,MALHA TUBULAR 10CM X 15MTS - ORTOFEN,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ORTOFEN,90211020,0,,580
+MAC0001,MASCARA ALTA CONCENTRAÇÃO AD- NAO ESTERIO PROTEC,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,PROTEC,90192090,326542,,581
+MCT0002,MASCARA CIRURGICA TRIPLA NÃO ESTERIL BRANCA - CX/50 - DESCARPACK,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,DESCARPACK,63079010,326542,534028,582
+MFA0001,MASCARA FACIAL AMBU,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,AMBU,90192010,326542,,583
+MMA0001,MASCARA MICRONEBULIZADOR AR COMPRIMIDO ADULTO - FOYOMED,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,FOYOMED,90192010,326542,,584
+M5-0001,MEROPENEM 1G - CX/25 - BIO CHIMICO,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BIOCHIMICO,30042099,324597,527299,585 | 586 | 587
+M1-0005,MEROPENEM 1G - CX/25 - BLAU,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BLAU,30042099,324597,527299,588 | 589 | 590 | 591 | 592
+M1-0004,MEROPENEM 1G CX/10 - FRESENIUS,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,FRESENIUS,30042099,324597,527299,593 | 594
+M5-0002,MEROPENEM 500MG - CX/10 - ABL,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,ABL,30042099,324597,527299,595 | 596 | 597
+M5B0001,MEROPENEM 500MG - CX/10 - BIO CHIMICO,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BIOCHIMICO,30042099,324597,527299,598
+M5-0006,MEROPENEM 500MG - CX/25 - BIO CHIMICO,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BIOCHIMICO,30042099,324597,527299,599
+M1C0001,MEROPENEM 500MG CX/10 - FRESENIUS,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,FRESENIUS,30042099,324597,527299,600
+M1B0007,METILPREDILISONA 125MG - CX/25 - BLAU,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,BLAU,30043210,324597,,601
+M1B0008,METILPREDILISONA 125MG BLAU CX/25,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,BLAU,30043210,324597,,602
+M5-0004,"MICROPORE 10CMX4,5M - CX/24 - MISSNER",Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,MISSNER,30051030,326542,,603
+M5X0004,MICROPORE 25MMX10M - CX/80 - 3M,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,3M,30051030,326542,,604
+M5-0005,MICROPORE 50MMX10M - CX/36 - CIEX DO BRASIL,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CIEX DO BRASIL,30051030,326542,,605
+M2-0001,MICROPORE 5CMX10M - CX/36 - CREMER,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CREMER,30051030,326542,,606
+M1A0004,MIDAZOLAM 15MG/3ML AP - HIPOLABOR,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HIPOLABOR,30049069,0,,607
+M1A0001,MIDAZOLAM 15MG/3ML AP - TEUTO,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,TEUTO,30049069,0,,608 | 609
+M150002,MIDAZOLAM 15MG/ML 3ML AP CX/05 - UNIÃO QUIMICA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,UNIÃO QUIMICA,30049069,0,,610
+M1A0003,MIDAZOLAM 1MG/ML 5ML AP CX/05 - TEUTO,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,TEUTO,30049069,0,,611
+M150001,MIDAZOLAM 50MG/ML 10ML AP CX/05 - TEUTO,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,TEUTO,30049069,0,,612
+NF20001,NEO FEDIPINA 20MG 30/CP NEO QUIMICA,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,NEO QUIMICA,30049062,324597,,613
+N010001,"NEOSTIGMINA 0,5MG/ML 1ML AP CX/05 - BLAU - 25061361",Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,BLAU,30049099,0,,614
+NE20002,NEURO ESPONJA 2.5X7.6 CM DETECTÁVEL AO RAIO-X - PCT/ 10 - DEROYAL,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,DEROYAL,30064020,0,,615 | 616 | 617
+N510002,NITROGLICERINA 5MG/ML 10ML - CX/10 - CRISTALIA (TRIDIL),Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,CRISTALIA,30049099,324597,527587,618 | 619
+N550003,NITROGLICERINA 5MG/ML 5ML - CX/10 - CRISTALIA (TRIDIL),Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,CRISTALIA,30049099,324597,527587,620 | 621 | 622 | 623 | 624
+NN20001,NITROP NITROPRUSSETO 25MG/2ML - CX/5 - HYPOFARMA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,HYPOFARMA,30049099,324597,527587,625 | 626
+N2C0001,NITROPRUSSETO 25MG/2ML - CX/5 - HYPOFARMA,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,HYPOFARMA,30049099,324597,527587,627
+N2-0005,NITROPRUSSETO DE SÓDIO 50MG/2ML - CX/5 - CRISTÁLIA,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,CRISTÁLIA,30049099,324597,527587,628
+NS50001,NITROPRUSSETO DE SÓDIO 50MG/2ML - CX/5 - HYPOFARMA,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,HYPOFARMA,30049099,324597,527587,629
+O4B0002,OMEPRAZOL 20MG CP HIPOLABOR CX/500,Medicamentos,Gastrointestinal e Antieméticos,10,alta,gastrointestinal/antiemético,HIPOLABOR,30049069,324597,,630
+O4U0002,OMEPRAZOL 40MG - CX/50 - UNIÃO QUIMICA,Medicamentos,Gastrointestinal e Antieméticos,10,alta,gastrointestinal/antiemético,UNIAO QUIMICA,30049069,324597,527595,631
+O410002,OMEPRAZOL 40MG 10ML - CX/25 - CRISTALIA,Medicamentos,Gastrointestinal e Antieméticos,10,alta,gastrointestinal/antiemético,CRISTALIA,30049069,324597,527595,632
+O4-0004,OMEPRAZOL 40MG/10ML - CX/20 - BLAU,Medicamentos,Gastrointestinal e Antieméticos,10,alta,gastrointestinal/antiemético,BLAU,30049069,324597,527595,633 | 634 | 635
+PC40001,PANO DE CHAO 43 X 63CM (M),Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,S/M,63071000,0,,636
+PHB0001,PAPEL HIG. ROLAO BCO STIK C/8,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,STIK,48181000,0,,637
+PL70002,PAPEL LENÇOL 50X50 - CX/10 RL - ECOLOGICO DESCARBOX,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,DESCARBOX,48115129,326542,,638
+PL70001,PAPEL LENÇOL 70X50 CM - CX/10 RL BRANCO - CLEAN,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,CLEAN,48115129,326542,,639
+PL50001,PAPEL LENÇOL 70X50 CM CX/10 RL BRANCO - BELIPEL CIPEL,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,BELIPEL CIPEL,48115129,326542,,640
+PL70003,PAPEL LENÇOL 70X50 CM ECOLOGIC RL - DESCARBOX,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,DESCARBOX,48115129,326542,,641
+PT10001,PAPEL TOALHA 10X21CM - CX/8000 - NOBREPAPER,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,NOBREPAPER,48182000,326542,,642
+PPC0001,PERNEIRA PADRÃO DE COMPRESSÃO DA COXA - ARJO,Materiais Médico-Hospitalares,"Curativos, Gazes e Compressas",16,alta,curativo/gaze,ARJO,90191000,0,,643
+P+T0001,PIPERACILINA + TAZOBACTAM 4G + 500MG - CX/10 - BIOCHIMICO,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BIOCHIMICO,30041019,324597,527299,644
+P+T0005,PIPERACILINA + TAZOBACTAM 4G + 500MG - CX/10 - EUROFARMA,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,EUROFARMA,30041019,324597,527299,645
+P+T0002,PIPERACILINA + TAZOBACTAM 4G + 500MG - CX/10 - TEUTO,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,VIATRIS,30041019,324597,527299,646 | 647
+P+T0004,PIPERACILINA + TAZOBACTAM 4G + 500MG - CX/10 - UNIÃO QUÍMICA,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,UNIÃO QUÍMICA,30041019,324597,527299,648
+P+T0031,PIPERACILINA + TAZOBACTAM 4G + 500MG - CX/10 - VIATRIS,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,VIATRIS,30041019,324597,527299,649 | 650 | 651 | 652
+P110001,PROPOFOL 1% 10MG/ML 20ML - CX/10 - CRISTÁLIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,30039095,324597,527300,653
+P110008,PROPOFOL 1% 10MG/ML 20ML - CX/5 - BAXTER,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,BAXTER,30039095,324597,527300,654 | 655
+P1-0002,PROPOFOL 10MG/20ML - CX/5 - MIDFARMA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,MIDFARMA,30039095,324597,527300,656 | 657 | 658 | 659
+P2B0019,PROPOFOL 20ML B BRAUN CX/5,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,B BRAUN,30039095,324597,,660
+RCL0012,RINGER C/ LACTADO 500ML (BOLSA) BAXTER CX/30,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,HALEX/STAR,30049099,324598,,661
+RCL0011,RINGER C/ LACTATO 500ML - CX/30 - HALEXSTAR,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,HALEXSTAR,30049099,324598,,662
+R120003,ROPIVACAINA 10MG/ML 20ML - CX/25 - TEUTO,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,TEUTO,30049069,324597,527300,663
+R7C0006,"ROPIVACAINA 7,5MG/1ML CX/25 HYPOFARMA",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOFARMA,30049069,324597,,664
+R7-0003,"ROPIVACAINA 7,5MG/20ML - CX/25 - HYPOFARMA",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOFARMA,30049069,324597,527300,665
+R7C0005,"ROPIVACAINA 7,5MG/20ML - CX/25 - HYPOLAB",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,HYPOLAB,30049069,324597,527300,666 | 667
+R7C0008,"ROPIVACAINA 7,5MG/20ML CX/25 - TEUTO",Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,TEUTO,30049069,324597,,668
+SÓF0002,SACARATO DE ÓXIDO FÉRRICO 20MG/ML 5ML AP CX/50 - BLAU,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,BLAU,30049099,0,,669
+SÓF0001,SACARATO DE ÓXIDO FÉRRICO 20MG/ML 5ML AP CX/50 - VMG,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,VMG,30049099,0,,670
+SLR0003,"SACO DE LIXO 200LT MEDIO (0,90X1,15) C/50",Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,S/M,39232910,338247,,671
+SLR0002,SACO DE LIXO RR 100LT PRETO PCT,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,RR,39232910,338247,,672
+SLR0001,"SACO LIXO 240L/300L MEDIO (1,17X1,25) 65,87 C/50",Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,S/M,39232910,338247,,673
+2255522,SAPATILHA BRANCA DESC 20G ANADONA,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,ANADONA,63079010,326542,527303,674
+SBD0001,SAPATILHA BRANCA DESCARTÁVEL GR LEVE - PCT/100 - DEJAMARO,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,DEJAMARO,63079010,326542,527303,675
+S2S0002,SCALP 23G WILTEX CX/100,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,WILTEX,90183929,370704,527298,676
+S2S0003,SCALP 25G WILTEX CX/100,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,SAFER,90183929,370704,527298,677
+ED20003,SCALP DESCARTAVEL 19G CX/100 MEDIX,Materiais Médico-Hospitalares,Agulhas e Cateteres,13,alta,agulha/cateter,MEDIX,90183921,370704,527298,678
+S1S0005,SERINGA 10ML S/AG BICO LUER LOCK - CX/100 - DESCARPACK,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,DESCARPACK,90183119,324596,,679
+S1S0002,SERINGA 10ML S/AG BICO LUER LOCK - CX/100 - MEDIX,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,MEDIX,90183119,324596,,680
+S1S0003,SERINGA 10ML S/AG BICO LUER LOCK - CX/100 - SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,681
+S1S0007,SERINGA 10ML S/AG BICO SLIP - CX/100 - MEDIX,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,MEDIX,90183119,324596,,682
+S1S0001,SERINGA 20ML S/AG BICO LUER SLIP - CX/50 - DESCARPACK,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,DESCARPACK,90183119,324596,,683
+S2S0004,SERINGA 20ML S/AG LUER LOCK - CX/250 - SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,684
+S2S0001,SERINGA 20ML S/AG LUER SLIP - CX/250 - SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,685
+S1S0004,SERINGA 3ML S/AG BICO LUER LOCK - CX/500 - SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,686
+S3S0001,SERINGA 3ML S/AG BICO LUER SLIP - CX/500 - SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,687 | 688
+SH60002,SERINGA 50ML BICO CATETER - CX/40 - BD,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,BD,90183119,324596,,689
+S1S0006,SERINGA 5ML S/AG BICO LUER SLIP - CX/50 - SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,690
+S2S0005,SERINGA 5ML S/AG LUER LOCK - CX/500 - SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,691
+S6S0001,SERINGA 60ML S/AG BICO CATETER CX/100 SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,692
+S6S0002,SERINGA 60ML S/AG BICO LUER SLIP CX/100 SR,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,693
+SPI0004,SERINGA P/ ALIMENTAÇÃO 1ML - CX/30 - (FREKA CONNECT) FRESENIUS,Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,FRESENIUS,90183119,324596,,694
+SPI0002,"SERINGA P/ INSULINA 0,5ML C/AG 0,25X6MM CX/100 - SR",Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,695
+SPI0001,"SERINGA P/ INSULINA 1ML C/AG 13X0,45 - CX/500 - SR",Materiais Médico-Hospitalares,Seringas e Infusão,14,alta,seringa,SR,90183119,324596,,696
+S2-0023,SEVOFLURANO 250ML - CRISTALIA,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,CRISTALIA,30049099,324597,536368 | 527300,697 | 705 | 706 | 707 | 708 | 709 | 710 | 711 | 712 | 713 | 714 | 715 | 716 | 717 | 718 | 719
+S2-0013,SEVOFLURANO 250ML - UNIÃO QUIMICA,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,UNIÃO QUIMICA,30049099,324597,527300,698 | 699 | 700 | 701 | 702 | 703 | 704 | 720 | 721 | 722 | 723
+SS20008,SEVOFLURANO SEVONESS 250ML - BAXTER,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BAXTER,30049099,324597,,724 | 725 | 726 | 727 | 728 | 729 | 730
+SS20007,SEVOFLURANO SEVONESS 250ML - BIOCHIMICO,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BIOCHIMICO,30049099,324597,,731 | 732 | 733
+S4C0003,SIMETICONA 40MG - CX/400CP - PHARMASCIENCE,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,AIRELA,30049079,324597,,734
+SAS0002,SONDA DE ASPIRAÇÃO SISTEMA FECHADO 24H 14FRX60CM - GUANGZHOU AMK,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,GUANGZHOU AMK,90183929,0,,735 | 736
+SPP0001,SONDA DE PVC PARA ASPIRAÇÃO TRAQUEAL N04 - MEDSONDA,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDSONSA,90183929,326542,534396,737
+SPP0002,SONDA DE PVC PARA ASPIRAÇÃO TRAQUEAL N06 - MEDSONDA,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDSONDA,90183929,326542,534396,738
+SPP0005,SONDA DE PVC PARA ASPIRAÇÃO TRAQUEAL N08 - MEDSONDA,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDSONDA,90183929,326542,534396,739
+SPP0003,SONDA DE PVC PARA ASPIRAÇÃO TRAQUEAL N12 - BELA INDUS,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,BELA INDUS,90183929,326542,534396,740
+SPP0004,SONDA DE PVC PARA ASPIRAÇÃO TRAQUEAL N14 - COMPER HEALTHCARE,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,COMPER HEALTHCARE,90183929,326542,534396,741
+SE50002,SONDA ENDOTRAQUEAL 5.0 ARAMADA COM BALÃO - CX/10 - WELLEAD,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,WELLEAD,90183921,326542,"534396;534027",742
+SE50003,SONDA ENDOTRAQUEAL 5.5 ARAMADA COM BALÃO - CX/10 - WELLEAD,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,WELLEAD,90183921,326542,"534396;534027",743
+S100001,STIMUPLEX A 100 0.80X100MM 21GX4 - BBRAUM,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BBRAUM,90183219,326542,,744
+S100002,STIMUPLEX A 50MM 0.70X50MM 22GX2 - BBRAUM,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BBRAUM,90183219,326542,,745
+SB10005,SUGAMADEX BRIDION 100MG/2ML - CX/10 - MSD,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,MSD,30049059,324597,527300,746 | 747
+SB10024,SUGAMADEX BRIDION 100MG/2ML - CX/10 - UNIAO QUIMICA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,UNIAO QUIMICA,30049059,324597,527300,748
+SB10017,SUGAMADEX BRIDION 100MG/2ML - DR REDDY,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,DR REDDY,30049059,324597,527577,751
+SB10002,SUGAMADEX BRIDION 100MG/2ML - DR REDDY - CX/10,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,DR REDDY,30049059,324597,,749 | 750
+SB10003,SUGAMADEX BRIDION 100MG/2ML CX/10 - BLAU,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,BLAU,30049059,324597,527577,752 | 753
+S240001,SULFAMETOXAZOL 200MG/5ML+TRIMETOPRINA 40MG/5ML 100ML SUSPENSÃO ORAL - CX/1 - EMS,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,EMS,30049072,324597,527299,754
+SA10005,SULFATO DE ATROPINA 1/4MG 1ML AP CX/100 - FARMACE,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,FARMACE,30044990,324597 | 326542,,755 | 756 | 757 | 758 | 759 | 760
+SE50001,SULFATO DE EFEDRINA 50MG/ML 1ML - CX/25 - HIPOLABOR,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,HIPOLABOR,30044100,324597,"527587;527573",761
+SE50005,SULFATO DE EFEDRINA 50MG/ML 1ML - CX/25 - UNIÃO QUIMICA,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,UNIÃO QUIMICA,30044100,324597,"527587;527573",762 | 763 | 764 | 765
+SG40001,SULFATO DE GENTAMICINA 40MG/ML 2ML AP CX/100 - HYPOFARMA,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,HYPOFARMA,30042061,0,,766
+SM10003,SULFATO DE MAGNÉSIO 10% 10ML AP CX/200 - SAMTEC,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,SAMTEC,30049099,0,,767 | 768 | 769
+SN+0004,SULFATO DE NEOMICINA + BACITRACINA ZINCICA 15G - BELFAR,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,BELFAR,30042069,324597,,770
+SN+0003,SULFATO DE NEOMICINA + BACITRACINA ZINCICA 15G - EMS,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,EMS,30042069,324597,536267,771 | 772 | 773
+SN+0008,SULFATO DE NEOMICINA + BACITRACINA ZINCICA 15G EMS,Diversos e Revisão Cadastral,Revisar Classificação,33,baixa,sem regra forte,EMS,30042069,324597,527299,774 | 775
+SN50006,SULFATO DE NEOMICINA 5MG/G + BACITRACINA ZINCICA 250UI/G 10G - ALTEFAR,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,ALTEFAR,30042069,324597,527299,776
+SN+0002,SULFATO DE NEOMICINA 5MG/G + BACITRACINA ZINCICA 250UI/G 15G ALTEFAR,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,ALTEFAR,30042069,324597,527299,777
+SN50005,SULFATO DE NEOMICINA 5MG/G + BACITRACINA ZINCICA 250UI/G 15G MEDLEY,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,MEDLEY,30042069,324597,527299,778 | 779
+SN50003,SULFATO DE NEOMICINA 5MG/G + BACITRACINA ZINCICA 250UI/G 15G PRATI,Materiais Médico-Hospitalares,Outros Materiais,23,baixa,padrão material,PRATI,30042069,324597,527299,780 | 781 | 782
+SPB0001,SULFATO DE POLIMIXINA B 500.000 UI FR - CX/25 - BLAU,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,BLAU,30042079,324597,,783
+SPB0002,SULFATO DE POLIMIXINA B 500.000 UI FR - CX/5 - UNIÃO QUIMICA,Medicamentos,Antibióticos e Antimicrobianos,2,alta,antimicrobiano,UNIÃO QUIMICA,30042079,324597,,784
+SF40001,SURGICEL FIBRILLAR 4INX4IN (10.2CMX10.2CM) - ETHICON,Materiais Médico-Hospitalares,"Fios, Suturas e Hemostáticos",22,média,fio/sutura/hemostático,ETHICON,30061090,0,,785
+TM10002,TARTARATO DE METROPOLOL 1MG/ML FR 5ML CX/05 - TEUTO,Medicamentos,Outros Medicamentos,11,baixa,padrão medicamentoso,TEUTO,30049039,0,,786 | 787 | 788
+T2-0010,TENOXICAM 20MG/2ML - CX/50 - CRISTALIA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,CRISTALIA,30049073,324597,"527570;535505",794
+T2-0011,TENOXICAM 20MG/2ML - CX/50 - UNIAO QUIMICA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,UNIAO QUIMICA,30049073,324597,527570,795
+T2C0002,TENOXICAM 20MG/2ML CX/50 - EUROFARMA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,EUROFARMA,30049073,324597,,789 | 790 | 791 | 792 | 796
+T2C0030,TENOXICAM 20MG/2ML CX/50 CRISTALIA,Medicamentos,Corticoides e Anti-inflamatórios,6,alta,corticoide/anti-inflamatório,CRISTALIA,30049073,324597,,793
+TRV0001,TIRAS P/TESTE DE GLICOSE - CX/50 - G-TECH,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,G-TECH,38221920,326542,,797
+TPG0001,TIRAS P/TESTE DE GLICOSE ON CALL PLUS II - CX/50 - ACON BIOTECH,Medicamentos,"Soluções, Eletrólitos e Diluentes",7,alta,solução/eletrólito,ACON BIOTECH,38221920,326542,,798
+TBD0001,TOUCA BRANCA DESC. SANFONADA C/ELASTICO - PCT/100 - ANADONA,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,ANADONA,62101000,326542,527303,799
+TBD0004,TOUCA BRANCA DESC. SANFONADA C/ELASTICO - PCT/100 - DEJAMARO,Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,DEJAMARO,62101000,326542,527303,800
+TEA0010,"TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 3,5 - CX/25 - MEDIX",Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,801
+TEA0009,"TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 4,0 - CX/25 - MEDIX",Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,802
+TEA0002,TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 4.5 - CX/25 - MEDIX,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,803
+TEA0006,"TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 5,0 - CX/25 - MEDIX",Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,804
+TEA0003,TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 5.5 - CX/25 - MEDIX,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,805
+TEA0007,"TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 6,0 - CX/25 - MEDIX",Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,806
+TEA0004,TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 6.5 - CX/25 - MEDIX,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,807
+TEA0001,TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 8.5 - CX/10 - SOLIDOR,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,SOLIDOR,90183929,326542,534027,808
+TEA0005,TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 8.5 - CX/25 - MEDIX,Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,809
+TEA0008,"TUBO ENDOTRAQUEAL ARAMADO C/BALÃO 9,0 - CX/25 - MEDIX",Materiais Médico-Hospitalares,"Tubos, Sondas e Via Aérea",15,alta,via aérea/sonda,MEDIX,90183929,326542,534027,810
+UCN0001,ULTRAVIST CONTRASTE NÃO IONICO 300/50ML - BAYER,Medicamentos,Contrastes e Diagnóstico,8,alta,contraste/diagnóstico,BAYER,29242964,324597,533418,811 | 812
+V2F0002,VASOPRESSINA 20U/ML FR 1ML ENCRISE CX/25 - BIOLAB,Medicamentos,Cardiovascular e Emergência,5,alta,cardiovascular/emergência,BIOLAB,30049029,324597 | 0,,813 | 814 | 815 | 816 | 817 | 818
+WL10003,"WRAP LEVE 0,80X0,80 VERDE N/ESTERIL - CX/250 - PION G",Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,56031290,326542,527304,819
+WL10001,"WRAP LEVE 1,00X1,00 VERDE N/ESTERIL - CX/150 - PION G",Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,56031290,326542,527304,820
+WL10002,"WRAP LEVE 1,20X1,20 VERDE N/ESTERIL - CX/125 - PION G",Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,56031290,326542,527304,821
+WL00001,"WRAP PESADO 0,80X0,80 AZUL N/ESTERIL - CX/250 - PION G",Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,56031290,326542,527304,822
+WL10005,"WRAP PESADO 1,00X1,00 AZUL N/ESTERIL - CX/150 - PION G",Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,NULL,56031290,326542,527304,823
+WL10004,"WRAP PESADO 1,20X1,20 AZUL N/ESTERIL - CX/100 - PION G",Materiais Médico-Hospitalares,Paramentação e Proteção,18,alta,paramentação,PION G,56031290,326542,527304,824
+XLS0002,XYLESTESIN LIDOCAÍNA SPRAY 10% 100MG/ML FR 50ML - CRISTÁLIA,Medicamentos,"Anestésicos, Analgésicos e Sedação",3,alta,anestesia/sedação,CRISTÁLIA,30049043,324597,,825 | 826

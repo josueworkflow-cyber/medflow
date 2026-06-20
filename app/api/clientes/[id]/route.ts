@@ -46,12 +46,25 @@ export async function PUT(
         cnpjCpf: body.cnpjCpf ?? undefined,
         email: body.email ?? undefined,
         telefone: body.telefone ?? undefined,
-        endereco: body.endereco ?? undefined,
-        cidade: body.cidade ?? undefined,
-        estado: body.estado ?? undefined,
+        endereco: body.endereco !== undefined
+          ? body.endereco
+          : body.logradouro !== undefined || body.numero !== undefined
+            ? [body.logradouro, body.numero].filter(Boolean).join(", ")
+            : undefined,
+        cidade: body.municipio ?? body.cidade ?? undefined,
+        estado: body.uf ?? body.estado ?? undefined,
         cep: body.cep ?? undefined,
         limiteCredito: body.limiteCredito != null ? Number(body.limiteCredito) : undefined,
         ativo: body.ativo ?? undefined,
+        logradouro: body.logradouro ?? undefined,
+        numero: body.numero ?? undefined,
+        complemento: body.complemento ?? undefined,
+        bairro: body.bairro ?? undefined,
+        codigoMunicipio: body.codigoMunicipio ?? undefined,
+        inscricaoEstadual: body.inscricaoEstadual ?? undefined,
+        inscricaoMunicipal: body.inscricaoMunicipal ?? undefined,
+        contribuinteICMS: body.contribuinteICMS !== undefined ? !!body.contribuinteICMS : undefined,
+        consumidorFinal: body.consumidorFinal !== undefined ? !!body.consumidorFinal : undefined,
       },
     });
     return NextResponse.json(cliente);

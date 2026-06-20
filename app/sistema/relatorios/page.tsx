@@ -1,15 +1,17 @@
 "use client";
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+ 
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
-  TrendingUp, 
+  BarChart3, 
+  Percent, 
+  RefreshCw, 
   Calendar, 
+  ArrowRight, 
   DollarSign, 
   Package, 
   PieChart, 
   FileText, 
-  ArrowRight,
-  ChevronRight
+  ChevronRight 
 } from "lucide-react";
 import Link from "next/link";
 
@@ -23,13 +25,15 @@ const secoes = [
         url: "/sistema/relatorios/vendas",
         icon: DollarSign,
         color: "bg-green-50 text-green-700",
+        borderLeft: "border-l-4 border-l-green-500"
       },
       {
-        title: "Inteligência de Preço e Margem",
-        description: "Análise detalhada de markup, margem de contribuição e lucratividade por produto.",
+        title: "Relatório de Margem",
+        description: "Monitore a lucratividade, markup, margem de venda e lucro unitário médio dos produtos ativos.",
         url: "/sistema/relatorios/margem",
-        icon: TrendingUp,
+        icon: Percent,
         color: "bg-blue-50 text-blue-700",
+        borderLeft: "border-l-4 border-l-blue-500"
       },
     ],
   },
@@ -42,13 +46,23 @@ const secoes = [
         url: "/sistema/relatorios/estoque",
         icon: Package,
         color: "bg-indigo-50 text-indigo-700",
+        borderLeft: "border-l-4 border-l-indigo-500"
+      },
+      {
+        title: "Giro de Estoque",
+        description: "Monitore a velocidade de saída de itens, cobertura média em dias de estoque e alertas de excesso ou escassez.",
+        url: "/sistema/relatorios/giro",
+        icon: RefreshCw,
+        color: "bg-emerald-50 text-emerald-700",
+        borderLeft: "border-l-4 border-l-emerald-500"
       },
       {
         title: "Controle de Validade",
-        description: "Gestão estratégica de lotes próximos ao vencimento e produtos vencidos (FEFO).",
+        description: "Monitore lotes próximos do vencimento e lotes já vencidos para ações corretivas sanitárias e financeiras imediatas.",
         url: "/sistema/relatorios/validade",
         icon: Calendar,
-        color: "bg-amber-50 text-amber-700",
+        color: "bg-red-50 text-red-700",
+        borderLeft: "border-l-4 border-l-red-500"
       },
     ],
   },
@@ -61,6 +75,7 @@ const secoes = [
         url: "/sistema/relatorios/financeiro",
         icon: PieChart,
         color: "bg-purple-50 text-purple-700",
+        borderLeft: "border-l-4 border-l-purple-500"
       },
     ],
   },
@@ -73,6 +88,7 @@ const secoes = [
         url: "/sistema/relatorios/fiscal",
         icon: FileText,
         color: "bg-rose-50 text-rose-700",
+        borderLeft: "border-l-4 border-l-rose-500"
       },
     ],
   },
@@ -80,16 +96,19 @@ const secoes = [
 
 export default function RelatoriosIndexPage() {
   return (
-    <div className="space-y-8 p-1">
+    <div className="flex-1 p-6 space-y-6">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 text-sm text-slate-500">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
           <span>Sistema</span>
           <ChevronRight className="h-3 w-3" />
           <span className="text-slate-900 font-medium">Relatórios</span>
         </div>
-        <h1 className="text-3xl font-bold tracking-tight mt-1 text-slate-900">Centro de Relatórios</h1>
-        <p className="text-muted-foreground text-sm">
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-1 flex items-center gap-2">
+          <BarChart3 className="h-8 w-8 text-slate-700" />
+          Centro de Relatórios
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
           Análises estratégicas, operacionais, financeiras e fiscais consolidando a inteligência do seu ERP.
         </p>
       </div>
@@ -101,29 +120,34 @@ export default function RelatoriosIndexPage() {
             <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-100 pb-2">
               {secao.nome}
             </h2>
-            <div className="grid gap-6 md:grid-cols-2">
-              {secao.relatorios.map((rel) => (
-                <Link key={rel.url} href={rel.url}>
-                  <Card className="hover:shadow-md transition-all cursor-pointer group border-slate-200 bg-white rounded-2xl overflow-hidden">
-                    <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-3">
-                      <div className={`h-12 w-12 rounded-xl ${rel.color} flex items-center justify-center`}>
-                        <rel.icon className="h-6 w-6" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg text-slate-900 group-hover:text-primary transition-colors">
-                          {rel.title}
-                        </CardTitle>
-                      </div>
-                      <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-primary transition-all group-hover:translate-x-1" />
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-xs leading-relaxed text-slate-500">
-                        {rel.description}
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {secao.relatorios.map((rel) => {
+                const Icon = rel.icon;
+                return (
+                  <Link key={rel.url} href={rel.url} className="block group">
+                    <Card className={`h-full shadow-sm border-slate-200 flex flex-col justify-between hover:shadow-md transition-all ${rel.borderLeft} bg-white`}>
+                      <CardHeader className="pb-3 flex flex-row items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <CardTitle className="text-base font-bold text-slate-900 group-hover:text-primary transition-colors">
+                            {rel.title}
+                          </CardTitle>
+                        </div>
+                        <div className={`p-2.5 rounded-xl ${rel.color} shrink-0`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4 flex-1 flex flex-col justify-between">
+                        <CardDescription className="text-xs text-slate-500 leading-relaxed">
+                          {rel.description}
+                        </CardDescription>
+                        <div className="pt-2 flex items-center text-xs font-bold text-slate-900 group-hover:underline gap-1 mt-auto">
+                          Acessar Relatório <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         ))}

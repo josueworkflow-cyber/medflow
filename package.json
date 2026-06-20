@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "import:produtos-estoque": "node scripts/importar-produtos-estoque-854968.mjs"
   },
   "dependencies": {
     "@alexssmusica/node-pdf-nfe": "^1.2.19",

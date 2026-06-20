@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
         numero: d.numero,
         status: d.status,
         dataEmissao: d.dataEmissao ? d.dataEmissao.toISOString().split("T")[0] : d.createdAt.toISOString().split("T")[0],
-        empresa: d.empresaFiscal.nomeFantasia || d.empresaFiscal.razaoSocial,
+        empresa: d.empresaFiscal!.nomeFantasia || d.empresaFiscal!.razaoSocial,
         cliente: d.cliente?.razaoSocial || "—",
         pedidoNumero: d.pedidoVenda?.numero || "—",
         valorTotal: Number(valorTotal.toFixed(2)),
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
     // Breakdown por Empresa Fiscal
     const empresaGroups = new Map<number, any>();
     docs.forEach((d) => {
-      const emp = d.empresaFiscal;
+      const emp = d.empresaFiscal!;
       const valorTotal = d.movimentacoesFiscais.reduce((sum, mf) => sum + mf.valorTotal, 0);
 
       if (!empresaGroups.has(emp.id)) {

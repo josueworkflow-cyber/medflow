@@ -109,7 +109,21 @@ const financeiroItems: NavItem[] = [
 
 const adminItems: NavItem[] = [
   { title: "Usuarios", url: "/sistema/usuarios", icon: UserCircle },
-  { title: "Relatorios", url: "/sistema/relatorios", icon: BarChart3 },
+  {
+    title: "Relatórios",
+    url: "#",
+    icon: BarChart3,
+    children: [
+      { title: "Visão Geral", url: "/sistema/relatorios" },
+      { title: "Vendas", url: "/sistema/relatorios/vendas" },
+      { title: "Margem", url: "/sistema/relatorios/margem" },
+      { title: "Estoque", url: "/sistema/relatorios/estoque" },
+      { title: "Giro de Estoque", url: "/sistema/relatorios/giro" },
+      { title: "Validade", url: "/sistema/relatorios/validade" },
+      { title: "Financeiro", url: "/sistema/relatorios/financeiro" },
+      { title: "Fiscal", url: "/sistema/relatorios/fiscal" },
+    ],
+  },
   { title: "Configuracoes", url: "/sistema/configuracoes", icon: Settings },
 ];
 
@@ -178,7 +192,8 @@ export function AppSidebar() {
     }
 
     if (url.startsWith("/sistema/relatorios")) {
-      return true;
+      const p: string = perfil;
+      return p === "FINANCEIRO" || p === "ADMINISTRADOR";
     }
 
     if (

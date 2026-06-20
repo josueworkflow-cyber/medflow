@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isApi = pathname.startsWith("/api");
 
-  if (pathname.startsWith("/api/auth")) {
+  if (pathname.startsWith("/api/auth") || pathname === "/api/health") {
     return NextResponse.next();
   }
 

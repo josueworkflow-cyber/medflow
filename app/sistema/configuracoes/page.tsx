@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import TaxRulesManager from "@/components/fiscal/TaxRulesManager";
 import {
   Building,
   Shield,
@@ -29,6 +30,7 @@ import {
   Lock,
   Send,
   Loader2,
+  Calculator,
 } from "lucide-react";
 
 // Algoritmo de Validação de CNPJ brasileiro padrão
@@ -311,27 +313,13 @@ export default function ConfiguracoesPage() {
     try {
       setSalvandoCertificado(true);
 
-      // Lê o arquivo como base64
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          const base64 = result.split(",")[1]; // remove prefixo data:...
-          resolve(base64);
-        };
-        reader.onerror = (error) => reject(error);
-      });
-
-      reader.readAsDataURL(certificadoFile);
-      const base64Pfx = await base64Promise;
+      const body = new FormData();
+      body.append("certificadoPfx", certificadoFile);
+      body.append("certificadoSenha", certificadoSenha);
 
       const res = await fetch(`/api/fiscal/empresa/${selectedEmpresaId}/certificado`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          certificadoPfxBase64: base64Pfx,
-          certificadoSenha,
-        }),
+        body,
       });
 
       const data = await res.json();
@@ -488,12 +476,15 @@ export default function ConfiguracoesPage() {
         <Card className="border-slate-200 overflow-hidden shadow-xs">
           <Tabs defaultValue="gerais" className="w-full flex-col">
             <div className="border-b border-slate-200 bg-slate-50/50 p-2">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 bg-slate-100 rounded-lg p-1">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 bg-slate-100 rounded-lg p-1">
                 <TabsTrigger value="gerais" className="gap-2">
                   <Building className="h-4 w-4" /> Dados Gerais
                 </TabsTrigger>
                 <TabsTrigger value="nfse" className="gap-2">
                   <Settings className="h-4 w-4" /> Configs NFS-e
+                </TabsTrigger>
+                <TabsTrigger value="tributos" className="gap-2">
+                  <Calculator className="h-4 w-4" /> Motor Tributário
                 </TabsTrigger>
                 <TabsTrigger value="certificado" className="gap-2">
                   <KeyRound className="h-4 w-4" /> Certificado Digital
@@ -747,6 +738,13 @@ export default function ConfiguracoesPage() {
                   </Button>
                 </div>
               </div>
+            </TabsContent>
+
+            <TabsContent value="tributos" className="p-6 focus:outline-none">
+              <TaxRulesManager
+                empresaFiscalId={selectedEmpresaId}
+                regimeTributario={empresas.find((empresa) => empresa.id === selectedEmpresaId)?.regimeTributario}
+              />
             </TabsContent>
 
             {/* TAB 3: Certificado Digital */}

@@ -27,8 +27,24 @@ export async function POST(
   }
 
   try {
-    const body = await req.json();
-    const { certificadoPfxBase64, certificadoSenha } = body;
+    const contentType = req.headers.get("content-type") || "";
+    let certificadoPfxBase64: string | null = null;
+    let certificadoSenha: string | null = null;
+
+    if (contentType.includes("multipart/form-data")) {
+      const form = await req.formData();
+      const file = form.get("certificadoPfx");
+      const senha = form.get("certificadoSenha");
+
+      if (file && typeof file !== "string") {
+        certificadoPfxBase64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+      }
+      certificadoSenha = typeof senha === "string" ? senha : null;
+    } else {
+      const body = await req.json();
+      certificadoPfxBase64 = body.certificadoPfxBase64 || null;
+      certificadoSenha = body.certificadoSenha ?? null;
+    }
 
     if (!certificadoPfxBase64) {
       return NextResponse.json({ error: "Arquivo de certificado PFX base64 e obrigatorio." }, { status: 400 });

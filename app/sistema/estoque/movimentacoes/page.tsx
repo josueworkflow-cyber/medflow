@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import {
   ArrowDownRight, ArrowUpRight, RefreshCw, Clock, Package, Hash, Calendar, Search,
   Eye, X, Filter, ChevronDown, ChevronUp, User, FileText, Building2,
-  AlertTriangle, Layers, RotateCcw, Ban, Boxes,
+  AlertTriangle, Layers, RotateCcw, Ban, Boxes, Pencil, History,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -22,6 +22,15 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
+import { HistoricoAlteracoes } from "@/components/auditoria/historico-alteracoes";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -90,6 +99,71 @@ export default function MovimentacoesPage() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [movToEstornar, setMovToEstornar] = useState<number | null>(null);
   const [isEstornando, setIsEstornando] = useState(false);
+
+  // Edit Entrada states
+  const [editingMov, setEditingMov] = useState<Movimentacao | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    quantidade: "",
+    observacao: "",
+    origem: "",
+  });
+  const [editMotivo, setEditMotivo] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // History states
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyMovId, setHistoryMovId] = useState<number | null>(null);
+
+  const openEditEntrada = (mov: Movimentacao) => {
+    setEditingMov(mov);
+    setEditForm({
+      quantidade: String(mov.quantidade),
+      observacao: mov.observacao || "",
+      origem: mov.origem || "",
+    });
+    setEditMotivo("");
+    setIsEditDialogOpen(true);
+  };
+
+  const salvarEdicaoEntrada = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingMov) return;
+
+    const qtd = Number(editForm.quantidade);
+    if (isNaN(qtd) || qtd < 0.001) {
+      return toast.error("Quantidade mínima é 0.001");
+    }
+
+    try {
+      setSavingEdit(true);
+      const payload = {
+        quantidade: qtd,
+        observacao: editForm.observacao !== "" ? editForm.observacao.trim() : null,
+        origem: editForm.origem !== "" ? editForm.origem.trim() : null,
+        motivo: editMotivo,
+      };
+
+      const res = await fetch(`/api/estoque/movimentacoes/${editingMov.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const resultado = await res.json();
+      if (!res.ok) throw new Error(resultado.error);
+
+      toast.success("Movimentação atualizada com sucesso!");
+      setIsEditDialogOpen(false);
+      setEditingMov(null);
+      setModalMov(null);
+      mutate();
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao atualizar movimentação.");
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   const handleEstornarClick = (movId: number) => {
     setMovToEstornar(movId);
@@ -578,13 +652,51 @@ export default function MovimentacoesPage() {
               )}
 
               {modalMov.tipo === "ENTRADA" && !modalMov.estornado && !modalMov.isEstorno && (
+                <div className="flex flex-col gap-2 mt-6">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1 h-9 gap-1.5 text-xs font-semibold border-amber-200 text-amber-700 hover:bg-amber-50"
+                      onClick={() => openEditEntrada(modalMov)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Editar Entrada
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 h-9 gap-1.5 text-xs font-semibold"
+                      onClick={() => {
+                        setHistoryMovId(modalMov.id);
+                        setIsHistoryOpen(true);
+                      }}
+                    >
+                      <History className="h-3.5 w-3.5" />
+                      Histórico
+                    </Button>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full h-9 gap-1.5 text-xs font-semibold"
+                    onClick={() => handleEstornarClick(modalMov.id)}
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    Estornar Entrada
+                  </Button>
+                </div>
+              )}
+
+              {/* History button for non-ENTRADA or estornado/isEstorno movements */}
+              {(modalMov.tipo !== "ENTRADA" || modalMov.estornado || modalMov.isEstorno) && (
                 <Button
-                  variant="destructive"
+                  variant="outline"
                   className="w-full mt-6 h-9 gap-1.5 text-xs font-semibold"
-                  onClick={() => handleEstornarClick(modalMov.id)}
+                  onClick={() => {
+                    setHistoryMovId(modalMov.id);
+                    setIsHistoryOpen(true);
+                  }}
                 >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                  Estornar Entrada
+                  <History className="h-3.5 w-3.5" />
+                  Histórico
                 </Button>
               )}
             </div>
@@ -639,6 +751,130 @@ export default function MovimentacoesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Entrada Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={(open) => { if (!open) { setIsEditDialogOpen(false); setEditingMov(null); } }}>
+        <DialogContent className="sm:max-w-[480px] bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <Pencil className="h-4 w-4 text-amber-600" />
+              Editar Movimentação de Entrada
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500">
+              {editingMov?.produto?.descricao || "Movimentação"} — Entrada #{editingMov?.id}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={salvarEdicaoEntrada} className="space-y-4 mt-2">
+            {/* Quantidade */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">Quantidade *</label>
+              <Input
+                type="number"
+                step="0.001"
+                min="0.001"
+                value={editForm.quantidade}
+                onChange={(e) => setEditForm({ ...editForm, quantidade: e.target.value })}
+                className="h-9 text-sm"
+                required
+              />
+            </div>
+
+            {/* Observação */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">Observação</label>
+              <Textarea
+                value={editForm.observacao}
+                onChange={(e) => setEditForm({ ...editForm, observacao: e.target.value })}
+                className="text-sm min-h-[60px] resize-none"
+                placeholder="Observação da movimentação..."
+              />
+            </div>
+
+            {/* Origem */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700">Origem</label>
+              <Input
+                type="text"
+                value={editForm.origem}
+                onChange={(e) => setEditForm({ ...editForm, origem: e.target.value })}
+                className="h-9 text-sm"
+                placeholder="Ex: Compra direta, Transferência..."
+              />
+            </div>
+
+            {/* Motivo - amber card */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+                <label className="text-xs font-semibold text-amber-800">
+                  Motivo da Alteração *
+                </label>
+              </div>
+              <Textarea
+                value={editMotivo}
+                onChange={(e) => setEditMotivo(e.target.value)}
+                className="text-sm min-h-[60px] resize-none bg-white border-amber-200 focus:border-amber-400"
+                placeholder="Descreva o motivo da alteração (mín. 5 caracteres)..."
+              />
+              <p className={cn(
+                "text-[10px] text-right font-medium",
+                editMotivo.trim().length >= 5 ? "text-emerald-600" : "text-amber-500"
+              )}>
+                {editMotivo.trim().length}/5 caracteres
+              </p>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => { setIsEditDialogOpen(false); setEditingMov(null); }}
+                disabled={savingEdit}
+                className="text-xs"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={savingEdit || editMotivo.trim().length < 5}
+                className="gap-1.5 text-xs bg-amber-600 hover:bg-amber-700 text-white"
+              >
+                {savingEdit ? (
+                  <>
+                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  "Salvar Alterações"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* History Sheet */}
+      <Sheet open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+        <SheetContent className="max-w-2xl sm:max-w-2xl overflow-y-auto w-full md:w-[600px]">
+          <SheetHeader className="mb-4">
+            <SheetTitle className="flex items-center gap-2 text-lg">
+              <History className="h-5 w-5 text-slate-600" />
+              Histórico de Alterações
+            </SheetTitle>
+            <SheetDescription className="text-xs">
+              Registro de todas as edições realizadas nesta movimentação.
+            </SheetDescription>
+          </SheetHeader>
+          {historyMovId && (
+            <div className="mt-2">
+              <HistoricoAlteracoes entidade="movimentacao-estoque" entidadeId={historyMovId} />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </main>
   );
 }

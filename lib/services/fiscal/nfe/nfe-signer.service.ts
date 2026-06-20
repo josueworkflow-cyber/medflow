@@ -60,3 +60,55 @@ export async function assinarXML(xml: string, empresaEmissoraId: number): Promis
     throw new Error(`Falha na assinatura do XML: ${error.message || error}`);
   }
 }
+
+/**
+ * Assina digitalmente o XML de um Evento de NF-e (ex: Cancelamento) utilizando o certificado digital da empresa.
+ */
+export async function assinarEventoXML(xml: string, empresaEmissoraId: number): Promise<string> {
+  try {
+    const { privateKeyPem, certificatePem } = await carregarCertificado(empresaEmissoraId);
+
+    const cleanCertPem = certificatePem
+      .replace(/-----BEGIN CERTIFICATE-----/, "")
+      .replace(/-----END CERTIFICATE-----/, "")
+      .replace(/\r?\n/g, "")
+      .trim();
+
+    const doc = new DOMParser().parseFromString(xml, "application/xml");
+    const infEventoNodes = doc.getElementsByTagName("infEvento");
+    if (infEventoNodes.length === 0) {
+      throw new Error("Elemento <infEvento> nao encontrado no XML.");
+    }
+    const infEventoNode = infEventoNodes[0] as any;
+    const id = infEventoNode.getAttribute("Id");
+    if (!id) {
+      throw new Error("Elemento <infEvento> nao possui o atributo 'Id' (necessario para referencia de assinatura).");
+    }
+
+    const sig = new SignedXml({
+      getKeyInfoContent: () => `<X509Data><X509Certificate>${cleanCertPem}</X509Certificate></X509Data>`
+    });
+
+    sig.privateKey = privateKeyPem;
+    
+    sig.addReference({
+      xpath: "//*[local-name()='infEvento']",
+      transforms: [
+        "http://www.w3.org/2000/09/xmldsig#enveloped-signature",
+        "http://www.w3.org/2001/10/xml-exc-c14n#"
+      ],
+      digestAlgorithm: "http://www.w3.org/2000/09/xmldsig#sha1",
+      uri: `#${id}`
+    });
+
+    sig.signatureAlgorithm = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+    sig.canonicalizationAlgorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
+
+    sig.computeSignature(xml);
+    return sig.getSignedXml();
+  } catch (error: any) {
+    console.error(`Erro ao assinar XML do evento da empresa ID ${empresaEmissoraId}: ${error.message || error}`);
+    throw new Error(`Falha na assinatura do XML do evento: ${error.message || error}`);
+  }
+}
+

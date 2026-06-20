@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { create } from "xmlbuilder2";
 import { empresaFiscalSelect } from "../../../fiscal-select";
+import type { TaxCalculationResult, TaxItemCalculation } from "@/lib/types/fiscal-tax";
 
 /**
  * Mapeamento de FormaPagamento do MedFlow para o código tPag da SEFAZ.
@@ -22,6 +23,145 @@ const MAPA_PAGAMENTO: Record<string, string> = {
 function cleanDigits(str: string | null | undefined): string {
   if (!str) return "";
   return str.replace(/\D/g, "");
+}
+
+function money(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+export type NFeBuildOptions = {
+  naturezaOperacao?: string | null;
+  informacoesComplementares?: string | null;
+  calculoTributario?: TaxCalculationResult | null;
+};
+
+function appendIcms(doc: any, tax: TaxItemCalculation, simplesNacional: boolean) {
+  const icms = doc.ele("ICMS");
+  if (simplesNacional) {
+    icms.ele(`ICMSSN${tax.csosn}`)
+      .ele("orig").txt(tax.origemMercadoria).up()
+      .ele("CSOSN").txt(tax.csosn).up()
+    .up();
+  } else if (tax.cstIcms === "00") {
+    const group = icms.ele("ICMS00")
+      .ele("orig").txt(tax.origemMercadoria).up()
+      .ele("CST").txt("00").up()
+      .ele("modBC").txt(tax.modalidadeBcIcms).up()
+      .ele("vBC").txt(tax.baseIcms.toFixed(2)).up()
+      .ele("pICMS").txt(tax.aliquotaIcms.toFixed(2)).up()
+      .ele("vICMS").txt(tax.valorIcms.toFixed(2)).up();
+    if (tax.aliquotaFcp > 0) {
+      group.ele("vBCFCP").txt(tax.baseIcms.toFixed(2)).up()
+        .ele("pFCP").txt(tax.aliquotaFcp.toFixed(2)).up()
+        .ele("vFCP").txt(tax.valorFcp.toFixed(2)).up();
+    }
+    group.up();
+  } else if (tax.cstIcms === "20") {
+    const group = icms.ele("ICMS20")
+      .ele("orig").txt(tax.origemMercadoria).up()
+      .ele("CST").txt("20").up()
+      .ele("modBC").txt(tax.modalidadeBcIcms).up()
+      .ele("pRedBC").txt(tax.reducaoBaseIcms.toFixed(2)).up()
+      .ele("vBC").txt(tax.baseIcms.toFixed(2)).up()
+      .ele("pICMS").txt(tax.aliquotaIcms.toFixed(2)).up()
+      .ele("vICMS").txt(tax.valorIcms.toFixed(2)).up();
+    if (tax.aliquotaFcp > 0) {
+      group.ele("vBCFCP").txt(tax.baseIcms.toFixed(2)).up()
+        .ele("pFCP").txt(tax.aliquotaFcp.toFixed(2)).up()
+        .ele("vFCP").txt(tax.valorFcp.toFixed(2)).up();
+    }
+    group.up();
+  } else if (tax.cstIcms === "10") {
+    const group = icms.ele("ICMS10")
+      .ele("orig").txt(tax.origemMercadoria).up()
+      .ele("CST").txt("10").up()
+      .ele("modBC").txt(tax.modalidadeBcIcms).up()
+      .ele("vBC").txt(tax.baseIcms.toFixed(2)).up()
+      .ele("pICMS").txt(tax.aliquotaIcms.toFixed(2)).up()
+      .ele("vICMS").txt(tax.valorIcms.toFixed(2)).up();
+    if (tax.aliquotaFcp > 0) {
+      group.ele("vBCFCP").txt(tax.baseIcms.toFixed(2)).up()
+        .ele("pFCP").txt(tax.aliquotaFcp.toFixed(2)).up()
+        .ele("vFCP").txt(tax.valorFcp.toFixed(2)).up();
+    }
+    group.ele("modBCST").txt(tax.modalidadeBcSt).up()
+      .ele("pMVAST").txt(tax.mvaSt.toFixed(2)).up()
+      .ele("vBCST").txt(tax.baseIcmsSt.toFixed(2)).up()
+      .ele("pICMSST").txt(tax.aliquotaIcmsSt.toFixed(2)).up()
+      .ele("vICMSST").txt(tax.valorIcmsSt.toFixed(2)).up();
+    if (tax.aliquotaFcpSt > 0) {
+      group.ele("vBCFCPST").txt(tax.baseIcmsSt.toFixed(2)).up()
+        .ele("pFCPST").txt(tax.aliquotaFcpSt.toFixed(2)).up()
+        .ele("vFCPST").txt(tax.valorFcpSt.toFixed(2)).up();
+    }
+    group.up();
+  } else {
+    icms.ele(`ICMS${tax.cstIcms}`)
+      .ele("orig").txt(tax.origemMercadoria).up()
+      .ele("CST").txt(tax.cstIcms).up()
+    .up();
+  }
+  icms.up();
+
+  if (tax.valorDifalDestino > 0 && tax.aliquotaInterestadual !== null && tax.aliquotaInternaDestino !== null) {
+    doc.ele("ICMSUFDest")
+      .ele("vBCUFDest").txt(tax.baseIcms.toFixed(2)).up()
+      .ele("vBCFCPUFDest").txt(tax.baseIcms.toFixed(2)).up()
+      .ele("pFCPUFDest").txt(tax.aliquotaFcp.toFixed(2)).up()
+      .ele("pICMSUFDest").txt(tax.aliquotaInternaDestino.toFixed(2)).up()
+      .ele("pICMSInter").txt(tax.aliquotaInterestadual.toFixed(2)).up()
+      .ele("pICMSInterPart").txt("100.00").up()
+      .ele("vFCPUFDest").txt(tax.valorFcp.toFixed(2)).up()
+      .ele("vICMSUFDest").txt(tax.valorDifalDestino.toFixed(2)).up()
+      .ele("vICMSUFRemet").txt("0.00").up()
+    .up();
+  }
+}
+
+function appendIpi(doc: any, tax: TaxItemCalculation) {
+  const ipi = doc.ele("IPI").ele("cEnq").txt(tax.codigoEnquadramentoIpi).up();
+  if (["50", "99"].includes(tax.cstIpi)) {
+    ipi.ele("IPITrib")
+      .ele("CST").txt(tax.cstIpi).up()
+      .ele("vBC").txt(tax.baseIpi.toFixed(2)).up()
+      .ele("pIPI").txt(tax.aliquotaIpi.toFixed(2)).up()
+      .ele("vIPI").txt(tax.valorIpi.toFixed(2)).up()
+    .up();
+  } else {
+    ipi.ele("IPINT").ele("CST").txt(tax.cstIpi).up().up();
+  }
+  ipi.up();
+}
+
+function appendContribution(doc: any, tax: TaxItemCalculation, kind: "PIS" | "COFINS") {
+  const cst = kind === "PIS" ? tax.cstPis : tax.cstCofins;
+  const base = kind === "PIS" ? tax.basePis : tax.baseCofins;
+  const rate = kind === "PIS" ? tax.aliquotaPis : tax.aliquotaCofins;
+  const value = kind === "PIS" ? tax.valorPis : tax.valorCofins;
+  const root = doc.ele(kind);
+  if (["01", "02"].includes(cst)) {
+    root.ele(`${kind}Aliq`)
+      .ele("CST").txt(cst).up()
+      .ele("vBC").txt(base.toFixed(2)).up()
+      .ele(`p${kind}`).txt(rate.toFixed(2)).up()
+      .ele(`v${kind}`).txt(value.toFixed(2)).up()
+    .up();
+  } else if (["04", "05", "06", "07", "08", "09"].includes(cst)) {
+    root.ele(`${kind}NT`).ele("CST").txt(cst).up().up();
+  } else {
+    root.ele(`${kind}Outr`)
+      .ele("CST").txt(cst).up()
+      .ele("vBC").txt(base.toFixed(2)).up()
+      .ele(`p${kind}`).txt(rate.toFixed(2)).up()
+      .ele(`v${kind}`).txt(value.toFixed(2)).up()
+    .up();
+  }
+  root.up();
+}
+
+function normalizeText(value: string | null | undefined, fallback = "", maxLength?: number): string {
+  const normalized = (value || fallback).replace(/\s+/g, " ").trim();
+  return maxLength ? normalized.slice(0, maxLength) : normalized;
 }
 
 /**
@@ -122,7 +262,7 @@ function formatarDataHora(date: Date): string {
 /**
  * Constrói o XML da NF-e no layout 4.00 a partir dos dados do PedidoVenda.
  */
-export async function buildNFeXml(pedidoVendaId: number): Promise<string> {
+export async function buildNFeXml(pedidoVendaId: number, options: NFeBuildOptions = {}): Promise<string> {
   // 1. Carrega o pedido completo do banco
   const pedido = await prisma.pedidoVenda.findUnique({
     where: { id: pedidoVendaId },
@@ -185,7 +325,8 @@ export async function buildNFeXml(pedidoVendaId: number): Promise<string> {
   }
 
   // 3. Preparação dos dados para a Chave de Acesso e Cabeçalho
-  const cUF = "33"; // Rio de Janeiro (RJ)
+  const cUF = cleanDigits(emitente.codigoMunicipio).slice(0, 2);
+  if (cUF.length !== 2) throw new Error("Codigo de municipio do emitente invalido para determinar a UF.");
   const dhEmiStr = formatarDataHora(new Date());
   const dhEmi = new Date();
   
@@ -219,17 +360,35 @@ export async function buildNFeXml(pedidoVendaId: number): Promise<string> {
 
   // indIEDest (1 = Contribuinte, 9 = Não Contribuinte)
   const indIEDest = cliente.contribuinteICMS ? "1" : "9";
+  const naturezaOperacao = normalizeText(options.naturezaOperacao, "Venda de Mercadoria", 60);
+  const informacoesComplementares = normalizeText(options.informacoesComplementares || pedido.observacao, "", 5000);
 
   // 4. Totais e Descontos
-  let vProdTotal = 0;
-  let vDescTotal = 0;
+  const calculoTributario = options.calculoTributario || null;
+  const taxByItemId = new Map(calculoTributario?.itens.map((item) => [item.itemPedidoId, item]) || []);
+  let vProdTotal = calculoTributario?.totais.valorProdutos || 0;
+  let vDescTotal = calculoTributario?.totais.desconto || 0;
+  let vBCTotal = calculoTributario?.totais.baseIcms || 0;
+  let vICMSTotal = calculoTributario?.totais.valorIcms || 0;
 
-  for (const item of pedido.itens) {
-    vProdTotal += item.subtotal;
-    vDescTotal += item.desconto || 0;
+  if (!calculoTributario) {
+    vDescTotal = pedido.desconto || 0;
+    for (const item of pedido.itens) {
+      const valorBrutoItem = money(item.quantidade * item.precoUnitario);
+      const descontoItem = item.desconto || 0;
+      const valorLiquidoItem = Math.max(0, money(valorBrutoItem - descontoItem));
+      const aliquotaIcms = Number(item.produto.aliquotaIcms || 0);
+      const destacaIcms = aliquotaIcms > 0 && !item.produto.csosn;
+      vProdTotal += valorBrutoItem;
+      vDescTotal += descontoItem;
+      if (destacaIcms) {
+        vBCTotal += valorLiquidoItem;
+        vICMSTotal += money(valorLiquidoItem * aliquotaIcms / 100);
+      }
+    }
   }
 
-  const vNF = vProdTotal - vDescTotal;
+  const vNF = calculoTributario?.totais.valorNota ?? Math.max(0, money(vProdTotal - vDescTotal));
 
   // 5. Montagem do XML
   const doc = create({ version: "1.0", encoding: "UTF-8" })
@@ -238,7 +397,7 @@ export async function buildNFeXml(pedidoVendaId: number): Promise<string> {
         .ele("ide")
           .ele("cUF").txt(cUF).up()
           .ele("cNF").txt(cNF).up()
-          .ele("natOp").txt("Venda de Mercadoria").up()
+          .ele("natOp").txt(naturezaOperacao).up()
           .ele("mod").txt(mod).up()
           .ele("serie").txt(parseInt(serie, 10).toString()).up()
           .ele("nNF").txt(nNF.toString()).up()
@@ -250,7 +409,7 @@ export async function buildNFeXml(pedidoVendaId: number): Promise<string> {
           .ele("tpEmis").txt(tpEmis).up()
           .ele("cDV").txt(cDV).up()
           .ele("tpAmb").txt(emitente.ambienteSEFAZ === "producao" ? "1" : "2").up()
-          .ele("finNFe").txt("1").up() // 1 = Normal
+          .ele("finNFe").txt(String(calculoTributario?.natureza.finalidadeNFe || 1)).up()
           .ele("indFinal").txt(cliente.consumidorFinal ? "1" : "0").up()
           .ele("indPres").txt("9").up() // 9 = Operação não presencial
           .ele("procEmi").txt("0").up() // 0 = Emissão de aplicativo do contribuinte
@@ -298,75 +457,82 @@ export async function buildNFeXml(pedidoVendaId: number): Promise<string> {
 
         // 6. Loop de Itens (det)
         pedido.itens.forEach((item, index) => {
-          const nItem = index + 1;
           const produto = item.produto;
+          const tax = taxByItemId.get(item.id);
+          if (calculoTributario && !tax) throw new Error(`Calculo tributario ausente para o item ${item.id}.`);
+          const valorBrutoItem = tax?.valorBruto ?? money(item.quantidade * item.precoUnitario);
+          const descontoItem = tax?.desconto ?? item.desconto ?? 0;
+          const valorLiquidoItem = tax?.valorLiquido ?? Math.max(0, money(valorBrutoItem - descontoItem));
+          const aliquotaIcms = Number(produto.aliquotaIcms || 0);
+          const valorIcms = money(valorLiquidoItem * aliquotaIcms / 100);
+          const destacaIcms = aliquotaIcms > 0 && !produto.csosn;
+          const det = doc.ele("det", { nItem: String(index + 1) });
+          const prodNode = det.ele("prod")
+            .ele("cProd").txt(produto.codigoInterno || produto.id.toString()).up()
+            .ele("cEAN").txt(produto.codigoBarras || "SEM GTIN").up()
+            .ele("xProd").txt(produto.descricao).up()
+            .ele("NCM").txt(cleanDigits(produto.ncm)).up()
+            .ele("CFOP").txt(tax?.cfop || produto.cfop || (idDest === "1" ? "5102" : "6102")).up()
+            .ele("uCom").txt(produto.unidadeFiscal || produto.unidadeVenda || "UN").up()
+            .ele("qCom").txt(item.quantidade.toFixed(4)).up()
+            .ele("vUnCom").txt(item.precoUnitario.toFixed(4)).up()
+            .ele("vProd").txt(valorBrutoItem.toFixed(2)).up()
+            .ele("cEANTrib").txt(produto.codigoBarras || "SEM GTIN").up()
+            .ele("uTrib").txt(produto.unidadeFiscal || produto.unidadeVenda || "UN").up()
+            .ele("qTrib").txt(item.quantidade.toFixed(4)).up()
+            .ele("vUnTrib").txt(item.precoUnitario.toFixed(4)).up();
+          if (descontoItem > 0) prodNode.ele("vDesc").txt(descontoItem.toFixed(2)).up();
+          prodNode.ele("indTot").txt("1").up();
 
-          doc.ele("det", { nItem: nItem.toString() })
-            .ele("prod")
-              .ele("cProd").txt(produto.codigoInterno || produto.id.toString()).up()
-              .ele("cEAN").txt(produto.codigoBarras || "SEM GTIN").up()
-              .ele("xProd").txt(produto.descricao).up()
-              .ele("NCM").txt(cleanDigits(produto.ncm)).up()
-              .ele("CFOP").txt(produto.cfop || (idDest === "1" ? "5102" : "6102")).up()
-              .ele("uCom").txt(produto.unidadeFiscal || produto.unidadeVenda || "UN").up()
-              .ele("qCom").txt(item.quantidade.toFixed(4)).up()
-              .ele("vUnCom").txt(item.precoUnitario.toFixed(4)).up()
-              .ele("vProd").txt(item.subtotal.toFixed(2)).up()
-              .ele("cEANTrib").txt(produto.codigoBarras || "SEM GTIN").up()
-              .ele("uTrib").txt(produto.unidadeFiscal || produto.unidadeVenda || "UN").up()
-              .ele("qTrib").txt(item.quantidade.toFixed(4)).up()
-              .ele("vUnTrib").txt(item.precoUnitario.toFixed(4)).up()
-              .ele("indTot").txt("1").up()
-            .up() // fim prod
-            .ele("imposto")
-              .ele("ICMS");
-                if (produto.csosn) {
-                  // Emitter Simples Nacional -> ICMSSN102
-                  doc.ele(`ICMSSN${produto.csosn === "102" || produto.csosn === "103" || produto.csosn === "300" || produto.csosn === "400" ? produto.csosn : "102"}`)
-                    .ele("orig").txt(produto.origemMercadoria || "0").up()
-                    .ele("CSOSN").txt(produto.csosn).up()
-                  .up();
-                } else {
-                  // Fallback para ICMS40 (Isento)
-                  doc.ele("ICMS40")
-                    .ele("orig").txt(produto.origemMercadoria || "0").up()
-                    .ele("CST").txt(produto.cst || "40").up()
-                  .up();
-                }
-              doc.up() // fim ICMS
-              .ele("PIS")
-                .ele("PISNT")
-                  .ele("CST").txt("07").up()
-                .up()
-              .up() // fim PIS
-              .ele("COFINS")
-                .ele("COFINSNT")
-                  .ele("CST").txt("07").up()
-                .up()
-              .up() // fim COFINS
-            .up() // fim imposto
-          .up(); // fim det
+          const imposto = det.ele("imposto");
+          if (tax) {
+            appendIcms(imposto, tax, crt === "1");
+            appendIpi(imposto, tax);
+            appendContribution(imposto, tax, "PIS");
+            appendContribution(imposto, tax, "COFINS");
+          } else {
+            const icms = imposto.ele("ICMS");
+            if (produto.csosn) {
+              icms.ele(`ICMSSN${["102", "103", "300", "400"].includes(produto.csosn) ? produto.csosn : "102"}`)
+                .ele("orig").txt(produto.origemMercadoria || "0").up()
+                .ele("CSOSN").txt(produto.csosn).up().up();
+            } else if (destacaIcms) {
+              icms.ele("ICMS00")
+                .ele("orig").txt(produto.origemMercadoria || "0").up()
+                .ele("CST").txt(produto.cst || "00").up()
+                .ele("modBC").txt("3").up()
+                .ele("vBC").txt(valorLiquidoItem.toFixed(2)).up()
+                .ele("pICMS").txt(aliquotaIcms.toFixed(2)).up()
+                .ele("vICMS").txt(valorIcms.toFixed(2)).up().up();
+            } else {
+              icms.ele("ICMS40")
+                .ele("orig").txt(produto.origemMercadoria || "0").up()
+                .ele("CST").txt(produto.cst || "40").up().up();
+            }
+            imposto.ele("PIS").ele("PISNT").ele("CST").txt("07").up().up().up();
+            imposto.ele("COFINS").ele("COFINSNT").ele("CST").txt("07").up().up().up();
+          }
         });
 
         // 7. Totais e Pagamentos
         doc.ele("total")
           .ele("ICMSTot")
-            .ele("vBC").txt("0.00").up()
-            .ele("vICMS").txt("0.00").up()
-            .ele("vFCP").txt("0.00").up()
-            .ele("vBCST").txt("0.00").up()
-            .ele("vST").txt("0.00").up()
-            .ele("vFCPST").txt("0.00").up()
+            .ele("vBC").txt(vBCTotal.toFixed(2)).up()
+            .ele("vICMS").txt(vICMSTotal.toFixed(2)).up()
+            .ele("vFCP").txt((calculoTributario?.totais.valorFcp || 0).toFixed(2)).up()
+            .ele("vBCST").txt((calculoTributario?.totais.baseIcmsSt || 0).toFixed(2)).up()
+            .ele("vST").txt((calculoTributario?.totais.valorIcmsSt || 0).toFixed(2)).up()
+            .ele("vFCPST").txt((calculoTributario?.totais.valorFcpSt || 0).toFixed(2)).up()
             .ele("vFCPSTRet").txt("0.00").up()
             .ele("vProd").txt(vProdTotal.toFixed(2)).up()
             .ele("vFrete").txt("0.00").up()
             .ele("vSeg").txt("0.00").up()
             .ele("vDesc").txt(vDescTotal.toFixed(2)).up()
             .ele("vII").txt("0.00").up()
-            .ele("vIPI").txt("0.00").up()
+            .ele("vIPI").txt((calculoTributario?.totais.valorIpi || 0).toFixed(2)).up()
             .ele("vIPIDevol").txt("0.00").up()
-            .ele("vPIS").txt("0.00").up()
-            .ele("vCOFINS").txt("0.00").up()
+            .ele("vPIS").txt((calculoTributario?.totais.valorPis || 0).toFixed(2)).up()
+            .ele("vCOFINS").txt((calculoTributario?.totais.valorCofins || 0).toFixed(2)).up()
             .ele("vOutro").txt("0.00").up()
             .ele("vNF").txt(vNF.toFixed(2)).up()
             .ele("vTotTrib").txt("0.00").up()
@@ -376,11 +542,17 @@ export async function buildNFeXml(pedidoVendaId: number): Promise<string> {
           .ele("modFrete").txt("9").up() // 9 = Sem frete
         .up() // fim transp
         .ele("pag")
-          .ele("detPag")
-            .ele("tPag").txt(MAPA_PAGAMENTO[pedido.formaPagamento || ""] || "99").up()
-            .ele("vPag").txt(pedido.valorTotal.toFixed(2)).up()
+            .ele("detPag")
+              .ele("tPag").txt(MAPA_PAGAMENTO[pedido.formaPagamento || ""] || "99").up()
+              .ele("vPag").txt(vNF.toFixed(2)).up()
           .up()
         .up(); // fim pag
+
+        if (informacoesComplementares) {
+          doc.ele("infAdic")
+            .ele("infCpl").txt(informacoesComplementares).up()
+          .up();
+        }
 
   return doc.end({ prettyPrint: true });
 }
