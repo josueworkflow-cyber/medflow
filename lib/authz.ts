@@ -1,22 +1,60 @@
 import { auth } from "@/auth";
 import type { PerfilUsuario } from "@prisma/client";
+import { jwtVerify } from "jose";
+import { NextRequest } from "next/server";
+import { headers } from "next/headers";
 
 export type AuthActor = {
   usuarioId: number;
   perfil: PerfilUsuario;
 };
 
-export async function getAuthActor(): Promise<AuthActor | null> {
+export async function getAuthActor(request?: Request | NextRequest): Promise<AuthActor | null> {
+  // 1. Tentar fluxo atual via cookie de sessão do NextAuth
   const session = await auth();
   const user = session?.user as any;
   const usuarioId = Number(user?.id);
   const perfil = user?.role as PerfilUsuario | undefined;
 
-  if (!session || !Number.isFinite(usuarioId) || !perfil) {
-    return null;
+  if (session && Number.isFinite(usuarioId) && perfil) {
+    return { usuarioId, perfil };
   }
 
-  return { usuarioId, perfil };
+  // 2. Se não houver sessão de cookie, verificar o Header Authorization (Bearer)
+  try {
+    let authHeader: string | null = null;
+
+    if (request) {
+      authHeader = request.headers.get("Authorization");
+    } else {
+      // Fallback para leitura dinâmica de headers se estiver rodando no Next.js Server Context
+      const dynamicHeaders = await headers();
+      authHeader = dynamicHeaders.get("Authorization");
+    }
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.substring(7).trim();
+      const secretStr = process.env.AUTH_SECRET;
+      if (!secretStr) {
+        console.error("AUTH_SECRET não está definida no ambiente para validação de Bearer Token.");
+        return null;
+      }
+
+      const secret = new TextEncoder().encode(secretStr);
+      const { payload } = await jwtVerify(token, secret);
+
+      const id = Number(payload.id);
+      const perfil = payload.perfil as PerfilUsuario;
+
+      if (Number.isFinite(id) && perfil) {
+        return { usuarioId: id, perfil };
+      }
+    }
+  } catch (err) {
+    console.warn("Validação do Bearer Token falhou:", err);
+  }
+
+  return null;
 }
 
 export async function requireAuthActor(): Promise<AuthActor> {

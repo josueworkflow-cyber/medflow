@@ -775,6 +775,109 @@ export class EstoqueService {
       return movAtualizada;
     });
   }
+
+  /**
+   * Transfere estoque de um lote/produto de uma localização de origem para uma de destino
+   */
+  static async transferirLote(data: {
+    loteId: number;
+    produtoId: number;
+    localizacaoOrigemId: number;
+    localizacaoDestinoId: number;
+    quantidade: number;
+    motivo: string;
+    usuarioId?: number;
+  }) {
+    return prisma.$transaction(async (tx) => {
+      // 1. Buscar EstoqueAtual da origem pelo produtoId + loteId + localizacaoOrigemId
+      const estoqueOrigem = await tx.estoqueAtual.findFirst({
+        where: {
+          produtoId: data.produtoId,
+          loteId: data.loteId,
+          localizacaoId: data.localizacaoOrigemId,
+        },
+      });
+
+      if (!estoqueOrigem) {
+        throw new Error("Estoque de origem não encontrado.");
+      }
+
+      // 2. Se estoqueOrigem.quantidadeDisponivel < data.quantidade → lançar erro
+      if (estoqueOrigem.quantidadeDisponivel < data.quantidade) {
+        throw new Error("Quantidade insuficiente no estoque de origem.");
+      }
+
+      // 3. Decrementar quantidadeDisponivel da origem
+      await tx.estoqueAtual.update({
+        where: { id: estoqueOrigem.id },
+        data: {
+          quantidadeDisponivel: { decrement: data.quantidade },
+        },
+      });
+
+      // 4. Buscar EstoqueAtual do destino pelo produtoId + loteId + localizacaoDestinoId
+      const estoqueDestino = await tx.estoqueAtual.findFirst({
+        where: {
+          produtoId: data.produtoId,
+          loteId: data.loteId,
+          localizacaoId: data.localizacaoDestinoId,
+        },
+      });
+
+      if (estoqueDestino) {
+        // Se existir → incrementar quantidadeDisponivel
+        await tx.estoqueAtual.update({
+          where: { id: estoqueDestino.id },
+          data: {
+            quantidadeDisponivel: { increment: data.quantidade },
+          },
+        });
+      } else {
+        // Se não existir → criar novo registro
+        await tx.estoqueAtual.create({
+          data: {
+            produtoId: data.produtoId,
+            loteId: data.loteId,
+            localizacaoId: data.localizacaoDestinoId,
+            quantidadeDisponivel: data.quantidade,
+            custoUnitario: estoqueOrigem.custoUnitario,
+            status: 'DISPONIVEL',
+          },
+        });
+      }
+
+      // 5. Criar as duas movimentações de estoque (Saída e Entrada)
+      // Saída da origem
+      await tx.movimentacaoEstoque.create({
+        data: {
+          produtoId: data.produtoId,
+          loteId: data.loteId,
+          tipo: "TRANSFERENCIA",
+          quantidade: -data.quantidade,
+          localizacaoId: data.localizacaoOrigemId,
+          destino: String(data.localizacaoDestinoId),
+          usuarioId: data.usuarioId,
+          observacao: data.motivo,
+        },
+      });
+
+      // Entrada no destino
+      await tx.movimentacaoEstoque.create({
+        data: {
+          produtoId: data.produtoId,
+          loteId: data.loteId,
+          tipo: "TRANSFERENCIA",
+          quantidade: data.quantidade,
+          localizacaoId: data.localizacaoDestinoId,
+          origem: String(data.localizacaoOrigemId),
+          usuarioId: data.usuarioId,
+          observacao: data.motivo,
+        },
+      });
+
+      return { success: true };
+    });
+  }
 }
 
 export const CAMPOS_AUDITAVEIS_MOVIMENTACAO = [
